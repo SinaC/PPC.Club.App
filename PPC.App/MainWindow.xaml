@@ -1,0 +1,43 @@
+﻿<Window x:Class="PPC.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:app="clr-namespace:PPC.App"
+        xmlns:players="clr-namespace:PPC.Players;assembly=PPC.Players"
+        xmlns:tab="clr-namespace:PPC.Tab;assembly=PPC.Tab"
+        xmlns:sale="clr-namespace:PPC.Sale;assembly=PPC.Sale"
+        xmlns:popup="clr-namespace:PPC.Popup;assembly=PPC.Popup"
+        mc:Ignorable="d"
+        SnapsToDevicePixels="True"
+        d:DataContext="{d:DesignInstance app:MainWindowViewModelDesignData, IsDesignTimeCreatable=True}"
+        Title="PPC" Height="600" Width="800">
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type players:PlayersViewModel}">
+            <players:PlayersView DataContext="{Binding}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type sale:SaleViewModel}">
+            <sale:SaleView DataContext="{Binding}"/>
+        </DataTemplate>
+    </Window.Resources>
+    <popup:ModalPopupPresenter x:Name="ModalPopupPresenter">
+        <TabControl TabStripPlacement="Left"
+                    SnapsToDevicePixels="True"
+                    ItemsSource="{Binding Tabs}"
+                    SelectedItem="{Binding SelectedTab}">
+            <TabControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type tab:TabBase}">
+                    <TextBlock Margin="0,5"
+                               Text="{Binding Header}">
+                        <TextBlock.LayoutTransform>
+                            <TransformGroup>
+                                <RotateTransform Angle="-90" />
+                            </TransformGroup>
+                        </TextBlock.LayoutTransform>
+
+                    </TextBlock>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+        </TabControl>
+    </popup:ModalPopupPresenter>
+</Window>

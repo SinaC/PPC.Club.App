@@ -1,0 +1,3 @@
+article DB
+article creation if not found
+closing (SaleViewModel.ClosingConfirmed)
