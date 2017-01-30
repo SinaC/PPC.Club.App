@@ -37,6 +37,7 @@
                            Margin="5,0,0,0">
                     <TextBlock.Style>
                         <Style TargetType="{x:Type TextBlock}">
+                            <Setter Property="VerticalAlignment" Value="Center"/>
                             <Setter Property="Text" Value="BC"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsCash}" Value="True">
