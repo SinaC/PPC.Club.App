@@ -43,6 +43,10 @@
       <DependentUpon>AskNamePopup.xaml</DependentUpon>
     </Compile>
     <Compile Include="AskNamePopupViewModel.cs" />
+    <Compile Include="ErrorPopup.xaml.cs">
+      <DependentUpon>ErrorPopup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ErrorPopupViewModel.cs" />
     <Compile Include="IPopup.cs" />
     <Compile Include="IPopupService.cs" />
     <Compile Include="ISaveNavigationAndFocusPopup.cs" />
@@ -69,6 +73,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="AskNamePopup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ErrorPopup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

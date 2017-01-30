@@ -4,16 +4,18 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Windows;
 using System.Windows.Input;
 using System.Xml;
 using PPC.DataContracts;
 using PPC.MVVM;
+using PPC.Popup;
 
 namespace PPC.Sale
 {
     public class ClientViewModel : ShoppingCartTabBase
     {
+        private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
+
         #region ShoppingCartTabBase
 
         public override string Header => ClientName;
@@ -98,7 +100,8 @@ namespace PPC.Sale
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Cannot save client cart. Exception: {ex}");
+                ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
+                PopupService.DisplayModal(vm, "Error while saving client cart");
             }
         }
     }

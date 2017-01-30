@@ -11,6 +11,11 @@
         <DataTemplate DataType="{x:Type popup:AskNamePopupViewModel}">
             <popup:AskNamePopup DataContext="{Binding}"/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type popup:ErrorPopupViewModel}">
+            <popup:ErrorPopup Width="400"
+                              MaxHeight="300"
+                              DataContext="{Binding}"/>
+        </DataTemplate>
         <!-- Question may be modal -->
         <DataTemplate DataType="{x:Type popup:QuestionPopupViewModel}">
             <popup:QuestionPopup />
@@ -35,7 +40,8 @@
                                            Text="{Binding Title, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"/>
                                 <Button Grid.Column="1"
                                         Click="ButtonClose_Click">
-                                    <TextBlock Text="X"/>
+                                    <TextBlock VerticalAlignment="Center"
+                                               Text="X"/>
                                 </Button>
                             </Grid>
                         </Border>

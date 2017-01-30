@@ -5,14 +5,16 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Windows;
 using System.Xml;
 using PPC.DataContracts;
+using PPC.Popup;
 
 namespace PPC.Sale
 {
     public class ShopViewModel : ShoppingCartTabBase
     {
+        private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
+
         public const string ShopFile = "_shop.xml";
 
         #region ShoppingCartTabBase
@@ -62,11 +64,15 @@ namespace PPC.Sale
                     }).ToList();
                 }
                 else
-                    MessageBox.Show("Shop file not found.");
+                {
+                    ErrorPopupViewModel vm = new ErrorPopupViewModel("Shop file not found");
+                    PopupService.DisplayModal(vm, "Error while loading shop");
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Cannot load shop. Exception: {ex}");
+                ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
+                PopupService.DisplayModal(vm, "Error while loading shop");
             }
         }
 
@@ -94,7 +100,8 @@ namespace PPC.Sale
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Cannot save shop. Exception: {ex}");
+                ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
+                PopupService.DisplayModal(vm, "Error while saving shop");
             }
         }
 

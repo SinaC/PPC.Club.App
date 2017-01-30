@@ -7,9 +7,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("PPC.Sale")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Elia")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("PPC.Sale")]
-[assembly: AssemblyCopyright("Copyright © Elia 2017")]
+[assembly: AssemblyCopyright("Copyright © 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

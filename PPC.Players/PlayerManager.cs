@@ -12,11 +12,10 @@ namespace PPC.Players
         public static List<PlayerModel> Load(string path)
         {
             global::LocalPlayers localPlayers;
-
             using (StreamReader sr = new StreamReader(path))
             {
                 XmlSerializer serializer = new XmlSerializer(typeof(global::LocalPlayers));
-                localPlayers = (global::LocalPlayers)serializer.Deserialize(sr);
+                localPlayers = (global::LocalPlayers) serializer.Deserialize(sr);
             }
 
             return localPlayers.Items.Select(x => new PlayerModel

@@ -72,9 +72,17 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EasyIoc\EasyIoc.csproj">
+      <Project>{38d20e7f-9510-4b80-8755-1def2ef07bcf}</Project>
+      <Name>EasyIoc</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PPC.MVVM\PPC.MVVM.csproj">
       <Project>{10833c79-c3fb-4f70-ad1d-7f0173d01966}</Project>
       <Name>PPC.MVVM</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Popup\PPC.Popup.csproj">
+      <Project>{c06f804c-58a5-48ea-a3b4-935470804b05}</Project>
+      <Name>PPC.Popup</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Tab\PPC.Tab.csproj">
       <Project>{468CB448-EEF9-4693-B487-8B6A7BAA18D8}</Project>

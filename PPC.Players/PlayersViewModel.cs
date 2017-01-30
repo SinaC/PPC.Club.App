@@ -1,13 +1,17 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Windows.Input;
 using PPC.MVVM;
+using PPC.Popup;
 using PPC.Tab;
 
 namespace PPC.Players
 {
     public class PlayersViewModel : TabBase
     {
+        private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
+
         #region TabBase
 
         public override string Header => "Players";
@@ -35,7 +39,15 @@ namespace PPC.Players
 
         private void Load()
         {
-            Players = new ObservableCollection<PlayerModel>(PlayerManager.Load(ConfigurationManager.AppSettings["PlayersPath"]));
+            try
+            {
+                Players = new ObservableCollection<PlayerModel>(PlayerManager.Load(ConfigurationManager.AppSettings["PlayersPath"]));
+            }
+            catch (Exception ex)
+            {
+                ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
+                PopupService.DisplayModal(vm, "Error while loading player file");
+            }
         }
 
         #endregion
@@ -54,8 +66,16 @@ namespace PPC.Players
 
         private void Save()
         {
-            PlayerManager.Save(ConfigurationManager.AppSettings["PlayersPath"], Players);
-            Load(); // crappy workaround to reset row.IsNewItem
+            try
+            {
+                PlayerManager.Save(ConfigurationManager.AppSettings["PlayersPath"], Players);
+                Load(); // crappy workaround to reset row.IsNewItem
+            }
+            catch (Exception ex)
+            {
+                ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
+                PopupService.DisplayModal(vm, "Error while saving player file");
+            }
         }
 
         #endregion

@@ -5,7 +5,6 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Windows;
 using System.Windows.Input;
 using System.Xml;
 using PPC.DataContracts;
@@ -18,13 +17,13 @@ namespace PPC.Sale
 {
     public class SaleViewModel : TabBase
     {
+        private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
+
         #region ShoppingCartTabBase
 
         public override string Header => "Sale";
 
         #endregion
-
-        private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
 
         #region Tab management
         private ObservableCollection<ShoppingCartTabBase> _tabs;
@@ -143,12 +142,16 @@ namespace PPC.Sale
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Cannot load shop. Exception: {ex}");
+                    ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
+                    PopupService.DisplayModal(vm, "Error while loading shop");
                 }
                 ReshreshSoldArticles();
             }
             else
-                MessageBox.Show("Backup path not found");
+            {
+                ErrorPopupViewModel vm = new ErrorPopupViewModel("Backup path not found");
+                PopupService.DisplayModal(vm, "Error while loading shop");
+            }
         }
 
         #endregion
