@@ -93,7 +93,7 @@
                 <TextBlock Grid.Row="1" 
                            Grid.Column="2" 
                            Margin="5,2"
-                           Text="{Binding SelectedArticle.Price, StringFormat={}{0:C}, ConverterCulture=FR-fr}"/>
+                           Text="{Binding SelectedArticle.Price, StringFormat={}{0:C}}"/>
 
                 <!-- +Quantity -->
                 <Button Grid.Row="1" 
@@ -174,7 +174,7 @@
                         <GridViewColumn Header="Quantity" 
                                         DisplayMemberBinding="{Binding Quantity}"/>
                         <GridViewColumn Header="Total" 
-                                        DisplayMemberBinding="{Binding Total, StringFormat={}{0:C}, ConverterCulture=FR-fr}"/>
+                                        DisplayMemberBinding="{Binding Total, StringFormat={}{0:C}}"/>
                     </GridView>
                 </ListView.View>
             </ListView>
@@ -190,7 +190,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="1"
                            Margin="5,2"
-                           Text="{Binding Total, StringFormat={}{0:C}, ConverterCulture=FR-fr}"/>
+                           Text="{Binding Total, StringFormat={}{0:C}}"/>
                 <Button Grid.Column="2"
                         Width="80"
                         Margin="5,2"

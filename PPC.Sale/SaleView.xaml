@@ -137,7 +137,7 @@
             <Expander.Header>
                 <TextBlock>
                     <TextBlock.Text>
-                        <MultiBinding StringFormat="{}#Articles: {0}  Total: {1:C}  Cash: {2:C}  BC: {3:C}" ConverterCulture="FR-fr">
+                        <MultiBinding StringFormat="{}#Articles: {0}  Total: {1:C}  Cash: {2:C}  BC: {3:C}">
                             <Binding Path="SoldArticlesCount"/>
                             <Binding Path="SoldArticlesTotal"/>
                             <Binding Path="SoldArticlesTotalCash"/>
@@ -151,7 +151,7 @@
                     <GridView>
                         <GridViewColumn Header="Ean" DisplayMemberBinding="{Binding Article.Ean}"/>
                         <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Article.Name}"/>
-                        <GridViewColumn Header="Price" DisplayMemberBinding="{Binding Article.Price, StringFormat={}{0:C}, ConverterCulture=FR-fr}"/>
+                        <GridViewColumn Header="Price" DisplayMemberBinding="{Binding Article.Price, StringFormat={}{0:C}}"/>
                         <GridViewColumn Header="#Cash" DisplayMemberBinding="{Binding QuantityCash}"/>
                         <GridViewColumn Header="#BankCard" DisplayMemberBinding="{Binding QuantityBankCard}"/>
                     </GridView>

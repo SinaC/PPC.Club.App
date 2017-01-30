@@ -32,7 +32,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" 
                            Margin="5,0,0,0"
-                           Text="{Binding ShoppingCart.Total, StringFormat={}{0:C}, ConverterCulture=FR-fr}"/>
+                           Text="{Binding ShoppingCart.Total, StringFormat={}{0:C}}"/>
                 <TextBlock Grid.Column="1"
                            Margin="5,0,0,0">
                     <TextBlock.Style>

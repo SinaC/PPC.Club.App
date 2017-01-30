@@ -191,14 +191,20 @@ namespace PPC.Sale
             // TODO: 
             // compute sold articles and write them to file
             // remove backupfiles
+            PopupService.DisplayMessages(new List<string>
+            {
+                $"#Articles sold: {SoldArticlesCount} for a total of {SoldArticlesTotal:C}",
+                $"Cash: {SoldArticlesTotalCash:C}",
+                $"Bank card: {SoldArticlesTotalBankCard:C}"
+            });
         }
 
         #endregion
 
         public int SoldArticlesCount => SoldArticles?.Sum(x => x.QuantityBankCard + x.QuantityCash) ?? 0;
         public double SoldArticlesTotal => SoldArticles?.Sum(x => x.Total) ?? 0;
-        public double SoldArticlesTotalBankCard => SoldArticles?.Sum(x => x.TotalBankCard) ?? 0;
         public double SoldArticlesTotalCash => SoldArticles?.Sum(x => x.TotalCash) ?? 0;
+        public double SoldArticlesTotalBankCard => SoldArticles?.Sum(x => x.TotalBankCard) ?? 0;
 
         public SaleViewModel()
         {
