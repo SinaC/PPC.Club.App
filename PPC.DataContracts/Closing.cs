@@ -4,10 +4,10 @@ using System.Runtime.Serialization;
 namespace PPC.DataContracts
 {
     [DataContract]
-    public class Shop
+    public class Closing
     {
         [DataMember]
-        public List<Item> Articles { get; set; }
+        public List<FullArticle> Articles { get; set; }
         [DataMember]
         public double Cash { get; set; }
         [DataMember]

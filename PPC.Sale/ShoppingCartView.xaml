@@ -4,26 +4,22 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PPC.Sale"
+             xmlns:dataContracts="clr-namespace:PPC.DataContracts;assembly=PPC.DataContracts"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:ShoppingCartViewModelDesignData, IsDesignTimeCreatable=True}"
              d:DesignHeight="300" d:DesignWidth="800">
     <Grid FocusManager.FocusedElement="{Binding ElementName=EanTextBox}">
         <Grid.InputBindings>
             <KeyBinding Key="Return" 
-                        Command="{Binding InputCommand}"
-                        CommandParameter="{x:Static Key.Return}"/>
+                        Command="{Binding AddSelectedArticleCommand}"/>
             <KeyBinding Key="Add" 
-                        Command="{Binding InputCommand}"
-                        CommandParameter="{x:Static Key.Add}"/>
+                        Command="{Binding IncrementSelectedArticleCommand}"/>
             <KeyBinding Key="Subtract" 
-                        Command="{Binding InputCommand}"
-                        CommandParameter="{x:Static Key.Subtract}"/>
+                        Command="{Binding DecrementSelectedArticleCommand}"/>
             <KeyBinding Key="C" 
-                        Command="{Binding InputCommand}"
-                        CommandParameter="{x:Static Key.C}"/>
+                        Command="{Binding CashCommand}"/>
             <KeyBinding Key="B" 
-                        Command="{Binding InputCommand}"
-                        CommandParameter="{x:Static Key.B}"/>
+                        Command="{Binding BankCardCommand}"/>
         </Grid.InputBindings>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -53,37 +49,44 @@
                            Grid.Column="0"
                            Margin="5,2"
                            Text="EAN"/>
-                <TextBox x:Name="EanTextBox"
-                         Grid.Row="1" 
-                         Grid.Column="0" 
-                         Width="100"
-                         Margin="5,2"
-                         MaxLength="13"
-                         Text="{Binding Ean, UpdateSourceTrigger=PropertyChanged}">
-                    <!--<TextBox.InputBindings>
-                        <KeyBinding Key="Return" 
-                                    Command="{Binding EnterCommand}"/>
-                    </TextBox.InputBindings>-->
-                </TextBox>
+                <StackPanel Grid.Row="1" 
+                             Grid.Column="0" 
+                             Orientation="Vertical">
+                    <TextBox x:Name="EanTextBox"
+                             Width="100"
+                             VerticalAlignment="Top"
+                             Margin="5,2"
+                             MaxLength="13"
+                             Text="{Binding Ean, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Margin="5,2"
+                            Command="{Binding CreateArticleCommand}">
+                        <TextBlock Text="New article"/>
+                    </Button>
+                </StackPanel>
 
                 <!-- Article -->
                 <TextBlock Grid.Row="0" 
                            Grid.Column="1" 
                            Margin="5,2"
                            Text="Article"/>
-                <!-- TODO: hierarchical combobox -->
-                <ComboBox Grid.Row="1" 
-                          Grid.Column="1" 
-                          Width="300"
-                          Margin="5,2"
-                          ItemsSource="{Binding Articles}"
-                          SelectedItem="{Binding SelectedArticle}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate DataType="{x:Type local:Article}">
-                            <TextBlock Text="{Binding Name}"/>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+                <StackPanel Grid.Row="1" 
+                            Grid.Column="1" 
+                            Orientation="Vertical">
+                    <ComboBox Width="300"
+                              Margin="5,2"
+                              ItemsSource="{Binding Categories}"
+                              SelectedItem="{Binding SelectedCategory}"/>
+                    <ComboBox Width="300"
+                              Margin="5,2"
+                              ItemsSource="{Binding Articles}"
+                              SelectedItem="{Binding SelectedArticle}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type dataContracts:Article}">
+                                <TextBlock Text="{Binding Description}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
 
                 <!-- Price -->
                 <TextBlock Grid.Row="0" 
@@ -92,12 +95,14 @@
                            Text="Price"/>
                 <TextBlock Grid.Row="1" 
                            Grid.Column="2" 
+                           VerticalAlignment="Top"
                            Margin="5,2"
                            Text="{Binding SelectedArticle.Price, StringFormat={}{0:C}}"/>
 
                 <!-- +Quantity -->
                 <Button Grid.Row="1" 
                         Grid.Column="3" 
+                        VerticalAlignment="Top"
                         Width="20"
                         Margin="5,2"
                         Command="{Binding IncrementSelectedArticleCommand}">
@@ -107,25 +112,39 @@
                 <!-- -Quantity -->
                 <Button Grid.Row="1" 
                         Grid.Column="4" 
+                        VerticalAlignment="Top"
                         Width="20"
                         Margin="5,2"
                         Command="{Binding DecrementSelectedArticleCommand}">
                     <TextBlock Text="-"/>
                 </Button>
 
+                <!-- Edit article -->
+                <Button Grid.Row="1"
+                        Grid.Column="2"
+                        Grid.ColumnSpan="3"
+                        Margin="5,2"
+                        VerticalAlignment="Bottom"
+                        Command="{Binding EditArticleCommand}">
+                    <TextBlock Text="Edit Article"/>
+                </Button>
+
                 <!-- Quantity -->
                 <TextBlock Grid.Row="0" 
                            Grid.Column="5"
+                           VerticalAlignment="Top"
                            Margin="5,2"
                            Text="Quantity"/>
                 <TextBox Grid.Row="1" 
                          Grid.Column="5" 
+                         VerticalAlignment="Top"
                          Margin="5,2"
                          Text="{Binding Quantity}"/>
 
                 <!-- Add article -->
                 <Button Grid.Row="1" 
                         Grid.Column="6" 
+                        VerticalAlignment="Top"
                         Width="80"
                         Margin="5,2"
                         Command="{Binding AddSelectedArticleCommand}">
@@ -170,9 +189,11 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                         <GridViewColumn Header="Name"
-                                        DisplayMemberBinding="{Binding Article.Name}"/>
+                                        DisplayMemberBinding="{Binding Article.Description}"/>
                         <GridViewColumn Header="Quantity" 
                                         DisplayMemberBinding="{Binding Quantity}"/>
+                        <GridViewColumn Header="Price" 
+                                        DisplayMemberBinding="{Binding Article.Price, StringFormat={}{0:C}}"/>
                         <GridViewColumn Header="Total" 
                                         DisplayMemberBinding="{Binding Total, StringFormat={}{0:C}}"/>
                     </GridView>

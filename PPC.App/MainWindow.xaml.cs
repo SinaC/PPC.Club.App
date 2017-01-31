@@ -12,9 +12,9 @@ namespace PPC.App
         {
             InitializeComponent();
 
-            DataContext = new MainWindowViewModel();
-
             EasyIoc.IocContainer.Default.RegisterInstance<IPopupService>(ModalPopupPresenter);
+
+            DataContext = new MainWindowViewModel();
         }
     }
 }

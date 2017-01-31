@@ -55,7 +55,18 @@ namespace PPC.Popup
             Guid = Guid.NewGuid();
         }
 
-        private void Thumb_OnDragDelta(object sender, DragDeltaEventArgs e)
+        private void ThumbResize_OnDragDelta(object sender, DragDeltaEventArgs e)
+        {
+            double yadjust = ActualHeight + e.VerticalChange;
+            double xadjust = ActualWidth + e.HorizontalChange;
+            if (xadjust >= 0 && yadjust >= 0)
+            {
+                Width = xadjust;
+                Height = yadjust;
+            }
+        }
+
+        private void ThumbMove_OnDragDelta(object sender, DragDeltaEventArgs e)
         {
             PopupService.Move(this, e.HorizontalChange, e.VerticalChange);
         }

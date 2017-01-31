@@ -5,6 +5,8 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Text;
+using System.Windows;
 using System.Windows.Input;
 using System.Xml;
 using PPC.DataContracts;
@@ -117,26 +119,8 @@ namespace PPC.Sale
                     //  add backup clients
                     foreach (string filename in Directory.GetFiles(ConfigurationManager.AppSettings["BackupPath"], "*.xml", SearchOption.TopDirectoryOnly).Where(x => !x.Contains(ShopViewModel.ShopFile)))
                     {
-                        ClientCart cart;
-                        using (XmlTextReader reader = new XmlTextReader(filename))
-                        {
-                            DataContractSerializer serializer = new DataContractSerializer(typeof(ClientCart));
-                            cart = (ClientCart) serializer.ReadObject(reader);
-                        }
-                        ClientViewModel client = new ClientViewModel(ReshreshSoldArticles, ReshreshSoldArticles)
-                        {
-                            ClientName = cart.Name,
-                            IsCash = cart.IsCash,
-                            IsPaid = cart.IsPaid,
-                            ShoppingCart =
-                            {
-                                ShoppingCartArticles = new ObservableCollection<ShoppingCartArticleItem>(cart.Articles.Select(x => new ShoppingCartArticleItem
-                                {
-                                    Article = FakeArticleDb.Articles.FirstOrDefault(a => a.Ean == x.Ean), // TODO: search DB
-                                    Quantity = x.Quantity
-                                }))
-                            },
-                        };
+                        ClientViewModel client = new ClientViewModel(ReshreshSoldArticles, ReshreshSoldArticles);
+                        client.Load(filename);
                         Tabs.Add(client);
                     }
                 }
@@ -188,26 +172,70 @@ namespace PPC.Sale
 
         private void ClosingConfirmed()
         {
-            // TODO: 
-            // compute sold articles and write them to file
-            // remove backupfiles
-            PopupService.DisplayMessages(new List<string>
+            try
             {
-                $"#Articles sold: {SoldArticlesCount} for a total of {SoldArticlesTotal:C}",
-                $"Cash: {SoldArticlesTotalCash:C}",
-                $"Bank card: {SoldArticlesTotalBankCard:C}"
-            });
+                Closing closing = new Closing
+                {
+                    Articles = SoldArticles.Select(x => new FullArticle
+                    {
+                        Guid = x.Article.Guid,
+                        Ean = x.Article.Ean,
+                        Description = x.Article.Description,
+                        Price = x.Article.Price,
+                        Quantity = x.Quantity
+                    }).ToList()
+                };
+                string filename = ConfigurationManager.AppSettings["ClosingPath"];
+                using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
+                {
+                    writer.Formatting = Formatting.Indented;
+                    DataContractSerializer serializer = new DataContractSerializer(typeof(Closing));
+                    serializer.WriteObject(writer, closing);
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorPopupViewModel vm = new ErrorPopupViewModel($"Cannot save new articles. Exception: {ex}");
+                PopupService.DisplayModal(vm, "Error");
+            }
+            Application.Current.Shutdown();
         }
 
         #endregion
 
-        public int SoldArticlesCount => SoldArticles?.Sum(x => x.QuantityBankCard + x.QuantityCash) ?? 0;
-        public double SoldArticlesTotal => SoldArticles?.Sum(x => x.Total) ?? 0;
-        public double SoldArticlesTotalCash => SoldArticles?.Sum(x => x.TotalCash) ?? 0;
-        public double SoldArticlesTotalBankCard => SoldArticles?.Sum(x => x.TotalBankCard) ?? 0;
+        private int _soldArticlesCount;
+        public int SoldArticlesCount
+        {
+            get { return _soldArticlesCount; }
+            set { Set(() => SoldArticlesCount, ref _soldArticlesCount, value); }
+        }
+
+        private double _soldArticlesTotal;
+        public double SoldArticlesTotal
+        {
+            get { return _soldArticlesTotal; }
+            set { Set(() => SoldArticlesTotal, ref _soldArticlesTotal, value); }
+        }
+
+        private double _soldArticlesTotalCash;
+        public double SoldArticlesTotalCash
+        {
+            get { return _soldArticlesTotalCash; }
+            set { Set(() => SoldArticlesTotalCash, ref _soldArticlesTotalCash, value); }
+        }
+
+        private double _soldArticlesTotalBankCard;
+        public double SoldArticlesTotalBankCard
+        {
+            get { return _soldArticlesTotalBankCard; }
+            set { Set(() => SoldArticlesTotalBankCard, ref _soldArticlesTotalBankCard, value); }
+        }
 
         public SaleViewModel()
         {
+            ArticleDb.Load();
+
+            //
             Shop = new ShopViewModel(ReshreshSoldArticles);
             Tabs = new ObservableCollection<ShoppingCartTabBase>
             {
@@ -218,53 +246,52 @@ namespace PPC.Sale
 
         private void ReshreshSoldArticles()
         {
-            Dictionary<string, SoldArticleItem> soldItems = new Dictionary<string, SoldArticleItem>();
+            double totalCash = 0;
+            double totalBankCard = 0;
+            Dictionary<Guid, SoldArticleItem> soldItems = new Dictionary<Guid, SoldArticleItem>();
             // Gather sold items in current shopping cart
-            foreach (ShopArticleItem item in Shop.SoldArticles)
+            foreach (SoldArticleItem item in Shop.SoldArticles)
             {
                 SoldArticleItem soldItem;
-                if (!soldItems.TryGetValue(item.Article.Ean, out soldItem))
+                if (!soldItems.TryGetValue(item.Article.Guid, out soldItem))
                 {
                     soldItem = new SoldArticleItem
                     {
                         Article = item.Article,
-                        QuantityCash = 0,
-                        QuantityBankCard = 0
+                        Quantity = 0
                     };
-                    soldItems.Add(item.Article.Ean, soldItem);
+                    soldItems.Add(item.Article.Guid, soldItem);
                 }
-                if (item.IsCash)
-                    soldItem.QuantityCash += item.Quantity;
-                else
-                    soldItem.QuantityBankCard += item.Quantity;
+                soldItem.Quantity += item.Quantity;
             }
+            totalCash += Shop.Cash;
+            totalBankCard += Shop.BankCard;
             // Gather sold items in closed client shopping carts
             foreach (ClientViewModel client in Tabs.OfType<ClientViewModel>().Where(x => x.IsPaid))
             {
                 foreach (ShoppingCartArticleItem item in client.ShoppingCart.ShoppingCartArticles)
                 {
                     SoldArticleItem soldItem;
-                    if (!soldItems.TryGetValue(item.Article.Ean, out soldItem))
+                    if (!soldItems.TryGetValue(item.Article.Guid, out soldItem))
                     {
                         soldItem = new SoldArticleItem
                         {
                             Article = item.Article,
-                            QuantityCash = 0,
-                            QuantityBankCard = 0
+                            Quantity = 0,
                         };
-                        soldItems.Add(item.Article.Ean, soldItem);
+                        soldItems.Add(item.Article.Guid, soldItem);
                     }
-                    if (client.IsCash)
-                        soldItem.QuantityCash += item.Quantity;
-                    else
-                        soldItem.QuantityBankCard += item.Quantity;
+                    soldItem.Quantity += item.Quantity;
                 }
+                totalCash += client.Cash;
+                totalBankCard += client.BankCard;
             }
             SoldArticles = soldItems.Values.ToList();
-            RaisePropertyChanged(() => SoldArticlesCount);
-            RaisePropertyChanged(() => SoldArticlesTotal);
-            RaisePropertyChanged(() => SoldArticlesTotalBankCard);
-            RaisePropertyChanged(() => SoldArticlesTotalCash);
+
+            SoldArticlesCount = SoldArticles.Sum(x => x.Quantity);
+            SoldArticlesTotal = SoldArticles.Sum(x => x.Total);
+            SoldArticlesTotalCash = totalCash;
+            SoldArticlesTotalBankCard = totalBankCard;
         }
     }
 

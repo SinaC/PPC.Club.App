@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -25,6 +26,12 @@ namespace PPC.Helpers
                 collection.Remove(itemToRemove);
 
             return itemsToRemove.Length;
+        }
+
+        public static void AddRange<T>(this ObservableCollection<T> collection, IEnumerable<T> items)
+        {
+            foreach(T item in items)
+                collection.Add(item);
         }
     }
 }

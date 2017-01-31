@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Configuration;
 using System.IO;
 using System.Linq;
@@ -7,15 +7,17 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
 using PPC.DataContracts;
+using PPC.Helpers;
 using PPC.Popup;
 
 namespace PPC.Sale
 {
     public class ShopViewModel : ShoppingCartTabBase
     {
-        private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
-
         public const string ShopFile = "_shop.xml";
+
+        private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
+        private readonly Action _cartPaidAction;
 
         #region ShoppingCartTabBase
 
@@ -23,25 +25,7 @@ namespace PPC.Sale
 
         #endregion
 
-        private readonly Action _cardPaidAction;
-
-        private ShoppingCartViewModel _shoppingCart;
-        public ShoppingCartViewModel ShoppingCart
-        {
-            get { return _shoppingCart; }
-            set { Set(() => ShoppingCart, ref _shoppingCart, value); }
-        }
-
-        public List<ShopArticleItem> SoldArticles { get; protected set; }
-
-        public ShopViewModel(Action cartPaidAction)
-        {
-            _cardPaidAction = cartPaidAction;
-            IsPaid = false;
-
-            SoldArticles = new List<ShopArticleItem>();
-            ShoppingCart = new ShoppingCartViewModel(CartPaid);
-        }
+        public ObservableCollection<SoldArticleItem> SoldArticles { get; }
 
         public void Load()
         {
@@ -54,14 +38,16 @@ namespace PPC.Sale
                     using (XmlTextReader reader = new XmlTextReader(filename))
                     {
                         DataContractSerializer serializer = new DataContractSerializer(typeof(Shop));
-                        shop = (Shop) serializer.ReadObject(reader);
+                        shop = (Shop)serializer.ReadObject(reader);
                     }
-                    SoldArticles = shop.Articles.Select(x => new ShopArticleItem
+                    SoldArticles.Clear();
+                    SoldArticles.AddRange(shop.Articles.Select(x => new SoldArticleItem
                     {
-                        Article = FakeArticleDb.Articles.FirstOrDefault(a => a.Ean == x.Ean), // TODO: search DB
+                        Article = ArticleDb.Articles.FirstOrDefault(a => a.Guid == x.Guid),
                         Quantity = x.Quantity,
-                        IsCash = x.IsCash
-                    }).ToList();
+                    }));
+                    Cash = shop.Cash;
+                    BankCard = shop.BankCard;
                 }
                 else
                 {
@@ -76,6 +62,47 @@ namespace PPC.Sale
             }
         }
 
+        public ShopViewModel(Action cartPaidAction)
+        {
+            IsPaid = false; // always false
+
+            _cartPaidAction = cartPaidAction;
+
+            SoldArticles = new ObservableCollection<SoldArticleItem>();
+            ShoppingCart = new ShoppingCartViewModel(Payment);
+        }
+
+        private void Payment(double cash, double bankCard)
+        {
+            // Add shopping cart articles to sold articles
+            foreach (ShoppingCartArticleItem shoppingCartArticle in ShoppingCart.ShoppingCartArticles)
+            {
+                SoldArticleItem soldArticle = SoldArticles.FirstOrDefault(x => x.Article.Guid == shoppingCartArticle.Article.Guid);
+                if (soldArticle == null)
+                {
+                    soldArticle = new SoldArticleItem
+                    {
+                        Article = shoppingCartArticle.Article
+                    };
+                    SoldArticles.Add(soldArticle);
+                }
+                soldArticle.Quantity += shoppingCartArticle.Quantity;
+            }
+
+            // Add cash/bank card
+            Cash += cash;
+            BankCard += BankCard;
+
+            // Clear shopping cart
+            ShoppingCart.Clear();
+
+            // Save
+            Save();
+
+            // Call cart paid action
+            _cartPaidAction();
+        }
+
         private void Save()
         {
             try
@@ -84,16 +111,18 @@ namespace PPC.Sale
                     Directory.CreateDirectory(ConfigurationManager.AppSettings["BackupPath"]);
                 Shop shop = new Shop
                 {
-                    Articles = SoldArticles.Select(x => new SoldArticle
+                    Articles = SoldArticles.Select(x => new Item
                     {
-                        Ean = x.Article.Ean,
+                        Guid = x.Article.Guid,
                         Quantity = x.Quantity,
-                        IsCash = x.IsCash
-                    }).ToList()
+                    }).ToList(),
+                    Cash = Cash,
+                    BankCard = BankCard
                 };
                 string filename = $"{ConfigurationManager.AppSettings["BackupPath"]}{ShopFile}";
                 using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
                 {
+                    writer.Formatting = Formatting.Indented;
                     DataContractSerializer serializer = new DataContractSerializer(typeof(Shop));
                     serializer.WriteObject(writer, shop);
                 }
@@ -104,21 +133,6 @@ namespace PPC.Sale
                 PopupService.DisplayModal(vm, "Error while saving shop");
             }
         }
-
-        private void CartPaid(bool isCash)
-        {
-
-            SoldArticles.AddRange(ShoppingCart.ShoppingCartArticles.Select(x => new ShopArticleItem
-            {
-                Article = x.Article,
-                Quantity = x.Quantity,
-                IsCash = isCash
-            }));
-            Save();
-            RaisePropertyChanged(() => SoldArticles);
-            ShoppingCart.Clear();
-            _cardPaidAction();
-        }
     }
 
     public class ShopViewModelDesignData : ShopViewModel
@@ -126,33 +140,41 @@ namespace PPC.Sale
         public ShopViewModelDesignData() : base(() => { })
         {
             ShoppingCart = new ShoppingCartViewModelDesignData();
-            SoldArticles = new List<ShopArticleItem>
+            SoldArticles.AddRange( new []
             {
-                new ShopArticleItem
+                new SoldArticleItem
                 {
-                    Article = FakeArticleDb.Articles[0],
+                    Article = new Article
+                    {
+                        Ean = "1111111",
+                        Description = "Article1",
+                        Price = 10
+                    },
                     Quantity = 7,
-                    IsCash = true
                 },
-                new ShopArticleItem
+                new SoldArticleItem
                 {
-                    Article = FakeArticleDb.Articles[0],
-                    Quantity = 3,
-                    IsCash = false
-                },
-                new ShopArticleItem
-                {
-                    Article = FakeArticleDb.Articles[1],
+                    Article = new Article
+                    {
+                        Ean = "222222222",
+                        Description = "Article2",
+                        Price = 20
+                    },
                     Quantity = 5,
-                    IsCash = false
                 },
-                new ShopArticleItem
+                new SoldArticleItem
                 {
-                    Article = FakeArticleDb.Articles[2],
+                    Article = new Article
+                    {
+                        Ean = "33333333",
+                        Description = "Article3",
+                        Price = 30
+                    },
                     Quantity = 3,
-                    IsCash = true
                 }
-            };
+            });
+            Cash = 47;
+            BankCard = 28;
         }
     }
 }

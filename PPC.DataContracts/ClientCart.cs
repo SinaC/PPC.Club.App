@@ -7,12 +7,14 @@ namespace PPC.DataContracts
     public class ClientCart
     {
         [DataMember]
-        public string Name { get; set; }
+        public string ClientName { get; set; }
         [DataMember]
-        public List<SoldArticle> Articles { get; set; }
+        public List<Item> Articles { get; set; }
         [DataMember]
         public bool IsPaid { get; set; }
         [DataMember]
-        public bool IsCash { get; set; }
+        public double Cash { get; set; }
+        [DataMember]
+        public double BankCard { get; set; }
     }
 }

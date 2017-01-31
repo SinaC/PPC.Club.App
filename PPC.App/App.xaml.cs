@@ -1,7 +1,11 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Markup;
+using PPC.Popup;
 
 namespace PPC.App
 {

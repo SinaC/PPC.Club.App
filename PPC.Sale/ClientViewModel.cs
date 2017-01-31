@@ -7,6 +7,7 @@ using System.Text;
 using System.Windows.Input;
 using System.Xml;
 using PPC.DataContracts;
+using PPC.Helpers;
 using PPC.MVVM;
 using PPC.Popup;
 
@@ -15,6 +16,9 @@ namespace PPC.Sale
     public class ClientViewModel : ShoppingCartTabBase
     {
         private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
+
+        private readonly Action _cartPaidAction;
+        private readonly Action _cartReopenedAction;
 
         #region ShoppingCartTabBase
 
@@ -29,13 +33,6 @@ namespace PPC.Sale
             set { Set(() => ClientName, ref _clientName, value); }
         }
 
-        private bool _isCash;
-        public bool IsCash
-        {
-            get { return _isCash; }
-            set { Set(() => IsCash, ref _isCash, value); }
-        }
-
         private ICommand _reOpenCommand;
         public ICommand ReOpenCommand => _reOpenCommand = _reOpenCommand ?? new RelayCommand(ReOpen);
         private void ReOpen()
@@ -45,23 +42,27 @@ namespace PPC.Sale
             Save();
         }
 
-        private ShoppingCartViewModel _shoppingCart;
-        public ShoppingCartViewModel ShoppingCart
+        public void Load(string filename)
         {
-            get { return _shoppingCart; }
-            private set { Set(() => ShoppingCart, ref _shoppingCart, value); }
-        }
+            ClientCart cart;
+            using (XmlTextReader reader = new XmlTextReader(filename))
+            {
+                DataContractSerializer serializer = new DataContractSerializer(typeof(ClientCart));
+                cart = (ClientCart)serializer.ReadObject(reader);
+            }
+            ClientName = cart.ClientName;
+            IsPaid = cart.IsPaid;
+            Cash = cart.Cash;
+            BankCard = cart.BankCard;
+            ShoppingCart.ShoppingCartArticles.Clear();
+            ShoppingCart.ShoppingCartArticles.AddRange(cart.Articles.Select(x => new ShoppingCartArticleItem
+            {
+                Article = ArticleDb.Articles.FirstOrDefault(a => a.Guid == x.Guid),
+                Quantity = x.Quantity
+            }));
 
-        private void CartPaid(bool isCash)
-        {
-            IsPaid = true;
-            IsCash = isCash;
-            _cartPaidAction();
-            Save();
+            RaisePropertyChanged(() => Header);
         }
-
-        private readonly Action _cartPaidAction;
-        private readonly Action _cartReopenedAction;
 
         public ClientViewModel(Action cartPaidAction, Action cartReopenedAction)
         {
@@ -70,7 +71,16 @@ namespace PPC.Sale
 
             IsPaid = false;
 
-            ShoppingCart = new ShoppingCartViewModel(CartPaid, Save);
+            ShoppingCart = new ShoppingCartViewModel(Payment, Save);
+        }
+
+        private void Payment(double cash, double bankCard)
+        {
+            IsPaid = true;
+            Cash = cash;
+            BankCard = bankCard;
+            _cartPaidAction();
+            Save();
         }
 
         private void Save()
@@ -81,19 +91,20 @@ namespace PPC.Sale
                     Directory.CreateDirectory(ConfigurationManager.AppSettings["BackupPath"]);
                 ClientCart cart = new ClientCart
                 {
-                    Name = Header,
+                    ClientName = ClientName,
                     IsPaid = IsPaid,
-                    IsCash = IsCash,
-                    Articles = ShoppingCart.ShoppingCartArticles.Select(x => new SoldArticle
+                    Cash = Cash,
+                    BankCard = BankCard,
+                    Articles = ShoppingCart.ShoppingCartArticles.Select(x => new Item
                     {
-                        Ean = x.Article.Ean,
+                        Guid = x.Article.Guid,
                         Quantity = x.Quantity,
-                        IsCash = IsCash // irrelevant if IsPaid is false
                     }).ToList()
                 };
                 string filename = $"{ConfigurationManager.AppSettings["BackupPath"]}{Header.ToLowerInvariant()}.xml";
                 using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
                 {
+                    writer.Formatting = Formatting.Indented;
                     DataContractSerializer serializer = new DataContractSerializer(typeof(ClientCart));
                     serializer.WriteObject(writer, cart);
                 }
@@ -112,7 +123,8 @@ namespace PPC.Sale
 
         {
             IsPaid = true;
-            IsCash = false;
+            Cash = 15;
+            BankCard = 20;
         }
     }
 }

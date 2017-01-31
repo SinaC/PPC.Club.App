@@ -20,7 +20,8 @@
             <sale:SaleView DataContext="{Binding}"/>
         </DataTemplate>
     </Window.Resources>
-    <popup:ModalPopupPresenter x:Name="ModalPopupPresenter">
+    <popup:ModalPopupPresenter x:Name="ModalPopupPresenter"
+                               OverlayBrush="Transparent">
         <TabControl TabStripPlacement="Left"
                     SnapsToDevicePixels="True"
                     ItemsSource="{Binding Tabs}"

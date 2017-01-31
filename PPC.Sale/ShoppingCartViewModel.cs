@@ -1,16 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Configuration;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Text;
 using System.Windows.Input;
+using System.Xml;
+using PPC.DataContracts;
+using PPC.Helpers;
 using PPC.MVVM;
+using PPC.Popup;
 
 namespace PPC.Sale
 {
     public class ShoppingCartViewModel : ObservableObject
     {
-        private readonly Action<bool> _cartPaidAction;
+        private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
+
+        private readonly Action<double, double> _paymentAction;
         private readonly Action _cartModifiedAction;
+
+        public IEnumerable<Article> Articles => (SelectedCategory == null ? ArticleDb.Articles : ArticleDb.Articles.Where(x => x.Category == SelectedCategory)).OrderBy(x => x.Description);
+        public IEnumerable<string> Categories => ArticleDb.Articles.GroupBy(x => x.Category, (category, articles) => category);
+        public IEnumerable<string> Producers => ArticleDb.Articles.GroupBy(x => x.Producer, (producer, articles) => producer);
+
+        #region Cart articles
+
+        public ObservableCollection<ShoppingCartArticleItem> ShoppingCartArticles { get; }
+        public double Total => ShoppingCartArticles.Sum(x => x.Total);
+
+        #endregion
+
+        #region Ean
 
         private string _ean;
         public string Ean
@@ -23,7 +46,13 @@ namespace PPC.Sale
                     if (_ean != null)
                     {
                         if (_ean.Length == 13)
-                            SelectedArticle = FakeArticleDb.Articles.FirstOrDefault(x => x.Ean == _ean);
+                        {
+                            Article article = ArticleDb.Articles.FirstOrDefault(x => x.Ean == _ean);
+                            if (article != null)
+                                SelectedArticle = article;
+                            else
+                                DisplayCreateArticlePopup();
+                        }
                         else
                             SelectedArticle = null;
                     }
@@ -31,7 +60,21 @@ namespace PPC.Sale
             }
         }
 
-        public IEnumerable<Article> Articles => FakeArticleDb.Articles; // TODO: hierarchical article list
+        #endregion
+
+        #region Selected article
+
+        private string _selectedCategory;
+        public string SelectedCategory
+        {
+            get { return _selectedCategory;}
+            set
+            {
+                if (Set(() => SelectedCategory, ref _selectedCategory, value))
+                    RaisePropertyChanged(() => Articles);
+            }
+        }
+
 
         private Article _selectedArticle;
         public Article SelectedArticle
@@ -50,6 +93,10 @@ namespace PPC.Sale
             }
         }
 
+        #endregion
+
+        #region Quantity
+
         private int? _quantity;
         public int? Quantity
         {
@@ -57,29 +104,9 @@ namespace PPC.Sale
             set { Set(() => Quantity, ref _quantity, value); }
         }
 
-        private ICommand _inputCommand;
-        public ICommand InputCommand => _inputCommand = _inputCommand ?? new RelayCommand<Key>(Input);
-        protected virtual void Input(Key key)
-        {
-            switch (key)
-            {
-                case Key.Return:
-                    AddSelectedArticleCommand.Execute(null);
-                    break;
-                case Key.Add:
-                    IncrementSelectedArticleCommand.Execute(null);
-                    break;
-                case Key.Subtract:
-                    _decrementSelectedArticleCommand.Execute(null);
-                    break;
-                case Key.C:
-                    CashCommand.Execute(null);
-                    break;
-                case Key.B:
-                    BankCardCommand.Execute(null);
-                    break;
-            }
-        }
+        #endregion
+
+        #region Increment selected article
 
         private ICommand _incrementSelectedArticleCommand;
         public ICommand IncrementSelectedArticleCommand => _incrementSelectedArticleCommand = _incrementSelectedArticleCommand ?? new RelayCommand(IncrementSelectedArticle);
@@ -92,6 +119,10 @@ namespace PPC.Sale
             else
                 Quantity++;
         }
+
+        #endregion
+
+        #region Decrement selected article
 
         private ICommand _decrementSelectedArticleCommand;
         public ICommand DecrementSelectedArticleCommand => _decrementSelectedArticleCommand = _decrementSelectedArticleCommand ?? new RelayCommand(DecrementSelectedArticle);
@@ -108,6 +139,10 @@ namespace PPC.Sale
             }
         }
 
+        #endregion
+
+        #region Add selected article in cart
+
         private ICommand _addSelectedArticleCommand;
         public ICommand AddSelectedArticleCommand => _addSelectedArticleCommand = _addSelectedArticleCommand ?? new RelayCommand(AddSelectedArticle);
         private void AddSelectedArticle()
@@ -116,7 +151,7 @@ namespace PPC.Sale
                 return;
             if (!Quantity.HasValue || Quantity.Value == 0)
                 return;
-            ShoppingCartArticleItem article = ShoppingCartArticles.FirstOrDefault(x => x.Article.Ean == SelectedArticle.Ean);
+            ShoppingCartArticleItem article = ShoppingCartArticles.FirstOrDefault(x => x.Article.Guid == SelectedArticle.Guid);
             if (article == null)
             {
                 article = new ShoppingCartArticleItem
@@ -131,11 +166,12 @@ namespace PPC.Sale
             _cartModifiedAction?.Invoke();
         }
 
-        public ObservableCollection<ShoppingCartArticleItem> ShoppingCartArticles { get; set; }
+        #endregion
+
+        #region Delete article from cart
 
         private ICommand _deleteArticleCommand;
         public ICommand DeleteArticleCommand => _deleteArticleCommand = _deleteArticleCommand ?? new RelayCommand<ShoppingCartArticleItem>(DeleteArticle);
-
         private void DeleteArticle(ShoppingCartArticleItem item)
         {
             ShoppingCartArticles.Remove(item);
@@ -143,9 +179,12 @@ namespace PPC.Sale
             _cartModifiedAction?.Invoke();
         }
 
+        #endregion
+
+        #region Increment article in cart
+
         private ICommand _incrementArticleCommand;
         public ICommand IncrementArticleCommand => _incrementArticleCommand = _incrementArticleCommand ?? new RelayCommand<ShoppingCartArticleItem>(IncrementArticle);
-
         private void IncrementArticle(ShoppingCartArticleItem item)
         {
             item.Quantity++;
@@ -153,9 +192,12 @@ namespace PPC.Sale
             _cartModifiedAction?.Invoke();
         }
 
+        #endregion
+
+        #region Decrement article in cart
+
         private ICommand _decrementArticleCommand;
         public ICommand DecrementArticleCommand => _decrementArticleCommand = _decrementArticleCommand ?? new RelayCommand<ShoppingCartArticleItem>(DecrementArticle);
-
         private void DecrementArticle(ShoppingCartArticleItem item)
         {
             if (item.Quantity == 1)
@@ -168,11 +210,115 @@ namespace PPC.Sale
             _cartModifiedAction?.Invoke();
         }
 
+        #endregion
+
+        #region Payment
+
+        #region Cash payment
+
         private ICommand _cashCommand;
-        public ICommand CashCommand => _cashCommand = _cashCommand ?? new RelayCommand(() => _cartPaidAction(true));
+        public ICommand CashCommand => _cashCommand = _cashCommand ?? new RelayCommand(() => DisplayPaymentPopup(true));
+
+        #endregion
+
+        #region Bank card payment
 
         private ICommand _bankCardCommand;
-        public ICommand BankCardCommand => _bankCardCommand = _bankCardCommand ?? new RelayCommand(() => _cartPaidAction(false));
+        public ICommand BankCardCommand => _bankCardCommand = _bankCardCommand ?? new RelayCommand(() => DisplayPaymentPopup(false));
+
+        #endregion
+
+        private void DisplayPaymentPopup(bool isCashFirst)
+        {
+            PaymentPopupViewModel vm = new PaymentPopupViewModel(PopupService, Total, isCashFirst, (cash, bankCard) => _paymentAction(cash, bankCard));
+            PopupService.DisplayModal(vm, "Payment");
+        }
+
+        #endregion
+
+        #region Article creation
+
+        private ICommand _createArticleCommand;
+        public ICommand CreateArticleCommand => _createArticleCommand = _createArticleCommand ?? new RelayCommand(DisplayCreateArticlePopup);
+
+        private void DisplayCreateArticlePopup()
+        {
+            CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(PopupService, Categories, Producers, CreateArticle)
+            {
+                IsEdition = false
+            };
+            PopupService.DisplayModal(vm, "New article");
+        }
+
+        private void CreateArticle(CreateEditArticlePopupViewModel vm)
+        {
+            Article article = new Article
+            {
+                Guid = Guid.NewGuid(),
+                Ean = vm.Ean,
+                Description = vm.Description,
+                Category = vm.Category,
+                Producer = vm.Producer,
+                SupplierPrice = vm.SupplierPrice,
+                Price = vm.Price,
+                Stock = vm.Stock,
+                VatRate = vm.VatRate,
+                IsNewArticle = true,
+            };
+            ArticleDb.Articles.Add(article);
+            SelectedArticle = article;
+
+            RaisePropertyChanged(() => Articles);
+            RaisePropertyChanged(() => Categories);
+
+            ArticleDb.Save();
+        }
+
+        #endregion
+
+        #region Article edition
+
+        private ICommand _editArticleCommand;
+        public ICommand EditArticleCommand => _editArticleCommand = _editArticleCommand ?? new RelayCommand(DisplayEditArticlePopup);
+
+        private void DisplayEditArticlePopup()
+        {
+            if (SelectedArticle != null)
+            {
+                CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(PopupService, Categories, Producers, SaveArticle)
+                {
+                    IsEdition = true,
+                    Ean = SelectedArticle.Ean,
+                    Description = SelectedArticle.Description,
+                    Category = SelectedArticle.Category,
+                    Producer = SelectedArticle.Producer,
+                    SupplierPrice = SelectedArticle.SupplierPrice,
+                    Price = SelectedArticle.Price,
+                    VatRate = SelectedArticle.VatRate,
+                    Stock = SelectedArticle.Stock
+                };
+                PopupService.DisplayModal(vm, "Edit article");
+            }
+        }
+
+        private void SaveArticle(CreateEditArticlePopupViewModel vm)
+        {
+            SelectedArticle.Ean = vm.Ean;
+            SelectedArticle.Description = vm.Description;
+            SelectedArticle.Category = vm.Category;
+            SelectedArticle.Producer = vm.Producer;
+            SelectedArticle.SupplierPrice = vm.SupplierPrice;
+            SelectedArticle.Price = vm.Price;
+            SelectedArticle.VatRate = vm.VatRate;
+            SelectedArticle.Stock = vm.Stock;
+
+            RaisePropertyChanged(() => Articles);
+            RaisePropertyChanged(() => Categories);
+
+            ArticleDb.Save();
+        }
+
+        #endregion
 
         public void Clear()
         {
@@ -181,11 +327,9 @@ namespace PPC.Sale
             _cartModifiedAction?.Invoke();
         }
 
-        public double Total => ShoppingCartArticles.Sum(x => x.Total);
-
-        public ShoppingCartViewModel(Action<bool> cartPaidAction, Action cartModifiedAction = null)
+        public ShoppingCartViewModel(Action<double, double> paymentAction, Action cartModifiedAction = null)
         {
-            _cartPaidAction = cartPaidAction;
+            _paymentAction = paymentAction;
             _cartModifiedAction = cartModifiedAction;
 
             ShoppingCartArticles = new ObservableCollection<ShoppingCartArticleItem>();
@@ -194,26 +338,41 @@ namespace PPC.Sale
 
     public class ShoppingCartViewModelDesignData : ShoppingCartViewModel
     {
-        public ShoppingCartViewModelDesignData() : base(b => { }, () => { })
+        public ShoppingCartViewModelDesignData() : base((d,d1) => { }, () => { })
         {
-            ShoppingCartArticles = new ObservableCollection<ShoppingCartArticleItem>
+            ShoppingCartArticles.AddRange(new []
             {
                 new ShoppingCartArticleItem
                 {
-                    Article = FakeArticleDb.Articles[0],
+                    Article = new Article
+                    {
+                        Ean = "1111111",
+                        Description = "Article1",
+                        Price = 10
+                    },
                     Quantity = 2,
                 },
                 new ShoppingCartArticleItem
                 {
-                    Article = FakeArticleDb.Articles[1],
+                    Article = new Article
+                    {
+                        Ean = "222222222",
+                        Description = "Article2",
+                        Price = 20
+                    },
                     Quantity = 3,
                 },
                 new ShoppingCartArticleItem
                 {
-                    Article = FakeArticleDb.Articles[2],
+                    Article = new Article
+                    {
+                        Ean = "33333333",
+                        Description = "Article3",
+                        Price = 30
+                    },
                     Quantity = 1,
                 }
-            };
+            });
         }
     }
 }

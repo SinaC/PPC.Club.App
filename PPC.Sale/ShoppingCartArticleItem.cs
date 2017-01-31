@@ -1,4 +1,5 @@
-﻿using PPC.MVVM;
+﻿using PPC.DataContracts;
+using PPC.MVVM;
 
 namespace PPC.Sale
 {
@@ -7,7 +8,6 @@ namespace PPC.Sale
         public Article Article { get; set; }
 
         private int _quantity;
-
         public int Quantity
         {
             get {  return _quantity;}

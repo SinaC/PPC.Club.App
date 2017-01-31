@@ -1,4 +1,5 @@
-﻿using PPC.MVVM;
+﻿using PPC.DataContracts;
+using PPC.MVVM;
 
 namespace PPC.Sale
 {
@@ -6,30 +7,17 @@ namespace PPC.Sale
     {
         public Article Article { get; set; }
 
-        private int _quantityCash;
-        public int QuantityCash
+        private int _quantity;
+        public int Quantity
         {
-            get { return _quantityCash; }
+            get { return _quantity; }
             set
             {
-                if (Set(() => QuantityCash, ref _quantityCash, value))
+                if (Set(() => Quantity, ref _quantity, value))
                     RaisePropertyChanged(() => Total);
             }
         }
 
-        private int _quantityBankCard;
-        public int QuantityBankCard
-        {
-            get { return _quantityBankCard; }
-            set
-            {
-                if (Set(() => QuantityBankCard, ref _quantityBankCard, value))
-                    RaisePropertyChanged(() => Total);
-            }
-        }
-
-        public double Total => (QuantityCash + QuantityBankCard) * Article.Price;
-        public double TotalBankCard => QuantityBankCard * Article.Price;
-        public double TotalCash => QuantityCash * Article.Price;
+        public double Total => Quantity* Article.Price;
     }
 }

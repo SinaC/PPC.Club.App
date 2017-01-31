@@ -152,8 +152,7 @@
                         <GridViewColumn Header="Ean" DisplayMemberBinding="{Binding Article.Ean}"/>
                         <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Article.Name}"/>
                         <GridViewColumn Header="Price" DisplayMemberBinding="{Binding Article.Price, StringFormat={}{0:C}}"/>
-                        <GridViewColumn Header="#Cash" DisplayMemberBinding="{Binding QuantityCash}"/>
-                        <GridViewColumn Header="#BankCard" DisplayMemberBinding="{Binding QuantityBankCard}"/>
+                        <GridViewColumn Header="Quantity" DisplayMemberBinding="{Binding Quantity}"/>
                     </GridView>
                 </ListView.View>
             </ListView>
