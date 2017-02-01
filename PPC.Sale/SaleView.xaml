@@ -146,16 +146,22 @@
                     </TextBlock.Text>
                 </TextBlock>
             </Expander.Header>
-            <ListView ItemsSource="{Binding SoldArticles}">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="Ean" DisplayMemberBinding="{Binding Article.Ean}"/>
-                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Article.Name}"/>
-                        <GridViewColumn Header="Price" DisplayMemberBinding="{Binding Article.Price, StringFormat={}{0:C}}"/>
-                        <GridViewColumn Header="Quantity" DisplayMemberBinding="{Binding Quantity}"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+            <DataGrid IsReadOnly="True"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      AutoGenerateColumns="False"
+                      ItemsSource="{Binding SoldArticles}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Ean"
+                                        Binding="{Binding Article.Ean}"/>
+                    <DataGridTextColumn Header="Description"
+                                        Binding="{Binding Article.Description}"/>
+                    <DataGridTextColumn Header="Quantity"
+                                        Binding="{Binding Quantity}"/>
+                    <DataGridTextColumn Header="Price"
+                                        Binding="{Binding Article.Price, StringFormat={}{0:C}}"/>
+                </DataGrid.Columns>
+            </DataGrid>
         </Expander>
     </Grid>
 </UserControl>

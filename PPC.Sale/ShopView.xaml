@@ -8,7 +8,34 @@
              d:DataContext="{d:DesignInstance local:ShopViewModelDesignData, IsDesignTimeCreatable=True}"
              d:DesignHeight="300" d:DesignWidth="600">
     <Grid>
-        <!-- TODO: other controls ??? -->
-        <local:ShoppingCartView DataContext="{Binding ShoppingCart}"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <local:ShoppingCartView Grid.Row="0"
+                                DataContext="{Binding ShoppingCart}"/>
+        <Expander Grid.Row="1"
+                  VerticalAlignment="Bottom"
+                  IsExpanded="False">
+            <Expander.Header>
+                <TextBlock Text="{Binding Transactions.Count, StringFormat={}#Transactions: {0}}"/>
+            </Expander.Header>
+            <DataGrid IsReadOnly="True"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      AutoGenerateColumns="False"
+                      ItemsSource="{Binding Transactions}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Timestamp"
+                                        Binding="{Binding Timestamp, StringFormat={}{0:dd/MM/yyyy HH:mm:ss}}"/>
+                    <DataGridTextColumn Header="#Articles"
+                                        Binding="{Binding Articles.Count}"/>
+                    <DataGridTextColumn Header="Cash"
+                                        Binding="{Binding Cash, StringFormat={}{0:C}}"/>
+                    <DataGridTextColumn Header="Bank card"
+                                        Binding="{Binding BankCard, StringFormat={}{0:C}}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Expander>
     </Grid>
 </UserControl>

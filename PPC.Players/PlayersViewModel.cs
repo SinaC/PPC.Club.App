@@ -22,7 +22,7 @@ namespace PPC.Players
         public ObservableCollection<PlayerModel> Players
         {
             get { return _players; }
-            set { Set(() => Players, ref _players, value); }
+            protected set { Set(() => Players, ref _players, value); }
         }
 
         #region Load

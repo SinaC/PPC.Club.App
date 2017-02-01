@@ -44,11 +44,20 @@
     <Compile Include="Article.cs" />
     <Compile Include="Closing.cs" />
     <Compile Include="FullArticle.cs" />
+    <Compile Include="produits.cs">
+      <DependentUpon>produits.xsd</DependentUpon>
+    </Compile>
     <Compile Include="Shop.cs" />
     <Compile Include="ClientCart.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ShopTransaction.cs" />
     <Compile Include="VatRates.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="produits.xsd">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

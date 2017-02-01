@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.IO;
@@ -25,7 +26,7 @@ namespace PPC.Sale
 
         #endregion
 
-        public ObservableCollection<SoldArticleItem> SoldArticles { get; }
+        public ObservableCollection<ShopTransactionItem> Transactions { get; }
 
         public void Load()
         {
@@ -40,14 +41,20 @@ namespace PPC.Sale
                         DataContractSerializer serializer = new DataContractSerializer(typeof(Shop));
                         shop = (Shop)serializer.ReadObject(reader);
                     }
-                    SoldArticles.Clear();
-                    SoldArticles.AddRange(shop.Articles.Select(x => new SoldArticleItem
+                    Transactions.Clear();
+                    Transactions.AddRange(shop.Transactions.Select(t => new ShopTransactionItem
                     {
-                        Article = ArticleDb.Articles.FirstOrDefault(a => a.Guid == x.Guid),
-                        Quantity = x.Quantity,
+                        Timestamp = t.Timestamp,
+                        Articles = t.Articles.Select(a => new ShopArticleItem
+                        {
+                            Article = ArticleDb.Articles.FirstOrDefault(x => x.Guid == a.Guid),
+                            Quantity = a.Quantity
+                        }).ToList(),
+                        Cash = t.Cash,
+                        BankCard = t.BankCard
                     }));
-                    Cash = shop.Cash;
-                    BankCard = shop.BankCard;
+                    Cash = Transactions.Sum(x => x.Cash);
+                    BankCard = Transactions.Sum(x => x.BankCard);
                 }
                 else
                 {
@@ -68,26 +75,25 @@ namespace PPC.Sale
 
             _cartPaidAction = cartPaidAction;
 
-            SoldArticles = new ObservableCollection<SoldArticleItem>();
+            Transactions = new ObservableCollection<ShopTransactionItem>();
             ShoppingCart = new ShoppingCartViewModel(Payment);
         }
 
-        private void Payment(double cash, double bankCard)
+        private void Payment(decimal cash, decimal bankCard)
         {
-            // Add shopping cart articles to sold articles
-            foreach (ShoppingCartArticleItem shoppingCartArticle in ShoppingCart.ShoppingCartArticles)
+            // Create shoptransaction from shopping cart
+            ShopTransactionItem transaction = new ShopTransactionItem
             {
-                SoldArticleItem soldArticle = SoldArticles.FirstOrDefault(x => x.Article.Guid == shoppingCartArticle.Article.Guid);
-                if (soldArticle == null)
+                Timestamp = DateTime.Now,
+                Articles = ShoppingCart.ShoppingCartArticles.Select(x => new ShopArticleItem
                 {
-                    soldArticle = new SoldArticleItem
-                    {
-                        Article = shoppingCartArticle.Article
-                    };
-                    SoldArticles.Add(soldArticle);
-                }
-                soldArticle.Quantity += shoppingCartArticle.Quantity;
-            }
+                    Article = x.Article,
+                    Quantity = x.Quantity
+                }).ToList(),
+                Cash = cash,
+                BankCard = bankCard
+            };
+            Transactions.Add(transaction);
 
             // Add cash/bank card
             Cash += cash;
@@ -111,13 +117,17 @@ namespace PPC.Sale
                     Directory.CreateDirectory(ConfigurationManager.AppSettings["BackupPath"]);
                 Shop shop = new Shop
                 {
-                    Articles = SoldArticles.Select(x => new Item
+                    Transactions = Transactions.Select(t => new ShopTransaction
                     {
-                        Guid = x.Article.Guid,
-                        Quantity = x.Quantity,
+                        Timestamp = t.Timestamp,
+                        Articles = t.Articles.Select(a => new Item
+                        {
+                            Guid = a.Article.Guid,
+                            Quantity = a.Quantity,
+                        }).ToList(),
+                        Cash = t.Cash,
+                        BankCard = t.BankCard
                     }).ToList(),
-                    Cash = Cash,
-                    BankCard = BankCard
                 };
                 string filename = $"{ConfigurationManager.AppSettings["BackupPath"]}{ShopFile}";
                 using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
@@ -140,39 +150,49 @@ namespace PPC.Sale
         public ShopViewModelDesignData() : base(() => { })
         {
             ShoppingCart = new ShoppingCartViewModelDesignData();
-            SoldArticles.AddRange( new []
+            Transactions.AddRange(new[]
             {
-                new SoldArticleItem
+                new ShopTransactionItem
                 {
-                    Article = new Article
+                    Timestamp = DateTime.Now,
+                    Articles = new List<ShopArticleItem>
                     {
-                        Ean = "1111111",
-                        Description = "Article1",
-                        Price = 10
+                        new ShopArticleItem
+                        {
+                            Article = new Article
+                            {
+                                Ean = "1111111",
+                                Description = "Article1",
+                                Price = 10
+                            },
+                            Quantity = 7
+                        },
+                        new ShopArticleItem
+                        {
+                            Article = new Article
+                            {
+                                Ean = "222222222",
+                                Description = "Article2",
+                                Price = 20
+                            },
+                            Quantity = 5,
+                        },
+                        new ShopArticleItem
+                        {
+                            Article = new Article
+                            {
+                                Ean = "33333333",
+                                Description = "Article3",
+                                Price = 30
+                            },
+                            Quantity = 3,
+                        }
                     },
-                    Quantity = 7,
-                },
-                new SoldArticleItem
-                {
-                    Article = new Article
-                    {
-                        Ean = "222222222",
-                        Description = "Article2",
-                        Price = 20
-                    },
-                    Quantity = 5,
-                },
-                new SoldArticleItem
-                {
-                    Article = new Article
-                    {
-                        Ean = "33333333",
-                        Description = "Article3",
-                        Price = 30
-                    },
-                    Quantity = 3,
+                    Cash = 20,
+                    BankCard = 15,
                 }
             });
+            
             Cash = 47;
             BankCard = 28;
         }

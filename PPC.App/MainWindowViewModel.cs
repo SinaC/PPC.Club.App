@@ -12,7 +12,7 @@ namespace PPC.App
         public ObservableCollection<TabBase> Tabs
         {
             get { return _tabs; }
-            set { Set(() => Tabs, ref _tabs, value); }
+            protected set { Set(() => Tabs, ref _tabs, value); }
         }
 
         private TabBase _selectedTab;
@@ -26,14 +26,14 @@ namespace PPC.App
         public PlayersViewModel PlayersViewModel
         {
             get { return _playersViewModel; }
-            set { Set(() => PlayersViewModel, ref _playersViewModel, value); }
+            protected set { Set(() => PlayersViewModel, ref _playersViewModel, value); }
         }
 
         private SaleViewModel _saleViewModel;
         public SaleViewModel SaleViewModel
         {
             get { return _saleViewModel; }
-            set { Set(() => SaleViewModel, ref _saleViewModel, value); }
+            protected set { Set(() => SaleViewModel, ref _saleViewModel, value); }
         }
 
         public MainWindowViewModel()

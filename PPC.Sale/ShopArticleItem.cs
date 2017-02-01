@@ -1,4 +1,5 @@
-﻿using PPC.MVVM;
+﻿using PPC.DataContracts;
+using PPC.MVVM;
 
 namespace PPC.Sale
 {
@@ -17,13 +18,6 @@ namespace PPC.Sale
             }
         }
 
-        private bool _isCash;
-        public bool IsCash
-        {
-            get { return _isCash; }
-            set { Set(() => IsCash, ref _isCash, value); }
-        }
-
-        public double Total => Quantity * Article.Price;
+        public decimal Total => Quantity * Article.Price;
     }
 }

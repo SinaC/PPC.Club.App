@@ -7,10 +7,6 @@ namespace PPC.DataContracts
     public class Shop
     {
         [DataMember]
-        public List<Item> Articles { get; set; }
-        [DataMember]
-        public double Cash { get; set; }
-        [DataMember]
-        public double BankCard { get; set; }
+        public List<ShopTransaction> Transactions { get; set; }
     }
 }

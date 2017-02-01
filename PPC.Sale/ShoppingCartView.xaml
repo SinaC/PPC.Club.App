@@ -16,10 +16,10 @@
                         Command="{Binding IncrementSelectedArticleCommand}"/>
             <KeyBinding Key="Subtract" 
                         Command="{Binding DecrementSelectedArticleCommand}"/>
-            <KeyBinding Key="C" 
+            <!--<KeyBinding Key="C" 
                         Command="{Binding CashCommand}"/>
             <KeyBinding Key="B" 
-                        Command="{Binding BankCardCommand}"/>
+                        Command="{Binding BankCardCommand}"/>-->
         </Grid.InputBindings>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -78,14 +78,41 @@
                               SelectedItem="{Binding SelectedCategory}"/>
                     <ComboBox Width="300"
                               Margin="5,2"
+                              ScrollViewer.VerticalScrollBarVisibility="Auto"
                               ItemsSource="{Binding Articles}"
                               SelectedItem="{Binding SelectedArticle}">
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
                         <ComboBox.ItemTemplate>
                             <DataTemplate DataType="{x:Type dataContracts:Article}">
-                                <TextBlock Text="{Binding Description}"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Description}"/>
+                                    <TextBlock Text="{Binding Price, StringFormat={} ({0:C})}"/>
+                                </StackPanel>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
+                    <local:MyAutoCompleteBox Width="300"
+                                             Margin="5,2"
+                                             IsTextCompletionEnabled="False"
+                                             FilterMode="ContainsOrdinal"
+                                             MinimumPopulateDelay="0"
+                                             MinimumPrefixLength="3"
+                                             ValueMemberPath="Description"
+                                             ItemsSource="{Binding Articles}"
+                                             SelectedItem="{Binding SelectedArticle, Mode=TwoWay}">
+                        <local:MyAutoCompleteBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type dataContracts:Article}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Description}"/>
+                                    <TextBlock Text="{Binding Price, StringFormat={} ({0:C})}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </local:MyAutoCompleteBox.ItemTemplate>
+                    </local:MyAutoCompleteBox>
                 </StackPanel>
 
                 <!-- Price -->
@@ -125,6 +152,7 @@
                         Grid.ColumnSpan="3"
                         Margin="5,2"
                         VerticalAlignment="Bottom"
+                        IsEnabled="{Binding IsEditArticleButtonActive}"
                         Command="{Binding EditArticleCommand}">
                     <TextBlock Text="Edit Article"/>
                 </Button>
@@ -154,51 +182,58 @@
         </GroupBox>
         <GroupBox Grid.Row="1" 
                       Header="Cart">
-            <ListView ItemsSource="{Binding ShoppingCartArticles}">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Width="60">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate DataType="{x:Type local:ShoppingCartArticleItem}">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Button Grid.Column="0"
+            <DataGrid CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      AutoGenerateColumns="False"
+                      ItemsSource="{Binding ShoppingCartArticles}">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate DataType="{x:Type local:ShopArticleItem}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button Grid.Column="0"
                                                 Width="16"
                                                 Command="{Binding DataContext.DeleteArticleCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                                                 CommandParameter="{Binding}">
-                                            <TextBlock Text="X"/>
-                                        </Button>
-                                        <Button Grid.Column="1"
+                                        <TextBlock Text="X"/>
+                                    </Button>
+                                    <Button Grid.Column="1"
                                                 Width="16"
                                                 Command="{Binding DataContext.IncrementArticleCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                                                 CommandParameter="{Binding}">
-                                            <TextBlock Text="+"/>
-                                        </Button>
-                                        <Button Grid.Column="2"
+                                        <TextBlock Text="+"/>
+                                    </Button>
+                                    <Button Grid.Column="2"
                                                 Width="16"
                                                 Command="{Binding DataContext.DecrementArticleCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                                                 CommandParameter="{Binding}">
-                                            <TextBlock Text="-"/>
-                                        </Button>
-                                    </Grid>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="Name"
-                                        DisplayMemberBinding="{Binding Article.Description}"/>
-                        <GridViewColumn Header="Quantity" 
-                                        DisplayMemberBinding="{Binding Quantity}"/>
-                        <GridViewColumn Header="Price" 
-                                        DisplayMemberBinding="{Binding Article.Price, StringFormat={}{0:C}}"/>
-                        <GridViewColumn Header="Total" 
-                                        DisplayMemberBinding="{Binding Total, StringFormat={}{0:C}}"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+                                        <TextBlock Text="-"/>
+                                    </Button>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn IsReadOnly="True" 
+                                        Width="*" 
+                                        MaxWidth="400"
+                                        Header="Description" 
+                                        Binding="{Binding Article.Description}"/>
+                    <DataGridTextColumn IsReadOnly="True" 
+                                        Header="Quantity" 
+                                        Binding="{Binding Quantity}"/>
+                    <DataGridTextColumn IsReadOnly="True" 
+                                        Header="Price" 
+                                        Binding="{Binding Article.Price, StringFormat={}{0:C}}"/>
+                    <DataGridTextColumn IsReadOnly="True" 
+                                        Header="Total" 
+                                        Binding="{Binding Total, StringFormat={}{0:C}}"/>
+                </DataGrid.Columns>
+            </DataGrid>
         </GroupBox>
         <GroupBox Grid.Row="2"
                   Header="Total">
@@ -228,6 +263,10 @@
         </GroupBox>
     </Grid>
 </UserControl>
+
+
+
+
 
 
 

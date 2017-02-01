@@ -42,7 +42,17 @@ namespace PPC.Popup
         public string Category
         {
             get { return _category; }
-            set { Set(() => Category, ref _category, value); }
+            set
+            {
+                if (Set(() => Category, ref _category, value))
+                {
+                    if (string.Compare(Category, "food", StringComparison.InvariantCultureIgnoreCase) == 0
+                        || string.Compare(Category, "drink", StringComparison.InvariantCultureIgnoreCase) == 0) 
+                        VatRate = VatRates.FoodDrink;
+                    else
+                        VatRate = VatRates.Other;
+                }
+            }
         }
 
         public ObservableCollection<string> Producers { get; private set; }
@@ -54,15 +64,15 @@ namespace PPC.Popup
             set { Set(() => Producer, ref _producer, value); }
         }
 
-        private double _supplierPrice;
-        public double SupplierPrice
+        private decimal _supplierPrice;
+        public decimal SupplierPrice
         {
             get { return _supplierPrice; }
             set { Set(() => SupplierPrice, ref _supplierPrice, value); }
         }
 
-        private double _price;
-        public double Price
+        private decimal _price;
+        public decimal Price
         {
             get { return _price; }
             set { Set(() => Price, ref _price, value); }
@@ -121,7 +131,7 @@ namespace PPC.Popup
             Description = "Article1";
             Category = "Cards";
             Producer = "MTG";
-            SupplierPrice = 5.45;
+            SupplierPrice = 5.45m;
             Price = 8;
             Stock = 7;
         }

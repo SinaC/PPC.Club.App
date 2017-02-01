@@ -17,9 +17,9 @@ namespace PPC.DataContracts
         [DataMember]
         public string Producer { get; set; }
         [DataMember]
-        public double SupplierPrice { get; set; }
+        public decimal SupplierPrice { get; set; }
         [DataMember]
-        public double Price { get; set; }
+        public decimal Price { get; set; }
         [DataMember]
         public int Stock { get; set; }
         [DataMember]

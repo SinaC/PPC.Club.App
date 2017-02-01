@@ -7,11 +7,11 @@ namespace PPC.Popup
     public class PaymentPopupViewModel : ObservableObject
     {
         private readonly IPopupService _popupService;
-        private readonly Action<double, double> _paidAction;
-        public double Total { get; }
+        private readonly Action<decimal, decimal> _paidAction;
+        public decimal Total { get; }
 
-        private double _cash;
-        public double Cash
+        private decimal _cash;
+        public decimal Cash
         {
             get { return _cash; }
             set
@@ -31,10 +31,10 @@ namespace PPC.Popup
             }
         }
 
-        public double MaxCash => Total - BankCard;
+        public decimal MaxCash => Total - BankCard;
 
-        private double _bankCard;
-        public double BankCard
+        private decimal _bankCard;
+        public decimal BankCard
         {
             get { return _bankCard; }
             set
@@ -54,10 +54,10 @@ namespace PPC.Popup
             }
         }
 
-        public double MaxBankCard => Total - Cash;
+        public decimal MaxBankCard => Total - Cash;
 
-        private double _clientCash;
-        public double ClientCash
+        private decimal _clientCash;
+        public decimal ClientCash
         {
             get { return _clientCash; }
             set
@@ -75,11 +75,11 @@ namespace PPC.Popup
 
         public bool IsClientCashNotEnough => Cash > 0 && ClientCash < Cash;
 
-        public double ClientChange => ClientCash > 0 && Cash > 0 ? ClientCash - Cash : 0;
+        public decimal ClientChange => ClientCash > 0 && Cash > 0 ? ClientCash - Cash : 0;
 
         public bool IsClientChangePositive => ClientChange > 0;
 
-        public double CurrentTotal => ClientCash + BankCard;
+        public decimal CurrentTotal => ClientCash + BankCard;
 
         public bool IsPaidButtonActive => !IsClientCashNotEnough && CurrentTotal >= Total; // >= because client can give more cash than needed
 
@@ -92,7 +92,7 @@ namespace PPC.Popup
             _paidAction(Cash, BankCard);
         }
 
-        public PaymentPopupViewModel(IPopupService popupService, double total, bool isCashFirst, Action<double,double> paidAction)
+        public PaymentPopupViewModel(IPopupService popupService, decimal total, bool isCashFirst, Action<decimal,decimal> paidAction)
         {
             _popupService = popupService;
             Total = total;

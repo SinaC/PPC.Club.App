@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
+using System.Xml.Serialization;
 using PPC.DataContracts;
 using PPC.Popup;
 
@@ -42,7 +43,7 @@ namespace PPC.Sale
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel($"Cannot load new articles. Exception: {ex}");
+                ErrorPopupViewModel vm = new ErrorPopupViewModel($"Cannot load articles. Exception: {ex}");
                 PopupService.DisplayModal(vm, "Error");
             }
         }
@@ -61,7 +62,37 @@ namespace PPC.Sale
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel($"Cannot load new articles. Exception: {ex}");
+                ErrorPopupViewModel vm = new ErrorPopupViewModel($"Cannot save articles. Exception: {ex}");
+                PopupService.DisplayModal(vm, "Error");
+            }
+        }
+
+        public static void Import()
+        {
+            try
+            {
+                string filename = @"C:\temp\ppc\produits.xml";
+                ArticleTable table;
+                using (StreamReader sr = new StreamReader(filename))
+                {
+                    XmlSerializer serializer = new XmlSerializer(typeof(ArticleTable));
+                    table = (ArticleTable)serializer.Deserialize(sr);
+                }
+                Articles.AddRange(table.ArticleRow.Select(x => new Article
+                {
+                    Guid = Guid.NewGuid(),
+                    Ean = x.Id,
+                    Description = x.Description,
+                    Category = x.Category,
+                    SupplierPrice = x.SupplierPrice ?? 0,
+                    Price = x.Price ?? 0,
+                    Producer = null,
+                    VatRate = x.VAT.HasValue ? (x.VAT.Value == 6 ? VatRates.FoodDrink : VatRates.Other) : VatRates.Other
+                }));
+            }
+            catch (Exception ex)
+            {
+                ErrorPopupViewModel vm = new ErrorPopupViewModel($"Cannot import articles. Exception: {ex}");
                 PopupService.DisplayModal(vm, "Error");
             }
         }

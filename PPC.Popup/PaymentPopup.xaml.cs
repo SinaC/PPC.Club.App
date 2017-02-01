@@ -1,4 +1,6 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
+using Xceed.Wpf.Toolkit;
 
 namespace PPC.Popup
 {
@@ -10,6 +12,14 @@ namespace PPC.Popup
         public PaymentPopup()
         {
             InitializeComponent();
+        }
+
+        private void UpDownBase_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            DecimalUpDown @this = sender as DecimalUpDown;
+            if (@this == null)
+                return;
+            @this.Text = @this.Text.Replace('.', ',');
         }
     }
 }

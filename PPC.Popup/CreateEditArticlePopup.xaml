@@ -7,7 +7,7 @@
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:CreateEditArticlePopupViewModelDesignData, IsDesignTimeCreatable=True}"
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="400">
     <Grid FocusManager.FocusedElement="{Binding ElementName=NameTextBox}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -16,7 +16,7 @@
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto" MinWidth="200"/>
+                <ColumnDefinition Width="Auto" MinWidth="250"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -36,7 +36,7 @@
             <TextBox Grid.Row="0"
                      Grid.Column="1"
                      Margin="5,2"
-                     MaxLength="11"
+                     MaxLength="13"
                      Text="{Binding Ean}"/>
             
             <!-- Name -->
@@ -89,6 +89,7 @@
                                 Minimum="0"
                                 Increment="0.01"
                                 FormatString="C"
+                                ValueChanged="UpDownBase_OnValueChanged"
                                 Value="{Binding SupplierPrice}"/>
 
             <!-- Vat rate -->
@@ -115,6 +116,7 @@
                                 Minimum="0"
                                 Increment="0.01"
                                 FormatString="C"
+                                ValueChanged="UpDownBase_OnValueChanged"
                                 Value="{Binding Price}"/>
 
             <!-- Stock price -->

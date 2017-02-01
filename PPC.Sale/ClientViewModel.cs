@@ -55,7 +55,7 @@ namespace PPC.Sale
             Cash = cart.Cash;
             BankCard = cart.BankCard;
             ShoppingCart.ShoppingCartArticles.Clear();
-            ShoppingCart.ShoppingCartArticles.AddRange(cart.Articles.Select(x => new ShoppingCartArticleItem
+            ShoppingCart.ShoppingCartArticles.AddRange(cart.Articles.Select(x => new ShopArticleItem
             {
                 Article = ArticleDb.Articles.FirstOrDefault(a => a.Guid == x.Guid),
                 Quantity = x.Quantity
@@ -74,7 +74,7 @@ namespace PPC.Sale
             ShoppingCart = new ShoppingCartViewModel(Payment, Save);
         }
 
-        private void Payment(double cash, double bankCard)
+        private void Payment(decimal cash, decimal bankCard)
         {
             IsPaid = true;
             Cash = cash;

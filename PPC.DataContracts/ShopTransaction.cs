@@ -1,13 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace PPC.DataContracts
 {
     [DataContract]
-    public class Closing
+    public class ShopTransaction
     {
         [DataMember]
-        public List<FullArticle> Articles { get; set; }
+        public DateTime Timestamp { get; set; }
+        [DataMember]
+        public List<Item> Articles { get; set; }
         [DataMember]
         public decimal Cash { get; set; }
         [DataMember]

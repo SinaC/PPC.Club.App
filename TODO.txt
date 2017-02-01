@@ -1,5 +1,5 @@
 special price (price+tva) (checkbox in shopping cart)
 form validation
-article DB
 payback (client doesn't want anymore an already paid article !! only for cash payment)
-transaction: closed shopping cart with amount cash/bank card (instead of only storing articles + sum cash/bc)
+transaction edition
+article DB (real DB instead of xml file)

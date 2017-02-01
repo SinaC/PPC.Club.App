@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Configuration;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
 using System.Windows.Input;
-using System.Xml;
 using PPC.DataContracts;
 using PPC.Helpers;
 using PPC.MVVM;
@@ -18,18 +13,19 @@ namespace PPC.Sale
     public class ShoppingCartViewModel : ObservableObject
     {
         private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
+        private static readonly string[] EmptyCategory =  {string.Empty};
 
-        private readonly Action<double, double> _paymentAction;
+        private readonly Action<decimal, decimal> _paymentAction;
         private readonly Action _cartModifiedAction;
 
-        public IEnumerable<Article> Articles => (SelectedCategory == null ? ArticleDb.Articles : ArticleDb.Articles.Where(x => x.Category == SelectedCategory)).OrderBy(x => x.Description);
-        public IEnumerable<string> Categories => ArticleDb.Articles.GroupBy(x => x.Category, (category, articles) => category);
+        public IEnumerable<Article> Articles => (string.IsNullOrWhiteSpace(SelectedCategory) ? ArticleDb.Articles : ArticleDb.Articles.Where(x => x.Category == SelectedCategory)).OrderBy(x => x.Description);
+        public IEnumerable<string> Categories => EmptyCategory.Concat(ArticleDb.Articles.GroupBy(x => x.Category, (category, articles) => category));
         public IEnumerable<string> Producers => ArticleDb.Articles.GroupBy(x => x.Producer, (producer, articles) => producer);
 
         #region Cart articles
 
-        public ObservableCollection<ShoppingCartArticleItem> ShoppingCartArticles { get; }
-        public double Total => ShoppingCartArticles.Sum(x => x.Total);
+        public ObservableCollection<ShopArticleItem> ShoppingCartArticles { get; }
+        public decimal Total => ShoppingCartArticles.Sum(x => x.Total);
 
         #endregion
 
@@ -75,7 +71,6 @@ namespace PPC.Sale
             }
         }
 
-
         private Article _selectedArticle;
         public Article SelectedArticle
         {
@@ -89,9 +84,12 @@ namespace PPC.Sale
                         : 1;
                     _ean = _selectedArticle?.Ean; // set value without retriggering article search
                     RaisePropertyChanged(() => Ean);
+                    RaisePropertyChanged(() => IsEditArticleButtonActive);
                 }
             }
         }
+
+        public bool IsEditArticleButtonActive => SelectedArticle != null;
 
         #endregion
 
@@ -151,10 +149,10 @@ namespace PPC.Sale
                 return;
             if (!Quantity.HasValue || Quantity.Value == 0)
                 return;
-            ShoppingCartArticleItem article = ShoppingCartArticles.FirstOrDefault(x => x.Article.Guid == SelectedArticle.Guid);
+            ShopArticleItem article = ShoppingCartArticles.FirstOrDefault(x => x.Article.Guid == SelectedArticle.Guid);
             if (article == null)
             {
-                article = new ShoppingCartArticleItem
+                article = new ShopArticleItem
                 {
                     Article = SelectedArticle,
                     Quantity = 0
@@ -171,8 +169,8 @@ namespace PPC.Sale
         #region Delete article from cart
 
         private ICommand _deleteArticleCommand;
-        public ICommand DeleteArticleCommand => _deleteArticleCommand = _deleteArticleCommand ?? new RelayCommand<ShoppingCartArticleItem>(DeleteArticle);
-        private void DeleteArticle(ShoppingCartArticleItem item)
+        public ICommand DeleteArticleCommand => _deleteArticleCommand = _deleteArticleCommand ?? new RelayCommand<ShopArticleItem>(DeleteArticle);
+        private void DeleteArticle(ShopArticleItem item)
         {
             ShoppingCartArticles.Remove(item);
             RaisePropertyChanged(() => Total);
@@ -184,8 +182,8 @@ namespace PPC.Sale
         #region Increment article in cart
 
         private ICommand _incrementArticleCommand;
-        public ICommand IncrementArticleCommand => _incrementArticleCommand = _incrementArticleCommand ?? new RelayCommand<ShoppingCartArticleItem>(IncrementArticle);
-        private void IncrementArticle(ShoppingCartArticleItem item)
+        public ICommand IncrementArticleCommand => _incrementArticleCommand = _incrementArticleCommand ?? new RelayCommand<ShopArticleItem>(IncrementArticle);
+        private void IncrementArticle(ShopArticleItem item)
         {
             item.Quantity++;
             RaisePropertyChanged(() => Total);
@@ -197,8 +195,8 @@ namespace PPC.Sale
         #region Decrement article in cart
 
         private ICommand _decrementArticleCommand;
-        public ICommand DecrementArticleCommand => _decrementArticleCommand = _decrementArticleCommand ?? new RelayCommand<ShoppingCartArticleItem>(DecrementArticle);
-        private void DecrementArticle(ShoppingCartArticleItem item)
+        public ICommand DecrementArticleCommand => _decrementArticleCommand = _decrementArticleCommand ?? new RelayCommand<ShopArticleItem>(DecrementArticle);
+        private void DecrementArticle(ShopArticleItem item)
         {
             if (item.Quantity == 1)
                 DeleteArticle(item);
@@ -327,12 +325,12 @@ namespace PPC.Sale
             _cartModifiedAction?.Invoke();
         }
 
-        public ShoppingCartViewModel(Action<double, double> paymentAction, Action cartModifiedAction = null)
+        public ShoppingCartViewModel(Action<decimal, decimal> paymentAction, Action cartModifiedAction = null)
         {
             _paymentAction = paymentAction;
             _cartModifiedAction = cartModifiedAction;
 
-            ShoppingCartArticles = new ObservableCollection<ShoppingCartArticleItem>();
+            ShoppingCartArticles = new ObservableCollection<ShopArticleItem>();
         }
     }
 
@@ -340,9 +338,10 @@ namespace PPC.Sale
     {
         public ShoppingCartViewModelDesignData() : base((d,d1) => { }, () => { })
         {
+            ShoppingCartArticles.Clear();
             ShoppingCartArticles.AddRange(new []
             {
-                new ShoppingCartArticleItem
+                new ShopArticleItem
                 {
                     Article = new Article
                     {
@@ -352,7 +351,7 @@ namespace PPC.Sale
                     },
                     Quantity = 2,
                 },
-                new ShoppingCartArticleItem
+                new ShopArticleItem
                 {
                     Article = new Article
                     {
@@ -362,7 +361,7 @@ namespace PPC.Sale
                     },
                     Quantity = 3,
                 },
-                new ShoppingCartArticleItem
+                new ShopArticleItem
                 {
                     Article = new Article
                     {

@@ -13,8 +13,8 @@ namespace PPC.DataContracts
         [DataMember]
         public bool IsPaid { get; set; }
         [DataMember]
-        public double Cash { get; set; }
+        public decimal Cash { get; set; }
         [DataMember]
-        public double BankCard { get; set; }
+        public decimal BankCard { get; set; }
     }
 }

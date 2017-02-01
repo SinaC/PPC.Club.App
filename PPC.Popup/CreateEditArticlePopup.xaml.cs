@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Xceed.Wpf.Toolkit;
 
 namespace PPC.Popup
 {
@@ -23,6 +24,14 @@ namespace PPC.Popup
         public CreateEditArticlePopup()
         {
             InitializeComponent();
+        }
+
+        private void UpDownBase_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            DecimalUpDown @this = sender as DecimalUpDown;
+            if (@this == null)
+                return;
+            @this.Text = @this.Text.Replace('.', ',');
         }
     }
 }

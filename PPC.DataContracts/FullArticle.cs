@@ -13,7 +13,7 @@ namespace PPC.DataContracts
         [DataMember]
         public string Description { get; set; }
         [DataMember]
-        public double Price { get; set; }
+        public decimal Price { get; set; }
         [DataMember]
         public int Quantity { get; set; }
     }

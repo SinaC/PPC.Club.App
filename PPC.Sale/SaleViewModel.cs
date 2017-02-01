@@ -32,7 +32,7 @@ namespace PPC.Sale
         public ObservableCollection<ShoppingCartTabBase> Tabs
         {
             get { return _tabs; }
-            set { Set(() => Tabs, ref _tabs, value); }
+            protected set { Set(() => Tabs, ref _tabs, value); }
         }
 
         private ShoppingCartTabBase _selectedTab;
@@ -75,8 +75,8 @@ namespace PPC.Sale
 
         #region Sold articles
 
-        private List<SoldArticleItem> _soldArticles;
-        public List<SoldArticleItem> SoldArticles
+        private List<ShopArticleItem> _soldArticles;
+        public List<ShopArticleItem> SoldArticles
         {
             get {  return _soldArticles; }
             private set { Set(() => SoldArticles, ref _soldArticles, value); }
@@ -183,7 +183,9 @@ namespace PPC.Sale
                         Description = x.Article.Description,
                         Price = x.Article.Price,
                         Quantity = x.Quantity
-                    }).ToList()
+                    }).ToList(),
+                    Cash = SoldArticlesTotalCash,
+                    BankCard = SoldArticlesTotalBankCard
                 };
                 string filename = ConfigurationManager.AppSettings["ClosingPath"];
                 using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
@@ -210,22 +212,22 @@ namespace PPC.Sale
             set { Set(() => SoldArticlesCount, ref _soldArticlesCount, value); }
         }
 
-        private double _soldArticlesTotal;
-        public double SoldArticlesTotal
+        private decimal _soldArticlesTotal;
+        public decimal SoldArticlesTotal
         {
             get { return _soldArticlesTotal; }
             set { Set(() => SoldArticlesTotal, ref _soldArticlesTotal, value); }
         }
 
-        private double _soldArticlesTotalCash;
-        public double SoldArticlesTotalCash
+        private decimal _soldArticlesTotalCash;
+        public decimal SoldArticlesTotalCash
         {
             get { return _soldArticlesTotalCash; }
             set { Set(() => SoldArticlesTotalCash, ref _soldArticlesTotalCash, value); }
         }
 
-        private double _soldArticlesTotalBankCard;
-        public double SoldArticlesTotalBankCard
+        private decimal _soldArticlesTotalBankCard;
+        public decimal SoldArticlesTotalBankCard
         {
             get { return _soldArticlesTotalBankCard; }
             set { Set(() => SoldArticlesTotalBankCard, ref _soldArticlesTotalBankCard, value); }
@@ -234,6 +236,8 @@ namespace PPC.Sale
         public SaleViewModel()
         {
             ArticleDb.Load();
+            //ArticleDb.Import();
+            //ArticleDb.Save();
 
             //
             Shop = new ShopViewModel(ReshreshSoldArticles);
@@ -246,16 +250,16 @@ namespace PPC.Sale
 
         private void ReshreshSoldArticles()
         {
-            double totalCash = 0;
-            double totalBankCard = 0;
-            Dictionary<Guid, SoldArticleItem> soldItems = new Dictionary<Guid, SoldArticleItem>();
+            decimal totalCash = 0;
+            decimal totalBankCard = 0;
+            Dictionary<Guid, ShopArticleItem> soldItems = new Dictionary<Guid, ShopArticleItem>();
             // Gather sold items in current shopping cart
-            foreach (SoldArticleItem item in Shop.SoldArticles)
+            foreach (ShopArticleItem item in Shop.Transactions.SelectMany(x => x.Articles))
             {
-                SoldArticleItem soldItem;
+                ShopArticleItem soldItem;
                 if (!soldItems.TryGetValue(item.Article.Guid, out soldItem))
                 {
-                    soldItem = new SoldArticleItem
+                    soldItem = new ShopArticleItem
                     {
                         Article = item.Article,
                         Quantity = 0
@@ -269,12 +273,12 @@ namespace PPC.Sale
             // Gather sold items in closed client shopping carts
             foreach (ClientViewModel client in Tabs.OfType<ClientViewModel>().Where(x => x.IsPaid))
             {
-                foreach (ShoppingCartArticleItem item in client.ShoppingCart.ShoppingCartArticles)
+                foreach (ShopArticleItem item in client.ShoppingCart.ShoppingCartArticles)
                 {
-                    SoldArticleItem soldItem;
+                    ShopArticleItem soldItem;
                     if (!soldItems.TryGetValue(item.Article.Guid, out soldItem))
                     {
-                        soldItem = new SoldArticleItem
+                        soldItem = new ShopArticleItem
                         {
                             Article = item.Article,
                             Quantity = 0,

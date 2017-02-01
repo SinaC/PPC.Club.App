@@ -17,15 +17,15 @@ namespace PPC.Sale
             protected set { Set(() => ShoppingCart, ref _shoppingCart, value); }
         }
 
-        private double _cash;
-        public double Cash
+        private decimal _cash;
+        public decimal Cash
         {
             get { return _cash; }
             set { Set(() => Cash, ref _cash, value); }
         }
 
-        private double _bankCard;
-        public double BankCard
+        private decimal _bankCard;
+        public decimal BankCard
         {
             get { return _bankCard; }
             set { Set(() => BankCard, ref _bankCard, value); }
