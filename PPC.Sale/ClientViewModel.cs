@@ -120,8 +120,8 @@ namespace PPC.Sale
     public class ClientViewModelDesignData : ClientViewModel
     {
         public ClientViewModelDesignData() : base(() => { }, () => { })
-
         {
+            ClientName = "James";
             IsPaid = true;
             Cash = 15;
             BankCard = 20;

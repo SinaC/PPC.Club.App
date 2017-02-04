@@ -23,8 +23,7 @@
         </Grid.InputBindings>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <GroupBox Grid.Row="0"
@@ -181,10 +180,12 @@
             </Grid>
         </GroupBox>
         <GroupBox Grid.Row="1" 
-                      Header="Cart">
+                  Header="Cart">
             <DataGrid CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
+                      VerticalScrollBarVisibility="Auto"
+                      ScrollViewer.CanContentScroll="True"
                       ItemsSource="{Binding ShoppingCartArticles}">
                 <DataGrid.Columns>
                     <DataGridTemplateColumn>

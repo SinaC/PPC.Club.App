@@ -13,7 +13,6 @@ using PPC.DataContracts;
 using PPC.Helpers;
 using PPC.MVVM;
 using PPC.Popup;
-using PPC.Tab;
 
 namespace PPC.Sale
 {
@@ -172,21 +171,23 @@ namespace PPC.Sale
 
         private void ClosingConfirmed()
         {
+            Closing closing = new Closing
+            {
+                Articles = SoldArticles.Select(x => new FullArticle
+                {
+                    Guid = x.Article.Guid,
+                    Ean = x.Article.Ean,
+                    Description = x.Article.Description,
+                    Price = x.Article.Price,
+                    Quantity = x.Quantity
+                }).ToList(),
+                Cash = SoldArticlesTotalCash,
+                BankCard = SoldArticlesTotalBankCard
+            };
+
             try
             {
-                Closing closing = new Closing
-                {
-                    Articles = SoldArticles.Select(x => new FullArticle
-                    {
-                        Guid = x.Article.Guid,
-                        Ean = x.Article.Ean,
-                        Description = x.Article.Description,
-                        Price = x.Article.Price,
-                        Quantity = x.Quantity
-                    }).ToList(),
-                    Cash = SoldArticlesTotalCash,
-                    BankCard = SoldArticlesTotalBankCard
-                };
+                
                 string filename = ConfigurationManager.AppSettings["ClosingPath"];
                 using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
                 {
@@ -197,10 +198,12 @@ namespace PPC.Sale
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel($"Cannot save new articles. Exception: {ex}");
-                PopupService.DisplayModal(vm, "Error");
+                ErrorPopupViewModel vmError = new ErrorPopupViewModel($"Cannot save new articles. Exception: {ex}");
+                PopupService.DisplayModal(vmError, "Error");
             }
-            Application.Current.Shutdown();
+
+            ClosingPopupViewModel vm = new ClosingPopupViewModel(PopupService, () => Application.Current.Shutdown(), closing);
+            PopupService.DisplayModal(vm, "Closing"); // !! Shutdown application on close
         }
 
         #endregion

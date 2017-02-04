@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:app="clr-namespace:PPC.App"
         xmlns:players="clr-namespace:PPC.Players;assembly=PPC.Players"
-        xmlns:tab="clr-namespace:PPC.Tab;assembly=PPC.Tab"
         xmlns:sale="clr-namespace:PPC.Sale;assembly=PPC.Sale"
-        xmlns:popup="clr-namespace:PPC.Popup;assembly=PPC.Popup"
+        xmlns:popup="clr-namespace:PPC.Popup;assembly=PPC.Popup" 
+        xmlns:mvvm="clr-namespace:PPC.MVVM;assembly=PPC.MVVM"
         mc:Ignorable="d"
         SnapsToDevicePixels="True"
         d:DataContext="{d:DesignInstance app:MainWindowViewModelDesignData, IsDesignTimeCreatable=True}"
@@ -27,7 +27,7 @@
                     ItemsSource="{Binding Tabs}"
                     SelectedItem="{Binding SelectedTab}">
             <TabControl.ItemTemplate>
-                <DataTemplate DataType="{x:Type tab:TabBase}">
+                <DataTemplate DataType="{x:Type mvvm:TabBase}">
                     <TextBlock Margin="0,5"
                                Text="{Binding Header}">
                         <TextBlock.LayoutTransform>
@@ -35,7 +35,6 @@
                                 <RotateTransform Angle="-90" />
                             </TransformGroup>
                         </TextBlock.LayoutTransform>
-
                     </TextBlock>
                 </DataTemplate>
             </TabControl.ItemTemplate>

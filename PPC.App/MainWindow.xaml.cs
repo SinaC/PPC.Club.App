@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Media;
 using PPC.Popup;
 
 namespace PPC.App
@@ -10,6 +11,8 @@ namespace PPC.App
     {
         public MainWindow()
         {
+            TextOptions.SetTextFormattingMode(this, TextFormattingMode.Display); // avoid blurry rotated text
+
             InitializeComponent();
 
             EasyIoc.IocContainer.Default.RegisterInstance<IPopupService>(ModalPopupPresenter);

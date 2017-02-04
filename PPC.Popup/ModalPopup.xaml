@@ -26,6 +26,11 @@
                                           MaxHeight="300"
                                           DataContext="{Binding}"/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type popup:ClosingPopupViewModel}">
+            <popup:ClosingPopup MaxWidth="600"
+                                MaxHeight="400"
+                                DataContext="{Binding}"/>
+        </DataTemplate>
         <!-- Question may be modal -->
         <DataTemplate DataType="{x:Type popup:QuestionPopupViewModel}">
             <popup:QuestionPopup />

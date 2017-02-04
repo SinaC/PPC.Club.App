@@ -4,7 +4,6 @@ using System.Configuration;
 using System.Windows.Input;
 using PPC.MVVM;
 using PPC.Popup;
-using PPC.Tab;
 
 namespace PPC.Players
 {

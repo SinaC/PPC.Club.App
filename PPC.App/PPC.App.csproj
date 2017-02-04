@@ -150,10 +150,6 @@
       <Project>{556ebfb5-473a-4ff5-8499-d9c0ce7167da}</Project>
       <Name>PPC.Sale</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PPC.Tab\PPC.Tab.csproj">
-      <Project>{468CB448-EEF9-4693-B487-8B6A7BAA18D8}</Project>
-      <Name>PPC.Tab</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

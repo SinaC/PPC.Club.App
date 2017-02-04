@@ -1,6 +1,4 @@
-﻿using PPC.MVVM;
-
-namespace PPC.Tab
+﻿namespace PPC.MVVM
 {
     public abstract class TabBase : ObservableObject
     {

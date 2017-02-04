@@ -1,4 +1,4 @@
-﻿using PPC.Tab;
+﻿using PPC.MVVM;
 
 namespace PPC.Sale
 {

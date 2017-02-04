@@ -6,11 +6,27 @@
              xmlns:local="clr-namespace:PPC.Sale"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:ShopViewModelDesignData, IsDesignTimeCreatable=True}"
-             d:DesignHeight="300" d:DesignWidth="600">
+             d:DesignHeight="300" d:DesignWidth="800">
+    <UserControl.Resources>
+        <DataTemplate x:Key="TransactionDataTemplate" DataType="{x:Type local:ShopTransactionItem}">
+            <DataGrid IsReadOnly="True"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      AutoGenerateColumns="False"
+                      ItemsSource="{Binding Articles}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Description" Binding="{Binding Article.Description}"/>
+                    <DataGridTextColumn Header="Price" Binding="{Binding Article.Price}"/>
+                    <DataGridTextColumn Header="Category" Binding="{Binding Article.Category}"/>
+                    <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </DataTemplate>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <local:ShoppingCartView Grid.Row="0"
                                 DataContext="{Binding ShoppingCart}"/>
@@ -18,12 +34,13 @@
                   VerticalAlignment="Bottom"
                   IsExpanded="False">
             <Expander.Header>
-                <TextBlock Text="{Binding Transactions.Count, StringFormat={}#Transactions: {0}}"/>
+                <TextBlock Text="{Binding Transactions.Count, StringFormat={}#Closed transactions: {0}}"/>
             </Expander.Header>
             <DataGrid IsReadOnly="True"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
+                      RowDetailsTemplate="{StaticResource TransactionDataTemplate}"
                       ItemsSource="{Binding Transactions}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Timestamp"

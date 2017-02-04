@@ -4,14 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PPC.Sale"
-             xmlns:tab="clr-namespace:PPC.Tab;assembly=PPC.Tab"
+             xmlns:mvvm="clr-namespace:PPC.MVVM;assembly=PPC.MVVM"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:SaleViewModelDesignData, IsDesignTimeCreatable=True}"
              d:DesignHeight="600" d:DesignWidth="800">
     <UserControl.Resources>
-        <Style TargetType="{x:Type TextBlock}">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
         <DataTemplate DataType="{x:Type local:ShopViewModel}">
             <local:ShopView DataContext="{Binding}"/>
         </DataTemplate>
@@ -21,45 +18,17 @@
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" MaxHeight="300"/>
         </Grid.RowDefinitions>
-        <!-- TODO // footer with #articles | total price | #unpaid carts -->
         <TabControl Grid.Row="0"
                     ItemsSource="{Binding Tabs}"
                     SelectedItem="{Binding SelectedTab}">
             <TabControl.Resources>
                 <Style TargetType="{x:Type TabItem}">
-                    <!--<Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="{x:Type TabItem}">
-                                <Grid>
-                                    <Border Name="Border" 
-                                            Margin="0,0,0,0" 
-                                            Background="Transparent"
-                                            BorderBrush="Black" 
-                                            BorderThickness="1" 
-                                            CornerRadius="5">
-                                        <ContentPresenter x:Name="ContentSite" 
-                                                          VerticalAlignment="Center"
-                                                          HorizontalAlignment="Center"
-                                                          ContentSource="Header" Margin="12,2"
-                                                          RecognizesAccessKey="True"/>
-                                    </Border>
-                                </Grid>
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="IsSelected" Value="True">
-                                        <Setter Property="Panel.ZIndex" Value="100" />
-                                        <Setter TargetName="Border" Property="Background" Value="Gainsboro" />
-                                        <Setter TargetName="Border" Property="BorderThickness" Value="1,1,1,0" />
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>-->
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsPaid}" Value="True">
-                            <Setter Property="Background" Value="Green"/>
+                            <Setter Property="Background" Value="LimeGreen"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
@@ -74,8 +43,8 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Grid x:Name="HeaderPanel"
-                                    Grid.Column="0"
-                                    Grid.Row="0">
+                              Grid.Column="0"
+                              Grid.Row="0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
@@ -92,7 +61,7 @@
                                     Command="{Binding AddNewTabCommand}">
                                 <TextBlock Text="+"/>
                             </Button>
-                            <!-- dummy column 2 -->
+                             <!--dummy column 2--> 
                             <StackPanel Grid.Column="3" Orientation="Horizontal">
                                 <Button Margin="2,2,2,0"
                                         Command="{Binding ReloadCommand}">
@@ -119,13 +88,11 @@
                                               Margin="{TemplateBinding Padding}"
                                               SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
                         </Border>
-
-                        <!--<Border x:Name="DisabledVisualTop" IsHitTestVisible="False" Opacity="0" Canvas.ZIndex="1" Background="#8CFFFFFF" Grid.RowSpan="2" CornerRadius="0,0,3,3" Grid.Row="1" />-->
                     </Grid>
                 </ControlTemplate>
             </Control.Template>
             <TabControl.ItemTemplate>
-                <DataTemplate DataType="{x:Type tab:TabBase}">
+                <DataTemplate DataType="{x:Type mvvm:TabBase}">
                     <TextBlock Text="{Binding Header}"/>
                 </DataTemplate>
             </TabControl.ItemTemplate>
@@ -150,6 +117,9 @@
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
+                      ScrollViewer.CanContentScroll="True" 
+                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
                       ItemsSource="{Binding SoldArticles}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Ean"

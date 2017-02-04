@@ -2,7 +2,6 @@
 using PPC.MVVM;
 using PPC.Players;
 using PPC.Sale;
-using PPC.Tab;
 
 namespace PPC.App
 {
