@@ -11,6 +11,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
         <StackPanel Grid.Row="0" 
@@ -48,5 +49,11 @@
                                         Binding="{Binding Price, StringFormat=C}"/>
             </DataGrid.Columns>
         </DataGrid>
+
+        <Button Grid.Row="2"
+                Width="80"
+                Command="{Binding OkCommand}">
+            <TextBlock Text="Ok"/>
+        </Button>
     </Grid>
 </UserControl>

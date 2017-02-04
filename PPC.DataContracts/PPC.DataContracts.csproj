@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="Article.cs" />
     <Compile Include="Closing.cs" />
+    <Compile Include="ClosingConfig.cs" />
     <Compile Include="FullArticle.cs" />
     <Compile Include="produits.cs">
       <DependentUpon>produits.xsd</DependentUpon>

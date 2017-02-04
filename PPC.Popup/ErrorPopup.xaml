@@ -13,7 +13,6 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0"
-                   TextWrapping="Wrap"
                    Text="{Binding Summary}"/>
         <Expander Grid.Row="1"
                   IsExpanded="False"

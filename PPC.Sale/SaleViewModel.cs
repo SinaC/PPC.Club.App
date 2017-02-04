@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Windows;
@@ -171,9 +173,10 @@ namespace PPC.Sale
 
         private void ClosingConfirmed()
         {
+            // Compute closing
             Closing closing = new Closing
             {
-                Articles = SoldArticles.Select(x => new FullArticle
+                Articles = SoldArticles?.Select(x => new FullArticle
                 {
                     Guid = x.Article.Guid,
                     Ean = x.Article.Ean,
@@ -185,9 +188,13 @@ namespace PPC.Sale
                 BankCard = SoldArticlesTotalBankCard
             };
 
+            // Display popup
+            ClosingPopupViewModel vm = new ClosingPopupViewModel(PopupService, () => Application.Current.Shutdown(), closing);
+            PopupService.DisplayModal(vm, "Closing"); // !! Shutdown application on close
+
             try
             {
-                
+                // Dump closing file
                 string filename = ConfigurationManager.AppSettings["ClosingPath"];
                 using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
                 {
@@ -198,12 +205,66 @@ namespace PPC.Sale
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vmError = new ErrorPopupViewModel($"Cannot save new articles. Exception: {ex}");
+                ErrorPopupViewModel vmError = new ErrorPopupViewModel(ex);
                 PopupService.DisplayModal(vmError, "Error");
             }
+            try
+            {
+                string closingConfigFilename = ConfigurationManager.AppSettings["ClosingConfigPath"];
+                if (!File.Exists(closingConfigFilename))
+                {
+                    ErrorPopupViewModel vmError = new ErrorPopupViewModel("Closing config file not found -> Cannot send automatically closing mail.");
+                    PopupService.DisplayModal(vmError, "Error");
+                }
+                else
+                {
+                    ClosingConfig closingConfig;
+                    using (XmlTextReader reader = new XmlTextReader(closingConfigFilename))
+                    {
+                        
+                        DataContractSerializer serializer = new DataContractSerializer(typeof(ClosingConfig));
+                        closingConfig = (ClosingConfig) serializer.ReadObject(reader);
+                    }
 
-            ClosingPopupViewModel vm = new ClosingPopupViewModel(PopupService, () => Application.Current.Shutdown(), closing);
-            PopupService.DisplayModal(vm, "Closing"); // !! Shutdown application on close
+                    // Send mail
+                    MailAddress fromAddress = new MailAddress(closingConfig.SenderMail, "From PPC Club");
+                    MailAddress toAddress = new MailAddress(closingConfig.RecipientMail, "To PPC");
+                    SmtpClient client = new SmtpClient
+                    {
+                        Host = "smtp.gmail.com",
+                        Port = 587,
+                        EnableSsl = true,
+                        DeliveryMethod = SmtpDeliveryMethod.Network,
+                        UseDefaultCredentials = false,
+                        Credentials = new NetworkCredential(fromAddress.Address, closingConfig.SenderPassword)
+                    };
+                    StringBuilder sb = new StringBuilder();
+                    sb.AppendLine($"Cloture de la caisse du club (date: {DateTime.Now:F})");
+                    sb.AppendLine($"Cash: {closing.Cash:C}");
+                    sb.AppendLine($"Bancontact: {closing.BankCard:C}");
+                    sb.AppendLine("Articles:");
+                    if (SoldArticles != null)
+                    {
+                        foreach (FullArticle article in closing.Articles)
+                            sb.AppendLine($"{article.Quantity,5} * {article.Ean,15} {article.Description,30} {article.Price,10:C}");
+                    }
+                    else
+                        sb.AppendLine("néant");
+                    using (var message = new MailMessage(fromAddress, toAddress)
+                    {
+                        Subject = $"Cloture caisse du club (date {DateTime.Now:F})",
+                        Body = sb.ToString()
+                    })
+                    {
+                        client.Send(message);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorPopupViewModel vmError = new ErrorPopupViewModel(ex);
+                PopupService.DisplayModal(vmError, "Error");
+            }
         }
 
         #endregion
