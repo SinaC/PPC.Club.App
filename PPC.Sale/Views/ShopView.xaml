@@ -91,15 +91,18 @@
                   CanUserAddRows="False"
                   CanUserDeleteRows="False"
                   AutoGenerateColumns="False"
+                  VerticalScrollBarVisibility="Auto"
                   Style="{StaticResource DataGridExpandStyle}"
                   RowHeaderStyle="{StaticResource TransactionRowHeaderStyle}"
                   ItemsSource="{Binding Transactions}">
             <DataGrid.RowDetailsTemplate>
                 <DataTemplate DataType="{x:Type viewModels:ShopTransactionItem}">
-                    <DataGrid IsReadOnly="True"
+                    <DataGrid MaxHeight="300"
+                              IsReadOnly="True"
                               CanUserAddRows="False"
                               CanUserDeleteRows="False"
                               AutoGenerateColumns="False"
+                              VerticalScrollBarVisibility="Auto"
                               ItemsSource="{Binding Articles}">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Description" 
@@ -132,7 +135,6 @@
                     </ToggleButton>
                 </DataTemplate>
             </DataGrid.RowHeaderTemplate>
-
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Timestamp"
                                     Binding="{Binding Timestamp, StringFormat=dd/MM/yyyy HH:mm:ss}"/>

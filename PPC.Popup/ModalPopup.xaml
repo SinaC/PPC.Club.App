@@ -38,13 +38,15 @@
             <Thumb DragDelta="ThumbMove_OnDragDelta">
                 <Thumb.Template>
                     <ControlTemplate>
-                        <Border Height="20" HorizontalAlignment="Stretch" Background="DodgerBlue">
+                        <Border MinHeight="20" HorizontalAlignment="Stretch" Background="DodgerBlue">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Margin="5,2"
+                                <TextBlock Grid.Column="0"
+                                           Margin="5,2"
+                                           VerticalAlignment="Center"
                                            Text="{Binding Title, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"/>
                                 <Button Grid.Column="1"
                                         Margin="2"

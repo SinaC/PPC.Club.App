@@ -127,6 +127,7 @@
         </TabControl>
 
         <Expander Grid.Row="1"
+                  MaxHeight="300"
                   VerticalAlignment="Bottom"
                   IsExpanded="False">
             <Expander.Header>

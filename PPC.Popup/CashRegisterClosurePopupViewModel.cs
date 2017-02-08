@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Input;
 using PPC.DataContracts;
 using PPC.MVVM;
@@ -41,23 +42,30 @@ namespace PPC.Popup
         {
             BankCard = 53,
             Cash = 19,
-            Articles = new List<FullArticle>
+            //Articles = new List<FullArticle>
+            //{
+            //    new FullArticle
+            //    {
+            //        Description = "Article 1",
+            //        Ean = "123456",
+            //        Price = 5,
+            //        Quantity = 2
+            //    },
+            //    new FullArticle
+            //    {
+            //        Description = "Article 2",
+            //        Ean = "9876",
+            //        Price = 4,
+            //        Quantity = 5
+            //    }
+            //}
+            Articles = Enumerable.Range(0,50).Select(x => new FullArticle
             {
-                new FullArticle
-                {
-                    Description = "Article 1",
-                    Ean = "123456",
-                    Price = 5,
-                    Quantity = 2
-                },
-                new FullArticle
-                {
-                    Description = "Article 2",
-                    Ean = "9876",
-                    Price = 4,
-                    Quantity = 5
-                }
-            }
+                Description = $"Article {x}",
+                Ean = "123456",
+                Price = 2+x,
+                Quantity = 5+x
+            }).ToList()
         }, () => { }, _ => { })
         {
         }

@@ -12,7 +12,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-        
+
             <TextBlock Grid.Row="0" FontWeight="Bold" Margin="10"
                        Text="{Binding Question}"/>
             

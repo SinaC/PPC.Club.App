@@ -9,30 +9,33 @@
              d:DesignHeight="300" d:DesignWidth="300"
              Width="400"
              MaxHeight="300">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0"
-                   Text="{Binding Summary}"/>
-        <Expander Grid.Row="1"
-                  IsExpanded="False"
-                  Header="Details">
-            <Expander.Style>
-                <Style TargetType="{x:Type Expander}">
-                    <Setter Property="Visibility" Value="Collapsed"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding HasDetails}" Value="True">
-                            <Setter Property="Visibility" Value="Visible"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Expander.Style>
-            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                <TextBox TextWrapping="Wrap"
-                         Text="{Binding Details}"/>
-            </ScrollViewer>
-        </Expander>
-    </Grid>
+    <Border BorderBrush="Black" BorderThickness="1" Background="LightGray">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0"
+                       Margin="5,2"
+                       Text="{Binding Summary}"/>
+            <Expander Grid.Row="1"
+                      IsExpanded="False"
+                      Header="Details">
+                <Expander.Style>
+                    <Style TargetType="{x:Type Expander}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding HasDetails}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Expander.Style>
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                    <TextBox TextWrapping="Wrap"
+                             Text="{Binding Details}"/>
+                </ScrollViewer>
+            </Expander>
+        </Grid>
+    </Border>
 </UserControl>
