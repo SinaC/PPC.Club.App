@@ -1,5 +1,10 @@
-﻿using System.Windows;
+﻿using System;
+using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Threading;
+using Xceed.Wpf.AvalonDock.Controls;
 using Xceed.Wpf.Toolkit;
 
 namespace PPC.Popup
@@ -14,12 +19,28 @@ namespace PPC.Popup
             InitializeComponent();
         }
 
-        private void UpDownBase_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        private void DecimalUpDown_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
+            // DecimalUpDown uses current culture and it seems fr-BE doesn't use . but ,
             DecimalUpDown @this = sender as DecimalUpDown;
             if (@this == null)
                 return;
             @this.Text = @this.Text.Replace('.', ',');
+        }
+
+        private void DecimalUpDown_OnGotFocus(object sender, RoutedEventArgs e)
+        {
+            // Crappy workaround because FocusManager.FocusedElement doesn't set Keyboard focus
+            DecimalUpDown @this = sender as DecimalUpDown;
+            TextBox partTextBox = @this?.FindVisualChildren<TextBox>().FirstOrDefault(x => x.Name == "PART_TextBox");
+            if (partTextBox == null)
+                return;
+            Dispatcher.BeginInvoke((Action)delegate
+            {
+                Keyboard.Focus(partTextBox);
+                partTextBox.SelectAll();
+            }, DispatcherPriority.Render);
+
         }
     }
 }

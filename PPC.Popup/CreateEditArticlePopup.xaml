@@ -7,7 +7,9 @@
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:CreateEditArticlePopupViewModelDesignData, IsDesignTimeCreatable=True}"
-             d:DesignHeight="300" d:DesignWidth="400">
+             d:DesignHeight="300" d:DesignWidth="400"
+             Width="400"
+             MaxHeight="300">
     <Grid FocusManager.FocusedElement="{Binding ElementName=NameTextBox}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

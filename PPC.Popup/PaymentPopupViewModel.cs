@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Input;
 using PPC.MVVM;
 
@@ -8,7 +9,19 @@ namespace PPC.Popup
     {
         private readonly IPopupService _popupService;
         private readonly Action<decimal, decimal> _paidAction;
-        public decimal Total { get; }
+
+        public decimal TotalWithoutDiscount { get; }
+
+        public decimal MinBankCard { get; private set; } = 5; // Config ?
+
+        public decimal Total => TotalWithoutDiscount - Discount;
+
+        private bool _hasBeenInitializedFromCash;
+        public bool HasBeenInitializedFromCash
+        {
+            get { return _hasBeenInitializedFromCash; }
+            set { Set(() => HasBeenInitializedFromCash, ref _hasBeenInitializedFromCash, value); }
+        }
 
         private decimal _cash;
         public decimal Cash
@@ -18,7 +31,7 @@ namespace PPC.Popup
             {
                 if (Set(() => Cash, ref _cash, value))
                 {
-                    _bankCard = Total - Cash;
+                    _bankCard = Total - Cash; // TODO: check MinBankCard
                     RaisePropertyChanged(() => BankCard);
                     RaisePropertyChanged(() => CurrentTotal);
                     RaisePropertyChanged(() => IsPaidButtonActive);
@@ -73,6 +86,67 @@ namespace PPC.Popup
             }
         }
 
+        private decimal _discount;
+        public decimal Discount
+        {
+            get {  return _discount;}
+            set
+            {
+                if (Set(() => Discount, ref _discount, value))
+                {
+                    // Set cash to total if no bank card payment
+                    if (BankCard == 0)
+                        _cash = Total;
+                    // Set bank to total if no cash payment
+                    else if (Cash == 0)
+                    {
+                        if (Total < MinBankCard) // *** same code (TODO: refactoring)
+                        {
+                            _bankCard = MinBankCard;
+                            _cash = Math.Max(0, Total - MinBankCard);
+                        }
+                        else
+                            _bankCard = Total;
+                    }
+                    // In case of mixed payment, try to remove discount from biggest value without going below bank card minimum (5EUR)
+                    else
+                    {
+                        if (Cash >= Discount)
+                            _cash -= Discount;
+                        else if (BankCard >= Discount) // *** same code (TODO: refactoring)
+                        {
+                            if (BankCard - Discount < MinBankCard)
+                            {
+                                _bankCard = MinBankCard;
+                                _cash = Math.Max(0, Total - MinBankCard);
+                            }
+                            else
+                                _bankCard -= Discount;
+                        }
+                        else
+                        {
+                            //
+                            _cash = 0;
+                            _bankCard = Total;
+                        }
+                    }
+                    RaisePropertyChanged(() => HasDiscount);
+                    RaisePropertyChanged(() => Total);
+                    RaisePropertyChanged(() => Cash);
+                    RaisePropertyChanged(() => BankCard);
+                    RaisePropertyChanged(() => CurrentTotal);
+                    RaisePropertyChanged(() => IsPaidButtonActive);
+                    RaisePropertyChanged(() => IsClientCashNotEnough);
+                    RaisePropertyChanged(() => ClientChange);
+                    RaisePropertyChanged(() => IsClientChangePositive);
+                    RaisePropertyChanged(() => MaxBankCard);
+                    RaisePropertyChanged(() => IsPaidButtonActive);
+                }
+            }
+        }
+
+        public bool HasDiscount => Discount > 0;
+
         public bool IsClientCashNotEnough => Cash > 0 && ClientCash < Cash;
 
         public decimal ClientChange => ClientCash > 0 && Cash > 0 ? ClientCash - Cash : 0;
@@ -84,7 +158,7 @@ namespace PPC.Popup
         public bool IsPaidButtonActive => !IsClientCashNotEnough && CurrentTotal >= Total; // >= because client can give more cash than needed
 
         private ICommand _paidCommand;
-        public ICommand PaidCommand => _paidCommand = _paidCommand ?? new RelayCommand(Paid);
+        public ICommand PaidCommand => _paidCommand = _paidCommand ?? new RelayCommand(Paid, () => IsPaidButtonActive);
 
         private void Paid()
         {
@@ -95,15 +169,16 @@ namespace PPC.Popup
         public PaymentPopupViewModel(IPopupService popupService, decimal total, bool isCashFirst, Action<decimal,decimal> paidAction)
         {
             _popupService = popupService;
-            Total = total;
+            TotalWithoutDiscount = total;
             _paidAction = paidAction;
 
             Cash = 0;
             BankCard = 0;
-            if (isCashFirst)
+            if (isCashFirst || total < MinBankCard)
                 Cash = total;
             else
                 BankCard = total;
+            HasBeenInitializedFromCash = isCashFirst;
         }
     }
 
@@ -113,6 +188,7 @@ namespace PPC.Popup
         {
             ClientCash = 5;
             BankCard = 7;
+            Discount = 2;
         }
     }
 }

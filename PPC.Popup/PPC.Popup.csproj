@@ -34,9 +34,6 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
@@ -70,10 +67,10 @@
       <DependentUpon>AskNamePopup.xaml</DependentUpon>
     </Compile>
     <Compile Include="AskNamePopupViewModel.cs" />
-    <Compile Include="ClosingPopup.xaml.cs">
-      <DependentUpon>ClosingPopup.xaml</DependentUpon>
+    <Compile Include="CashRegisterClosurePopup.xaml.cs">
+      <DependentUpon>CashRegisterClosurePopup.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ClosingPopupViewModel.cs" />
+    <Compile Include="CashRegisterClosurePopupViewModel.cs" />
     <Compile Include="ErrorPopup.xaml.cs">
       <DependentUpon>ErrorPopup.xaml</DependentUpon>
     </Compile>
@@ -119,7 +116,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ClosingPopup.xaml">
+    <Page Include="CashRegisterClosurePopup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

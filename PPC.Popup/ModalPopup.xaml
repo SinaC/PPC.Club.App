@@ -12,24 +12,16 @@
             <popup:AskNamePopup DataContext="{Binding}"/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type popup:ErrorPopupViewModel}">
-            <popup:ErrorPopup Width="400"
-                              MaxHeight="300"
-                              DataContext="{Binding}"/>
+            <popup:ErrorPopup DataContext="{Binding}"/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type popup:PaymentPopupViewModel}">
-            <popup:PaymentPopup Width="400"
-                                MaxHeight="300"
-                                DataContext="{Binding}"/>
+            <popup:PaymentPopup DataContext="{Binding}"/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type popup:CreateEditArticlePopupViewModel}">
-            <popup:CreateEditArticlePopup Width="400"
-                                          MaxHeight="300"
-                                          DataContext="{Binding}"/>
+            <popup:CreateEditArticlePopup DataContext="{Binding}"/>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type popup:ClosingPopupViewModel}">
-            <popup:ClosingPopup MaxWidth="600"
-                                MaxHeight="400"
-                                DataContext="{Binding}"/>
+        <DataTemplate DataType="{x:Type popup:CashRegisterClosurePopupViewModel}">
+            <popup:CashRegisterClosurePopup DataContext="{Binding}"/>
         </DataTemplate>
         <!-- Question may be modal -->
         <DataTemplate DataType="{x:Type popup:QuestionPopupViewModel}">
@@ -55,6 +47,7 @@
                                 <TextBlock Grid.Column="0" Margin="5,2"
                                            Text="{Binding Title, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"/>
                                 <Button Grid.Column="1"
+                                        Margin="2"
                                         Click="ButtonClose_Click">
                                     <TextBlock VerticalAlignment="Center"
                                                Text="X"/>

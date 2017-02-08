@@ -36,15 +36,20 @@ namespace PPC.Sale
                     using (XmlTextReader reader = new XmlTextReader(filename))
                     {
                         DataContractSerializer serializer = new DataContractSerializer(typeof(List<Article>));
-                        newArticles = (List<Article>)serializer.ReadObject(reader);
+                        newArticles = (List<Article>) serializer.ReadObject(reader);
                     }
                     Articles.AddRange(newArticles);
+                }
+                else
+                {
+                    ErrorPopupViewModel vm = new ErrorPopupViewModel("Articles DB file not found.");
+                    PopupService.DisplayModal(vm, "Warning");
                 }
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel($"Cannot load articles. Exception: {ex}");
-                PopupService.DisplayModal(vm, "Error");
+                ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
+                PopupService.DisplayModal(vm, "Cannot load articles");
             }
         }
 
@@ -62,8 +67,8 @@ namespace PPC.Sale
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel($"Cannot save articles. Exception: {ex}");
-                PopupService.DisplayModal(vm, "Error");
+                ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
+                PopupService.DisplayModal(vm, "Cannot save articles");
             }
         }
 
@@ -92,8 +97,8 @@ namespace PPC.Sale
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel($"Cannot import articles. Exception: {ex}");
-                PopupService.DisplayModal(vm, "Error");
+                ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
+                PopupService.DisplayModal(vm, "Cannot import articles");
             }
         }
     }

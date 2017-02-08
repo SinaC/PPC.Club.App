@@ -1,4 +1,6 @@
-﻿namespace PPC.MVVM
+﻿using System.Windows.Input;
+
+namespace PPC.MVVM
 {
     public abstract class TabBase : ObservableObject
     {

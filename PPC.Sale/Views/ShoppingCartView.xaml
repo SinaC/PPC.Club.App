@@ -1,0 +1,273 @@
+﻿<UserControl x:Class="PPC.Sale.Views.ShoppingCartView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:dataContracts="clr-namespace:PPC.DataContracts;assembly=PPC.DataContracts"
+             xmlns:controls="clr-namespace:PPC.Controls;assembly=PPC.Controls"
+             xmlns:viewModels="clr-namespace:PPC.Sale.ViewModels"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance viewModels:ShoppingCartViewModelDesignData, IsDesignTimeCreatable=True}"
+             d:DesignHeight="300" d:DesignWidth="800">
+    <Grid FocusManager.FocusedElement="{Binding ElementName=EanTextBox}">
+        <Grid.InputBindings>
+            <KeyBinding Key="Return" 
+                        Command="{Binding AddSelectedArticleCommand}"/>
+            <KeyBinding Key="Add" 
+                        Command="{Binding IncrementSelectedArticleCommand}"/>
+            <KeyBinding Key="Subtract" 
+                        Command="{Binding DecrementSelectedArticleCommand}"/>
+            <!--<KeyBinding Key="C" 
+                        Command="{Binding CashCommand}"/>
+            <KeyBinding Key="B" 
+                        Command="{Binding BankCardCommand}"/>-->
+        </Grid.InputBindings>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <GroupBox Grid.Row="0"
+                  Header="Article">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Ean -->
+                <TextBlock Grid.Row="0" 
+                           Grid.Column="0"
+                           Margin="5,2"
+                           Text="EAN"/>
+                <StackPanel Grid.Row="1" 
+                             Grid.Column="0" 
+                             Orientation="Vertical">
+                    <TextBox x:Name="EanTextBox"
+                             Width="100"
+                             VerticalAlignment="Top"
+                             Margin="5,2"
+                             MaxLength="13"
+                             Text="{Binding Ean, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Margin="5,2"
+                            Command="{Binding CreateArticleCommand}">
+                        <TextBlock Text="New article"/>
+                    </Button>
+                </StackPanel>
+
+                <!-- Article -->
+                <TextBlock Grid.Row="0" 
+                           Grid.Column="1" 
+                           Margin="5,2"
+                           Text="Article"/>
+                <StackPanel Grid.Row="1" 
+                            Grid.Column="1" 
+                            Orientation="Vertical">
+                    <ComboBox Width="300"
+                              Margin="5,2"
+                              ItemsSource="{Binding Categories}"
+                              SelectedItem="{Binding SelectedCategory}"/>
+                    <ComboBox Width="300"
+                              Margin="5,2"
+                              ScrollViewer.VerticalScrollBarVisibility="Auto"
+                              ItemsSource="{Binding Articles}"
+                              SelectedItem="{Binding SelectedArticle}">
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type dataContracts:Article}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Description}"/>
+                                    <TextBlock Text="{Binding Price, StringFormat={} ({0:C})}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <controls:KeyFriendlyAutoCompleteBox Width="300"
+                                             Margin="5,2"
+                                             IsTextCompletionEnabled="False"
+                                             FilterMode="ContainsOrdinal"
+                                             MinimumPopulateDelay="0"
+                                             MinimumPrefixLength="3"
+                                             ValueMemberPath="Description"
+                                             ItemsSource="{Binding Articles}"
+                                             SelectedItem="{Binding SelectedArticle, Mode=TwoWay}">
+                        <controls:KeyFriendlyAutoCompleteBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type dataContracts:Article}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Description}"/>
+                                    <TextBlock Text="{Binding Price, StringFormat={} ({0:C})}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </controls:KeyFriendlyAutoCompleteBox.ItemTemplate>
+                    </controls:KeyFriendlyAutoCompleteBox>
+                </StackPanel>
+
+                <!-- Price -->
+                <TextBlock Grid.Row="0" 
+                           Grid.Column="2" 
+                           Margin="5,2"
+                           Text="Price"/>
+                <TextBlock Grid.Row="1" 
+                           Grid.Column="2" 
+                           VerticalAlignment="Top"
+                           Margin="5,2"
+                           Text="{Binding SelectedArticle.Price, StringFormat=C}"/>
+
+                <!-- +Quantity -->
+                <Button Grid.Row="1" 
+                        Grid.Column="3" 
+                        VerticalAlignment="Top"
+                        Width="20"
+                        Margin="5,2"
+                        Command="{Binding IncrementSelectedArticleCommand}">
+                    <TextBlock Text="+"/>
+                </Button>
+
+                <!-- -Quantity -->
+                <Button Grid.Row="1" 
+                        Grid.Column="4" 
+                        VerticalAlignment="Top"
+                        Width="20"
+                        Margin="5,2"
+                        Command="{Binding DecrementSelectedArticleCommand}">
+                    <TextBlock Text="-"/>
+                </Button>
+
+                <!-- Edit article -->
+                <Button Grid.Row="1"
+                        Grid.Column="2"
+                        Grid.ColumnSpan="3"
+                        Margin="5,2"
+                        VerticalAlignment="Bottom"
+                        Command="{Binding EditArticleCommand}">
+                    <TextBlock Text="Edit Article"/>
+                </Button>
+
+                <!-- Quantity -->
+                <TextBlock Grid.Row="0" 
+                           Grid.Column="5"
+                           VerticalAlignment="Top"
+                           Margin="5,2"
+                           Text="Quantity"/>
+                <TextBox Grid.Row="1" 
+                         Grid.Column="5" 
+                         VerticalAlignment="Top"
+                         Margin="5,2"
+                         Text="{Binding Quantity}"/>
+
+                <!-- Add article -->
+                <Button Grid.Row="1" 
+                        Grid.Column="6" 
+                        VerticalAlignment="Top"
+                        Width="80"
+                        Margin="5,2"
+                        Command="{Binding AddSelectedArticleCommand}">
+                    <TextBlock Text="Add"/>
+                </Button>
+            </Grid>
+        </GroupBox>
+        <GroupBox Grid.Row="1" 
+                  Header="Cart">
+            <DataGrid CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      AutoGenerateColumns="False"
+                      VerticalScrollBarVisibility="Auto"
+                      ScrollViewer.CanContentScroll="True"
+                      ItemsSource="{Binding ShoppingCartArticles}">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate DataType="{x:Type viewModels:ShopArticleItem}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button Grid.Column="0"
+                                                Width="16"
+                                                Command="{Binding DataContext.DeleteArticleCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                                                CommandParameter="{Binding}">
+                                        <TextBlock Text="X"/>
+                                    </Button>
+                                    <Button Grid.Column="1"
+                                                Width="16"
+                                                Command="{Binding DataContext.IncrementArticleCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                                                CommandParameter="{Binding}">
+                                        <TextBlock Text="+"/>
+                                    </Button>
+                                    <Button Grid.Column="2"
+                                                Width="16"
+                                                Command="{Binding DataContext.DecrementArticleCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                                                CommandParameter="{Binding}">
+                                        <TextBlock Text="-"/>
+                                    </Button>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn IsReadOnly="True" 
+                                        Width="*" 
+                                        MaxWidth="400"
+                                        Header="Description" 
+                                        Binding="{Binding Article.Description}"/>
+                    <DataGridTextColumn IsReadOnly="True" 
+                                        Header="Quantity" 
+                                        Binding="{Binding Quantity}"/>
+                    <DataGridTextColumn IsReadOnly="True" 
+                                        Header="Price" 
+                                        Binding="{Binding Article.Price, StringFormat=C}"/>
+                    <DataGridTextColumn IsReadOnly="True" 
+                                        Header="Total" 
+                                        Binding="{Binding Total, StringFormat=C}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+        <GroupBox Grid.Row="2"
+                  Header="Total">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="1"
+                           Margin="5,2"
+                           Text="{Binding Total, StringFormat=C}"/>
+                <Button Grid.Column="2"
+                        Width="80"
+                        Margin="5,2"
+                        Command="{Binding CashCommand}">
+                    <TextBlock Text="Cash"/>
+                </Button>
+                <Button Grid.Column="3" 
+                        Width="80"
+                        Margin="5,2"
+                        Command="{Binding BankCardCommand}">
+                    <TextBlock Text="BC"/>
+                </Button>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</UserControl>
+
+
+
+
+
+
+

@@ -16,11 +16,12 @@ namespace EasyIoc
 
         private readonly object _lockObject = new object();
 
+        #region Singleton
+
         private static readonly Lazy<IocContainer> LazyDefault = new Lazy<IocContainer>(() => new IocContainer());
-        public static IIocContainer Default
-        {
-            get { return LazyDefault.Value; }
-        }
+        public static IIocContainer Default => LazyDefault.Value;
+
+        #endregion
 
         #region IIocContainer
 
@@ -51,7 +52,7 @@ namespace EasyIoc
                 throw new ArgumentException("Cannot Register: No interface or abstract class is valid as implementation");
 
             if (!interfaceType.IsAssignableFrom(implementationType))
-                throw new ArgumentException(String.Format("{0} is not assignable from {1}", interfaceType.FullName, implementationType.FullName));
+                throw new ArgumentException($"{interfaceType.FullName} is not assignable from {implementationType.FullName}");
 
             lock (_lockObject)
             {
@@ -64,7 +65,7 @@ namespace EasyIoc
                 if (_implementations.ContainsKey(interfaceType))
                 {
                     if (_implementations[interfaceType] != implementationType)
-                        throw new ArgumentException(String.Format("Cannot Register: An implementation has already been registered for interface {0}", interfaceType.FullName));
+                        throw new ArgumentException($"Cannot Register: An implementation has already been registered for interface {interfaceType.FullName}");
                 }
                 else
                     _implementations.Add(interfaceType, implementationType);
@@ -76,7 +77,7 @@ namespace EasyIoc
             where TInterface : class
         {
             if (createFunc == null)
-                throw new ArgumentNullException("createFunc");
+                throw new ArgumentNullException(nameof(createFunc));
 
             Type interfaceType = typeof (TInterface);
 
@@ -94,7 +95,7 @@ namespace EasyIoc
                 if (_factories.ContainsKey(interfaceType))
                 {
                     if (_factories[interfaceType] != createFunc)
-                        throw new ArgumentException(String.Format("Cannot RegisterFactory: A factory has already been registered for interface {0}", interfaceType.FullName));
+                        throw new ArgumentException($"Cannot RegisterFactory: A factory has already been registered for interface {interfaceType.FullName}");
                 }
                 else
                     _factories[interfaceType] = createFunc;
@@ -105,7 +106,7 @@ namespace EasyIoc
             where TInterface : class
         {
             if (instance == null)
-                throw new ArgumentNullException("instance");
+                throw new ArgumentNullException(nameof(instance));
 
             Type interfaceType = typeof (TInterface);
 
@@ -123,7 +124,7 @@ namespace EasyIoc
                 if (_instances.ContainsKey(interfaceType))
                 {
                     if (_instances[interfaceType] != instance)
-                        throw new ArgumentException(String.Format("Cannot RegisterInstance: An instance has already been registered for interface {0}", interfaceType.FullName));
+                        throw new ArgumentException($"Cannot RegisterInstance: An instance has already been registered for interface {interfaceType.FullName}");
                 }
                 else
                     _instances.Add(interfaceType, instance);
@@ -201,13 +202,13 @@ namespace EasyIoc
             if (resolveTree is ErrorNode)
             {
                 if (resolveTree == ErrorNode.TypeNotRegistered)
-                    throw new ArgumentException(String.Format("Cannot Resolve: No registration found for type {0}", interfaceType.FullName));
+                    throw new ArgumentException($"Cannot Resolve: No registration found for type {interfaceType.FullName}");
                 if (resolveTree == ErrorNode.NoPublicConstructorOrNoConstructor)
-                    throw new ArgumentException(String.Format("Cannot Resolve: No constructor or not public constructor for type {0}", interfaceType.FullName));
+                    throw new ArgumentException($"Cannot Resolve: No constructor or not public constructor for type {interfaceType.FullName}");
                 if (resolveTree == ErrorNode.NoResolvableConstructor)
-                    throw new ArgumentException(String.Format("Cannot Resolve: No resolvable constructor for type {0}", interfaceType.FullName));
+                    throw new ArgumentException($"Cannot Resolve: No resolvable constructor for type {interfaceType.FullName}");
                 if (resolveTree == ErrorNode.CyclicDependencyConstructor)
-                    throw new ArgumentException(String.Format("Cannot Resolve: Cyclic dependency detected for type {0}", interfaceType.FullName));
+                    throw new ArgumentException($"Cannot Resolve: Cyclic dependency detected for type {interfaceType.FullName}");
             }
             // Create instance
             try
@@ -234,20 +235,20 @@ namespace EasyIoc
             {
                 // Don't search in resolve tree cache: ResolveTree may be different with or without parameters
                 // Create resolve tree
-                List<ParameterValue> parametersList = parameters == null ? null : parameters.ToList();
+                List<ParameterValue> parametersList = parameters?.ToList();
                 resolveTree = BuildResolveTree(interfaceType, parametersList);
             }
             // Check errors
             if (resolveTree is ErrorNode)
             {
                 if (resolveTree == ErrorNode.TypeNotRegistered)
-                    throw new ArgumentException(String.Format("Cannot Resolve: No registration found for type {0}", interfaceType.FullName));
+                    throw new ArgumentException($"Cannot Resolve: No registration found for type {interfaceType.FullName}");
                 if (resolveTree == ErrorNode.NoPublicConstructorOrNoConstructor)
-                    throw new ArgumentException(String.Format("Cannot Resolve: No constructor or not public constructor for type {0}", interfaceType.FullName));
+                    throw new ArgumentException($"Cannot Resolve: No constructor or not public constructor for type {interfaceType.FullName}");
                 if (resolveTree == ErrorNode.NoResolvableConstructor)
-                    throw new ArgumentException(String.Format("Cannot Resolve: No resolvable constructor for type {0}", interfaceType.FullName));
+                    throw new ArgumentException($"Cannot Resolve: No resolvable constructor for type {interfaceType.FullName}");
                 if (resolveTree == ErrorNode.CyclicDependencyConstructor)
-                    throw new ArgumentException(String.Format("Cannot Resolve: Cyclic dependency detected for type {0}", interfaceType.FullName));
+                    throw new ArgumentException($"Cannot Resolve: Cyclic dependency detected for type {interfaceType.FullName}");
             }
             // Create instance
             try
@@ -317,7 +318,7 @@ namespace EasyIoc
             public override object Resolve()
             {
                 if (Factory == null)
-                    throw new InvalidOperationException(String.Format("No factory for type {0}", InterfaceType.FullName));
+                    throw new InvalidOperationException($"No factory for type {InterfaceType.FullName}");
 
                 object instance = Factory.DynamicInvoke(null);
                 return instance;
@@ -336,13 +337,13 @@ namespace EasyIoc
 
         private sealed class BuildableNode : ResolveNodeBase
         {
-            public ConstructorInfo ConstructorInfo { get; set; }
-            public List<ResolveNodeBase> Parameters { get; set; }
+            public ConstructorInfo ConstructorInfo { private get; set; }
+            public List<ResolveNodeBase> Parameters { private get; set; }
 
             public override object Resolve()
             {
                 if (ConstructorInfo == null)
-                    throw new InvalidOperationException(String.Format("No constructor info for type {0}", InterfaceType.FullName));
+                    throw new InvalidOperationException($"No constructor info for type {InterfaceType.FullName}");
 
                 // If parameterless, create instance
                 if (Parameters == null)
@@ -427,7 +428,7 @@ namespace EasyIoc
                 bool ok = true;
                 foreach (ParameterInfo parameterInfo in c.Parameters)
                 {
-                    ParameterValue parameterValue = userDefinedParameters != null ? userDefinedParameters.FirstOrDefault(x => x.Name == parameterInfo.Name) : null;
+                    ParameterValue parameterValue = userDefinedParameters?.FirstOrDefault(x => x.Name == parameterInfo.Name);
                     if (parameterValue != null)
                     {
                         ValueNode parameter = new ValueNode

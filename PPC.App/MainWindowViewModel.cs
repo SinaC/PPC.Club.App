@@ -1,12 +1,20 @@
 ﻿using System.Collections.ObjectModel;
+using PPC.Messages;
 using PPC.MVVM;
-using PPC.Players;
-using PPC.Sale;
+using PPC.Players.ViewModels;
+using PPC.Sale.ViewModels;
 
 namespace PPC.App
 {
     public class MainWindowViewModel : ObservableObject
     {
+        private bool _isWaiting;
+        public bool IsWaiting
+        {
+            get { return _isWaiting; }
+            set { Set(() => IsWaiting, ref _isWaiting, value); }
+        }
+
         private ObservableCollection<TabBase> _tabs;
         public ObservableCollection<TabBase> Tabs
         {
@@ -46,6 +54,20 @@ namespace PPC.App
                 PlayersViewModel
             };
             SelectedTab = Tabs[0];
+
+            Mediator.Default.Register<ChangeWaitingMessage>(this, ChangeWaiting);
+            Mediator.Default.Register<PlayerSelectedMessage>(this, PlayerSelected);
+        }
+
+        private void ChangeWaiting(ChangeWaitingMessage msg)
+        {
+            IsWaiting = msg.IsWaiting;
+        }
+
+        private void PlayerSelected(PlayerSelectedMessage msg)
+        {
+            if (msg.SwitchToSaleTab)
+                SelectedTab = SaleViewModel;
         }
     }
 

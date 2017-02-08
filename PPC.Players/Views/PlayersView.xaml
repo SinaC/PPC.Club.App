@@ -1,0 +1,47 @@
+﻿<UserControl x:Class="PPC.Players.Views.PlayersView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:viewModels="clr-namespace:PPC.Players.ViewModels"
+             xmlns:helpers="clr-namespace:PPC.Helpers;assembly=PPC.Helpers"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance viewModels:PlayersViewModelDesignData, IsDesignTimeCreatable=True}"
+             d:DesignHeight="300" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0"
+                    Orientation="Horizontal">
+            <Button Margin="5,2"
+                    Command="{Binding LoadCommand}">
+                <TextBlock Text="Load"/>
+            </Button>
+            <Button Margin="5,2"
+                    Command="{Binding SaveCommand}">
+                <TextBlock Text="Save"/>
+            </Button>
+        </StackPanel>
+
+        <DataGrid x:Name="PlayersDataGrid"  Grid.Row="1"
+                  ItemsSource="{Binding Players}"
+                  AutoGenerateColumns="False"
+                  ScrollViewer.CanContentScroll="True" 
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                  helpers:DataGridHelpers.DataGridDoubleClickCommand="{Binding SelectPlayerCommand}"
+                  helpers:DataGridHelpers.DataGridDoubleClickWithModifierCommand="{Binding SelectPlayerWithModifierCommand}"
+                  BeginningEdit="DataGrid_OnBeginningEdit">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="DCI" Binding="{Binding DCINumber}"/>
+                <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}"/>
+                <DataGridTextColumn Header="Last Name" Binding="{Binding LastName}"/>
+                <DataGridTextColumn Header="Country" Binding="{Binding CountryCode}"/>
+                <DataGridCheckBoxColumn Header="Judge?" Binding="{Binding IsJudge}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

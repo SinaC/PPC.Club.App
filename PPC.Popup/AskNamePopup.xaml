@@ -6,7 +6,10 @@
              xmlns:local="clr-namespace:PPC.Popup"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:AskNamePopupViewModelDesignData, IsDesignTimeCreatable=True}"
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="300"
+             Width="300"
+             MaxWidth="500"
+             MaxHeight="100">
     <Grid FocusManager.FocusedElement="{Binding ElementName=NameTextBox}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
