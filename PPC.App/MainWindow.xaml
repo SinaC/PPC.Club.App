@@ -16,7 +16,8 @@
         SnapsToDevicePixels="True"
         d:DataContext="{d:DesignInstance app:MainWindowViewModelDesignData, IsDesignTimeCreatable=True}"
         Icon="logo.png"
-        Title="PPC Club" Height="600" Width="800">
+        Title="PPC Club" Height="600" Width="800"
+        TextElement.FontSize="16">
     <Window.Resources>
         <DataTemplate DataType="{x:Type playersViewModels:PlayersViewModel}">
             <playersViews:PlayersView DataContext="{Binding}"/>
@@ -26,38 +27,29 @@
         </DataTemplate>
         <SolidColorBrush Color="Black" Opacity=".20" x:Key="ModalPopupPresenterOverlayBrush"/>
     </Window.Resources>
-    <Grid SizeChanged="MainGrid_SizeChanged">
-        <Grid.LayoutTransform>
-            <ScaleTransform x:Name="ApplicationScaleTransform"
-                        CenterX="0"
-                        CenterY="0"
-                        ScaleX="{Binding ElementName=AppMainWindow, Path=ScaleValue}"
-                        ScaleY="{Binding ElementName=AppMainWindow, Path=ScaleValue}" />
-        </Grid.LayoutTransform>
-        <popup:ModalPopupPresenter x:Name="ModalPopupPresenter"
-                                   OverlayBrush="{StaticResource ModalPopupPresenterOverlayBrush}">
-            <controls:AdornedControl IsAdornerVisible="{Binding IsWaiting}">
-                <controls:AdornedControl.AdornerContent>
-                    <controls:LoadingWait />
-                </controls:AdornedControl.AdornerContent>
-                <TabControl TabStripPlacement="Left"
-                            SnapsToDevicePixels="True"
-                            ItemsSource="{Binding Tabs}"
-                            SelectedItem="{Binding SelectedTab}">
-                    <TabControl.ItemTemplate>
-                        <DataTemplate DataType="{x:Type mvvm:TabBase}">
-                            <TextBlock Margin="0,5"
-                                       Text="{Binding Header}">
-                                <TextBlock.LayoutTransform>
-                                    <TransformGroup>
-                                        <RotateTransform Angle="-90" />
-                                    </TransformGroup>
-                                </TextBlock.LayoutTransform>
-                            </TextBlock>
-                        </DataTemplate>
-                    </TabControl.ItemTemplate>
-                </TabControl>
-            </controls:AdornedControl>
-        </popup:ModalPopupPresenter>
-    </Grid>
+    <popup:ModalPopupPresenter x:Name="ModalPopupPresenter"
+                                OverlayBrush="{StaticResource ModalPopupPresenterOverlayBrush}">
+        <controls:AdornedControl IsAdornerVisible="{Binding IsWaiting}">
+            <controls:AdornedControl.AdornerContent>
+                <controls:LoadingWait />
+            </controls:AdornedControl.AdornerContent>
+            <TabControl TabStripPlacement="Left"
+                        SnapsToDevicePixels="True"
+                        ItemsSource="{Binding Tabs}"
+                        SelectedItem="{Binding SelectedTab}">
+                <TabControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type mvvm:TabBase}">
+                        <TextBlock Margin="0,5"
+                                    Text="{Binding Header}">
+                            <TextBlock.LayoutTransform>
+                                <TransformGroup>
+                                    <RotateTransform Angle="-90" />
+                                </TransformGroup>
+                            </TextBlock.LayoutTransform>
+                        </TextBlock>
+                    </DataTemplate>
+                </TabControl.ItemTemplate>
+            </TabControl>
+        </controls:AdornedControl>
+    </popup:ModalPopupPresenter>
 </Window>
