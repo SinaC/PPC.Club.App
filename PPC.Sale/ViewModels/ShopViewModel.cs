@@ -102,7 +102,7 @@ namespace PPC.Sale.ViewModels
 
             // Add cash/bank card
             Cash += cash;
-            BankCard += BankCard;
+            BankCard += bankCard;
 
             // Clear shopping cart
             ShoppingCart.Clear();
