@@ -260,6 +260,40 @@ namespace PPC.Sale.ViewModels
         private async Task CashRegisterClosureConfirmedAsync()
         {
             // Compute cash register closure
+            //  transactions from shop
+            List<TransactionFullArticle> transactions = new List<TransactionFullArticle>(Shop.Transactions.Select(t => new TransactionFullArticle
+            {
+                Timestamp = t.Timestamp,
+                Articles = t.Articles.Select(x => new FullArticle
+                {
+                    Guid = x.Article.Guid,
+                    Ean = x.Article.Ean,
+                    Description = x.Article.Description,
+                    Price = x.Article.Price,
+                    Quantity = x.Quantity
+                }).ToList(),
+                Cash = t.Cash,
+                BankCard = t.BankCard
+            }));
+            //  transactions from tabs
+            foreach (ClientViewModel client in Tabs.OfType<ClientViewModel>())
+            {
+                transactions.Add(new TransactionFullArticle
+                {
+                    Timestamp = client.PaymentTimestamp,
+                    Articles = client.ShoppingCart.ShoppingCartArticles.Select(x => new FullArticle
+                    {
+                        Guid = x.Article.Guid,
+                        Ean = x.Article.Ean,
+                        Description = x.Article.Description,
+                        Price = x.Article.Price,
+                        Quantity = x.Quantity
+                    }).ToList(),
+                    Cash = client.Cash,
+                    BankCard = client.BankCard
+                });
+            }
+            //  closure summary
             CashRegisterClosure closure = new CashRegisterClosure
             {
                 Articles = SoldArticles?.Select(x => new FullArticle
@@ -271,17 +305,31 @@ namespace PPC.Sale.ViewModels
                     Quantity = x.Quantity
                 }).ToList(),
                 Cash = SoldArticlesTotalCash,
-                BankCard = SoldArticlesTotalBankCard
+                BankCard = SoldArticlesTotalBankCard,
+                Transactions = transactions
             };
 
             // Display popup
-            CashRegisterClosurePopupViewModel vm = new CashRegisterClosurePopupViewModel(PopupService, closure, () => Application.Current.Shutdown(), async c => await SendCashRegisterClosureMailAsync(closure));
+            CashRegisterClosurePopupViewModel vm = new CashRegisterClosurePopupViewModel(PopupService, closure, CloseApplication, async c => await SendCashRegisterClosureMailAsync(closure));
             PopupService.DisplayModal(vm, "Cash register closure"); // !! Shutdown application on close
 
             // Dump cash register closure file
+            DateTime now = DateTime.Now;
+            //  txt
             try
             {
-                string filename = $"{ConfigurationManager.AppSettings["CashRegisterClosurePath"]}CashRegister_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.xml";
+                string filename = $"{ConfigurationManager.AppSettings["CashRegisterClosurePath"]}CashRegister_{now:yyyy-MM-dd_HH-mm-ss}.txt";
+                File.WriteAllText(filename, closure.ToString());
+            }
+            catch (Exception ex)
+            {
+                ErrorPopupViewModel vmError = new ErrorPopupViewModel(ex);
+                PopupService.DisplayModal(vmError, "Error");
+            }
+            //  xml
+            try
+            {
+                string filename = $"{ConfigurationManager.AppSettings["CashRegisterClosurePath"]}CashRegister_{now:yyyy-MM-dd_HH-mm-ss}.xml";
                 using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
                 {
                     writer.Formatting = Formatting.Indented;
@@ -294,14 +342,17 @@ namespace PPC.Sale.ViewModels
                 ErrorPopupViewModel vmError = new ErrorPopupViewModel(ex);
                 PopupService.DisplayModal(vmError, "Error");
             }
+        }
 
+        private void CloseApplication()
+        {
             // Delete backup files
             try
             {
                 string backupPath = ConfigurationManager.AppSettings["BackupPath"];
                 foreach (string file in Directory.EnumerateFiles(backupPath))
                 {
-                    await Task.Run(() => File.Delete(file));
+                    File.Delete(file);
                 }
             }
             catch (Exception ex)
@@ -309,6 +360,8 @@ namespace PPC.Sale.ViewModels
                 ErrorPopupViewModel vmError = new ErrorPopupViewModel(ex);
                 PopupService.DisplayModal(vmError, "Error");
             }
+
+            Application.Current.Shutdown();
         }
 
         private async Task SendCashRegisterClosureMailAsync(CashRegisterClosure closure)
@@ -317,8 +370,8 @@ namespace PPC.Sale.ViewModels
             Mediator.Default.Send(new ChangeWaitingMessage { IsWaiting = true });
             try
             {
-                string closureFilename = ConfigurationManager.AppSettings["CashRegisterClosureConfigPath"];
-                if (!File.Exists(closureFilename))
+                string closureConfigFilename = ConfigurationManager.AppSettings["CashRegisterClosureConfigPath"];
+                if (!File.Exists(closureConfigFilename))
                 {
                     ErrorPopupViewModel vmError = new ErrorPopupViewModel("Cash register closure config file not found -> Cannot send automatically cash register closure mail.");
                     PopupService.DisplayModal(vmError, "Warning");
@@ -326,7 +379,7 @@ namespace PPC.Sale.ViewModels
                 else
                 {
                     CashRegisterClosureConfig closureConfig;
-                    using (XmlTextReader reader = new XmlTextReader(closureFilename))
+                    using (XmlTextReader reader = new XmlTextReader(closureConfigFilename))
                     {
                         DataContractSerializer serializer = new DataContractSerializer(typeof(CashRegisterClosureConfig));
                         closureConfig = (CashRegisterClosureConfig) await serializer.ReadObjectAsync(reader);
@@ -345,22 +398,11 @@ namespace PPC.Sale.ViewModels
                         Credentials = new NetworkCredential(fromAddress.Address, closureConfig.SenderPassword)
                     })
                     {
-                        StringBuilder sb = new StringBuilder();
-                        sb.AppendLine($"Cloture de la caisse du club (date: {DateTime.Now:F})");
-                        sb.AppendLine($"Cash: {closure.Cash:C}");
-                        sb.AppendLine($"Bancontact: {closure.BankCard:C}");
-                        sb.AppendLine("Articles:");
-                        if (SoldArticles != null)
-                        {
-                            foreach (FullArticle article in closure.Articles)
-                                sb.AppendLine($"{article.Quantity,5} * {article.Ean,15} {article.Description,30} {article.Price,10:C}");
-                        }
-                        else
-                            sb.AppendLine("néant");
+                        
                         using (var message = new MailMessage(fromAddress, toAddress)
                         {
                             Subject = $"Cloture caisse du club (date {DateTime.Now:F})",
-                            Body = sb.ToString()
+                            Body = closure.ToString()
                         })
                         {
                             await client.SendMailAsync(message);

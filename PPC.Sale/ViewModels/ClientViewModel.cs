@@ -21,6 +21,8 @@ namespace PPC.Sale.ViewModels
 
         public string Filename => $"{ConfigurationManager.AppSettings["BackupPath"]}{Header.ToLowerInvariant()}.xml";
 
+        public DateTime PaymentTimestamp { get; private set; }
+
         #region ShoppingCartTabBase
 
         public override string Header => ClientName;
@@ -99,10 +101,12 @@ namespace PPC.Sale.ViewModels
             Cash = cash;
             BankCard = bankCard;
             _cartPaidAction();
+            PaymentTimestamp = DateTime.Now;
             Save();
         }
 
         #region Load/Save
+
         private void Load(string filename)
         {
             ClientCart cart;

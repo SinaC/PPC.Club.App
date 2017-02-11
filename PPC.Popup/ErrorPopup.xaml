@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:ErrorPopupViewModelDesignData, IsDesignTimeCreatable=True}"
              d:DesignHeight="300" d:DesignWidth="300"
-             Width="400"
+             MaxWidth="400"
              MaxHeight="300">
     <Border BorderBrush="Black" BorderThickness="1" Background="LightGray">
         <Grid>
@@ -17,6 +17,7 @@
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0"
                        Margin="5,2"
+                       TextWrapping="Wrap"
                        Text="{Binding Summary}"/>
             <Expander Grid.Row="1"
                       IsExpanded="False"

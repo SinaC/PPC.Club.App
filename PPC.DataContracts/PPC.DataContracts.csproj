@@ -48,6 +48,7 @@
     <Compile Include="Item.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShopTransaction.cs" />
+    <Compile Include="TransactionFullArticle.cs" />
     <Compile Include="VatRates.cs" />
   </ItemGroup>
   <ItemGroup>
