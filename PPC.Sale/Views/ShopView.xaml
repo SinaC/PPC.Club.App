@@ -104,14 +104,12 @@
                               VerticalScrollBarVisibility="Auto"
                               ItemsSource="{Binding Articles}">
                         <DataGrid.Columns>
+                            <DataGridTextColumn Header="Quantity" 
+                                                Binding="{Binding Quantity}"/>
                             <DataGridTextColumn Header="Description" 
                                                 Binding="{Binding Article.Description}"/>
                             <DataGridTextColumn Header="Price" 
                                                 Binding="{Binding Article.Price, StringFormat=C}"/>
-                            <DataGridTextColumn Header="Category" 
-                                                Binding="{Binding Article.Category}"/>
-                            <DataGridTextColumn Header="Quantity" 
-                                                Binding="{Binding Quantity}"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </DataTemplate>

@@ -11,13 +11,14 @@
         xmlns:saleViewModels="clr-namespace:PPC.Sale.ViewModels;assembly=PPC.Sale"
         xmlns:playersViews="clr-namespace:PPC.Players.Views;assembly=PPC.Players"
         xmlns:salesViews="clr-namespace:PPC.Sale.Views;assembly=PPC.Sale"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         x:Name="AppMainWindow"
         mc:Ignorable="d"
         SnapsToDevicePixels="True"
         d:DataContext="{d:DesignInstance app:MainWindowViewModelDesignData, IsDesignTimeCreatable=True}"
         Icon="logo.png"
         Title="PPC Club" Height="600" Width="800"
-        TextElement.FontSize="16">
+        TextElement.FontSize="14">
     <Window.Resources>
         <DataTemplate DataType="{x:Type playersViewModels:PlayersViewModel}">
             <playersViews:PlayersView DataContext="{Binding}"/>
@@ -34,13 +35,13 @@
                 <controls:LoadingWait />
             </controls:AdornedControl.AdornerContent>
             <TabControl TabStripPlacement="Left"
-                        SnapsToDevicePixels="True"
-                        ItemsSource="{Binding Tabs}"
-                        SelectedItem="{Binding SelectedTab}">
+                            SnapsToDevicePixels="True"
+                            ItemsSource="{Binding Tabs}"
+                            SelectedItem="{Binding SelectedTab}">
                 <TabControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type mvvm:TabBase}">
                         <TextBlock Margin="0,5"
-                                    Text="{Binding Header}">
+                                        Text="{Binding Header}">
                             <TextBlock.LayoutTransform>
                                 <TransformGroup>
                                     <RotateTransform Angle="-90" />

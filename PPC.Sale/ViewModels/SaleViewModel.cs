@@ -48,6 +48,7 @@ namespace PPC.Sale.ViewModels
 
         private ICommand _addNewTabCommand;
         public ICommand AddNewTabCommand => _addNewTabCommand = _addNewTabCommand ?? new RelayCommand(AddNewTab);
+
         private void AddNewTab()
         {
             AskNamePopupViewModel vm = new AskNamePopupViewModel(PopupService, AddNewTabNameSelected);
@@ -168,6 +169,7 @@ namespace PPC.Sale.ViewModels
 
         private ICommand _reloadCommand;
         public ICommand ReloadCommand => _reloadCommand = _reloadCommand ?? new RelayCommand(Reload);
+
         private void Reload()
         {
             PopupService.DisplayQuestion("Reload", "Are you sure you want to reload from backup ?",
@@ -231,6 +233,7 @@ namespace PPC.Sale.ViewModels
 
         private ICommand _cashRegisterClosureCommand;
         public ICommand CashRegisterClosureCommand => _cashRegisterClosureCommand = _cashRegisterClosureCommand ?? new RelayCommand(CashRegisterClosure);
+
         private void CashRegisterClosure()
         {
             if (Tabs.OfType<ClientViewModel>().Any(x => x.PaymentState == PaymentStates.Unpaid))
@@ -458,7 +461,10 @@ namespace PPC.Sale.ViewModels
         public SaleViewModel()
         {
             if (!DesignMode.IsInDesignModeStatic)
+            {
                 ArticleDb.Load();
+                //ArticleDb.ImportFromCsv();
+            }
             //ArticleDb.Import();
             //ArticleDb.Save();
 

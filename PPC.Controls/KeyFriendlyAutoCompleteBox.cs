@@ -8,8 +8,18 @@ namespace PPC.Controls
         protected override void OnKeyDown(KeyEventArgs e)
         {
             base.OnKeyDown(e);
+            if (e.Key == Key.Enter || e.Key == Key.Return)
+            {
+                TextBox textBox = e.OriginalSource as TextBox;
+                textBox?.SelectAll();
+            }
             e.Handled = false;
         }
 
+        protected override void OnGotKeyboardFocus(KeyboardFocusChangedEventArgs e)
+        {
+            TextBox textBox = e.OriginalSource as TextBox;
+            textBox?.SelectAll();
+        }
     }
 }

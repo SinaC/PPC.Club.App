@@ -1,4 +1,3 @@
-special price (price+tva) (checkbox in shopping cart)
 form validation
 payback (client doesn't want anymore an already paid article !! only for cash payment)
 transaction edition

@@ -21,7 +21,7 @@ namespace PPC.Popup
 
         private void DecimalUpDown_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            // DecimalUpDown uses current culture and it seems fr-BE doesn't use . but ,
+            // DecimalUpDown uses current culture and it seems fr-BE doesn't use . but , as decimal separator
             DecimalUpDown @this = sender as DecimalUpDown;
             if (@this == null)
                 return;
@@ -41,6 +41,17 @@ namespace PPC.Popup
                 partTextBox.SelectAll();
             }, DispatcherPriority.Render);
 
+        }
+
+        private void ClientCashDecimalUpDown_OnKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter || e.Key == Key.Return) // set focus on PaidButton when Enter is pressed
+            {
+                Dispatcher.BeginInvoke((Action)delegate
+                {
+                    Keyboard.Focus(PaidButton);
+                }, DispatcherPriority.Render);
+            }
         }
     }
 }

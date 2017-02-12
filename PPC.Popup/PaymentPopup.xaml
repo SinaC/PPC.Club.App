@@ -105,6 +105,7 @@
                                 Increment="0.01"
                                 FormatString="C"
                                 GotFocus="DecimalUpDown_OnGotFocus"
+                                KeyDown="ClientCashDecimalUpDown_OnKeyDown"
                                 ValueChanged="DecimalUpDown_OnValueChanged"
                                 Value="{Binding ClientCash}"/>
  

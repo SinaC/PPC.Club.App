@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Serialization;
 using PPC.DataContracts;
@@ -17,7 +19,7 @@ namespace PPC.Sale
     {
         private static IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
 
-        public static List<Article> Articles { get; private set; }
+        public static List<Article> Articles { get; }
 
         static ArticleDb()
         {
@@ -72,7 +74,7 @@ namespace PPC.Sale
             }
         }
 
-        public static void Import()
+        public static void ImportFromXml()
         {
             try
             {
@@ -100,6 +102,139 @@ namespace PPC.Sale
                 ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
                 PopupService.DisplayModal(vm, "Cannot import articles");
             }
+        }
+
+        public static void ImportFromCsv()
+        {
+            string filename = @"C:\temp\ppc\liste des produits.csv";
+            if (File.Exists(filename))
+            {
+                try
+                {
+                    int newArticlesCount = 0;
+                    int categoryModifiedCount = 0;
+                    int priceModifiedCount = 0;
+                    int supplierPriceModifiedCount = 0;
+                    int vatModifiedCount = 0;
+                    string[] lines = File.ReadAllLines(filename, Encoding.GetEncoding("iso-8859-1"));
+                    // column 2: id
+                    // column 3: description
+                    // column 6: category
+                    // column 10: supplier price
+                    // column 13: price
+                    // column 16: price-vat -> can be used to compute vat
+                    // if column 0 or 1 is non-empty or 3 is empty -> irrevelant line
+                    foreach (string rawLine in lines)
+                    {
+                        string[] tokens = SplitCsv(rawLine).ToArray();
+                        if (string.IsNullOrWhiteSpace(tokens[0]) && string.IsNullOrWhiteSpace(tokens[1]) && !string.IsNullOrWhiteSpace(tokens[3]))
+                        {
+                            Debug.Assert(tokens.Length == 17);
+                            string id = tokens[2];
+                            string description = tokens[3];
+
+                            bool isNewArticle = false;
+
+                            // search if article already exists
+                            Article article = Articles.SingleOrDefault(x => x.Ean == id && x.Description.Trim().ToLowerInvariant() == description.ToLowerInvariant());
+                            if (article == null)
+                            {
+                                article = new Article
+                                {
+                                    Guid = Guid.NewGuid(),
+                                    Ean = id,
+                                    Description = description,
+                                };
+                                Articles.Add(article);
+                                isNewArticle = true;
+                            }
+
+                            string category = tokens[6].Trim();
+                            int stock;
+                            if (!int.TryParse(tokens[8], out stock))
+                                stock = 0;
+                            decimal supplierPrice;
+                            if (!decimal.TryParse(tokens[10], out supplierPrice))
+                                supplierPrice = 0;
+                            decimal price;
+                            if (!decimal.TryParse(tokens[13], out price))
+                                price = 0;
+                            decimal priceNoVat;
+                            if (!decimal.TryParse(tokens[16], out priceNoVat))
+                                priceNoVat = 0;
+                            decimal vat = Math.Round(100*(price - priceNoVat)/priceNoVat, 0, MidpointRounding.AwayFromZero);
+                            VatRates vatRate = vat == 6 ? VatRates.FoodDrink : VatRates.Other;
+
+                            if (isNewArticle)
+                            {
+                                Debug.WriteLine($"NEW: Id:[{id}] Descr:[{description}] Cat:[{category}] P:[{price:C}] SP:[{supplierPrice:C}] VAT:[{vatRate}] Stock:[{stock}] PHT:[{priceNoVat}]");
+                                newArticlesCount++;
+                            }
+                            else
+                            {
+                                if (!string.Equals(category.Trim(), article.Category.Trim(), StringComparison.InvariantCultureIgnoreCase))
+                                {
+                                    Debug.WriteLine($"{id} {description}: category: [{article.Category}] -> [{category}]");
+                                    categoryModifiedCount++;
+                                }
+                                if (price != article.Price)
+                                {
+                                    Debug.WriteLine($"{id} {description}: price: [{article.Price:C}] -> [{price:C}]");
+                                    priceModifiedCount++;
+                                }
+                                if (supplierPrice != article.SupplierPrice)
+                                {
+                                    Debug.WriteLine($"{id} {description}: supplierPrice: [{article.SupplierPrice:C}] -> [{supplierPrice:C}]");
+                                    supplierPriceModifiedCount++;
+                                }
+                                if (vatRate != article.VatRate)
+                                {
+                                    Debug.WriteLine($"{id} {description}: VatRate: [{article.VatRate}] -> [{vatRate}]");
+                                    vatModifiedCount++;
+                                }
+                            }
+
+                            article.Category = category;
+                            article.Price = price;
+                            article.SupplierPrice = supplierPrice;
+                            article.Stock = stock;
+                            article.VatRate = vatRate;
+                        }
+                    }
+
+                    Debug.WriteLine($"New: {newArticlesCount}");
+                    Debug.WriteLine($"Category modified: {categoryModifiedCount}");
+                    Debug.WriteLine($"Price modified: {priceModifiedCount}");
+                    Debug.WriteLine($"SupplierPrice modified: {supplierPriceModifiedCount}");
+                    Debug.WriteLine($"VAT modified: {vatModifiedCount}");
+
+                    //if (newArticlesCount > 0 || categoryModifiedCount > 0 || priceModifiedCount > 0 || supplierPriceModifiedCount > 0 || vatModifiedCount > 0)
+                    //    Save();
+                }
+                catch (Exception ex)
+                {
+                    ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
+                    PopupService.DisplayModal(vm, "Cannot import articles");
+                }
+            }
+        }
+
+        private static readonly Regex CsvSplitRegEx = new Regex("(?:^|,)(\"(?:[^\"]+|\"\")*\"|[^,]*)", RegexOptions.Compiled);
+
+        private static IEnumerable<string> SplitCsv(string input)
+        {
+            foreach (Match match in CsvSplitRegEx.Matches(input))
+                yield return match.Value.TrimStart(',').TrimStart('\"').TrimEnd('\"').Trim();
+        }
+
+        private static double Round(double value, int decimals)
+        {
+            if (decimals < 0)
+            {
+                var factor = Math.Pow(10, -decimals);
+                return Round(value / factor, 0) * factor;
+            }
+            return Math.Round(value, decimals, MidpointRounding.AwayFromZero);
         }
     }
 }
