@@ -10,30 +10,32 @@
              Width="300"
              MaxWidth="500"
              MaxHeight="100">
-    <Grid FocusManager.FocusedElement="{Binding ElementName=NameTextBox}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <Border BorderBrush="Black" BorderThickness="1" Background="{x:Static SystemColors.ControlLightBrush}">
+        <Grid FocusManager.FocusedElement="{Binding ElementName=NameTextBox}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <TextBox x:Name="NameTextBox"
-                 Grid.Row="0"
-                 Margin="5,2"
-                 Text="{Binding Name}">
-            <TextBox.InputBindings>
-                <KeyBinding Key="Return" 
-                    Command="{Binding EnterCommand}"
-                    CommandParameter="{Binding ElementName=NameTextBox, Path=Text}"/>
-            </TextBox.InputBindings>
-        </TextBox>
+            <TextBox x:Name="NameTextBox"
+                     Grid.Row="0"
+                     Margin="5,2"
+                     Text="{Binding Name}">
+                <TextBox.InputBindings>
+                    <KeyBinding Key="Return" 
+                        Command="{Binding EnterCommand}"
+                        CommandParameter="{Binding ElementName=NameTextBox, Path=Text}"/>
+                </TextBox.InputBindings>
+            </TextBox>
                  
         
-        <Button x:Name="BtnOk"
-                Grid.Row="1" 
-                Margin="5,2"
-                Width="50"
-                Command="{Binding OkCommand}">
-            <TextBlock Text="Ok"/>
-        </Button>
-    </Grid>
+            <Button x:Name="BtnOk"
+                    Grid.Row="1" 
+                    Margin="5,2"
+                    Width="50"
+                    Command="{Binding OkCommand}">
+                <TextBlock Text="Ok"/>
+            </Button>
+        </Grid>
+    </Border>
 </UserControl>

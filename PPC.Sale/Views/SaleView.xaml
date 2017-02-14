@@ -56,11 +56,15 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <Button Grid.Column="0"
-                                    Margin="2,2,2,2"
+                                    Margin="0,2,0,-2"
+                                    Width="20"
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Stretch"
+                                    ToolTip="Add new client shopping cart tab"
                                     Command="{Binding AddNewTabCommand}">
-                                <TextBlock Text="+"/>
+                                <Image RenderOptions.BitmapScalingMode="HighQuality"
+                                       RenderOptions.EdgeMode="Aliased"
+                                       Source="../Images/plus-round.png"/>
                             </Button>
                             <WrapPanel x:Name="_HeaderPanel"
                                        Grid.Column="1"
@@ -73,13 +77,21 @@
                                         HorizontalAlignment="Right"
                                         VerticalAlignment="Top"
                                         Orientation="Horizontal">
-                                <Button Margin="5,2"
+                                <Button Margin="5,0"
+                                        ToolTip="Load previous session"
                                         Command="{Binding ReloadCommand}">
-                                    <TextBlock Text="!!RELOAD!!"/>
+                                    <Image Width="16"
+                                           RenderOptions.BitmapScalingMode="HighQuality"
+                                           RenderOptions.EdgeMode="Aliased"
+                                           Source="../Images/refresh.png"/>
                                 </Button>
-                                <Button Margin="5,2"
+                                <Button Margin="5,0"
+                                        ToolTip="Cash registry closure"
                                         Command="{Binding CashRegisterClosureCommand}">
-                                    <TextBlock Text="Cash registry closure"/>
+                                    <Image Width="16"
+                                           RenderOptions.EdgeMode="Aliased"
+                                           RenderOptions.BitmapScalingMode="HighQuality"
+                                           Source="../Images/power.png"/>
                                 </Button>
                             </StackPanel>
                         </Grid>
@@ -118,8 +130,9 @@
                                 Padding="0"
                                 Command="{Binding DataContext.CloseTabCommand, RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}"
                                 CommandParameter="{Binding}">
-                            <TextBlock FontSize="9"
-                                       Text="x"/>
+                            <Image RenderOptions.BitmapScalingMode="HighQuality"
+                                   RenderOptions.EdgeMode="Aliased"
+                                   Source="../Images/close-round.png"/>
                         </Button>
                     </Grid>
                 </DataTemplate>

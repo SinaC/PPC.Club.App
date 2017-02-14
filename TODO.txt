@@ -2,3 +2,8 @@ form validation
 payback (client doesn't want anymore an already paid article !! only for cash payment)
 transaction edition
 article DB (real DB instead of xml file)
+
+new project: PPC.Style containing style used in multiple views
+
+known issues:
+after creating a new article, article cannot be added to shopping cart with enter

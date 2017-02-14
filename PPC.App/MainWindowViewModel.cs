@@ -3,6 +3,7 @@ using PPC.Messages;
 using PPC.MVVM;
 using PPC.Players.ViewModels;
 using PPC.Sale.ViewModels;
+using PPC.Shop.ViewModels;
 
 namespace PPC.App
 {
@@ -43,15 +44,24 @@ namespace PPC.App
             protected set { Set(() => SaleViewModel, ref _saleViewModel, value); }
         }
 
+        //private Shop.ViewModels.ShopViewModel _shopViewModel;
+        //public Shop.ViewModels.ShopViewModel ShopViewModel
+        //{
+        //    get { return _shopViewModel; }
+        //    set { Set(() => ShopViewModel, ref _shopViewModel, value); }
+        //}
+
         public MainWindowViewModel()
         {
             PlayersViewModel = new PlayersViewModel();
             SaleViewModel = new SaleViewModel();
+            //ShopViewModel = new Shop.ViewModels.ShopViewModel();
 
             Tabs = new ObservableCollection<TabBase>
             {
                 SaleViewModel,
-                PlayersViewModel
+                PlayersViewModel,
+                //ShopViewModel
             };
             SelectedTab = Tabs[0];
 
@@ -84,6 +94,8 @@ namespace PPC.App
                 PlayersViewModel
             };
             SelectedTab = Tabs[0];
+
+            IsWaiting = true;
         }
     }
 }

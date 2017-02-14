@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Windows.Input;
 using System.Xml;
@@ -90,7 +91,8 @@ namespace PPC.Sale.ViewModels
             ShoppingCart = new ShoppingCartViewModel(Payment, Save);
         }
 
-        public ClientViewModel(Action cartPaidAction, Action cartReopenedAction, string filename) : this(cartPaidAction, cartReopenedAction)
+        public ClientViewModel(Action cartPaidAction, Action cartReopenedAction, string filename) 
+            : this(cartPaidAction, cartReopenedAction)
         {
             Load(filename);
         }
@@ -112,13 +114,14 @@ namespace PPC.Sale.ViewModels
             ClientCart cart;
             using (XmlTextReader reader = new XmlTextReader(filename))
             {
-                System.Runtime.Serialization.DataContractSerializer serializer = new System.Runtime.Serialization.DataContractSerializer(typeof(ClientCart));
+                DataContractSerializer serializer = new DataContractSerializer(typeof(ClientCart));
                 cart = (ClientCart)serializer.ReadObject(reader);
             }
             ClientName = cart.ClientName;
             PaymentState = cart.IsPaid 
                 ? PaymentStates.Paid 
                 : PaymentStates.Unpaid;
+            PaymentTimestamp = cart.PaymentTimeStamp;
             Cash = cart.Cash;
             BankCard = cart.BankCard;
             ShoppingCart.ShoppingCartArticles.Clear();
@@ -141,6 +144,7 @@ namespace PPC.Sale.ViewModels
                 {
                     ClientName = ClientName,
                     IsPaid = PaymentState == PaymentStates.Paid,
+                    PaymentTimeStamp = PaymentTimestamp,
                     Cash = Cash,
                     BankCard = BankCard,
                     Articles = ShoppingCart.ShoppingCartArticles.Select(x => new Item
@@ -153,7 +157,7 @@ namespace PPC.Sale.ViewModels
                 using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
                 {
                     writer.Formatting = Formatting.Indented;
-                    System.Runtime.Serialization.DataContractSerializer serializer = new System.Runtime.Serialization.DataContractSerializer(typeof(ClientCart));
+                    DataContractSerializer serializer = new DataContractSerializer(typeof(ClientCart));
                     serializer.WriteObject(writer, cart);
                 }
             }

@@ -9,61 +9,63 @@
              d:DesignHeight="300" d:DesignWidth="300"
              MaxWidth="700"
              MaxHeight="500">
-    <Grid Margin="5">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <Border BorderBrush="Black" BorderThickness="1" Background="{x:Static SystemColors.ControlLightBrush}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
         
-        <StackPanel Grid.Row="0" 
-                    Orientation="Horizontal">
-            <StackPanel Orientation="Vertical">
-                <TextBlock Margin="5,2"
-                           FontWeight="Bold"
-                           Text="Cash:"/>
-                <TextBlock Margin="5,2"
-                           Text="{Binding ClosureData.Cash, StringFormat=C}"/>
+            <StackPanel Grid.Row="0" 
+                        Orientation="Horizontal">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Margin="5,2"
+                               FontWeight="Bold"
+                               Text="Cash:"/>
+                    <TextBlock Margin="5,2"
+                               Text="{Binding ClosureData.Cash, StringFormat=C}"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Margin="5,2"
+                               FontWeight="Bold"
+                               Text="Bank card:"/>
+                    <TextBlock Margin="5,2"
+                               Text="{Binding ClosureData.BankCard, StringFormat=C}"/>
+                </StackPanel>
             </StackPanel>
-            <StackPanel Orientation="Vertical">
-                <TextBlock Margin="5,2"
-                           FontWeight="Bold"
-                           Text="Bank card:"/>
-                <TextBlock Margin="5,2"
-                           Text="{Binding ClosureData.BankCard, StringFormat=C}"/>
+
+            <DataGrid Grid.Row="1"
+                      IsReadOnly="True"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      AutoGenerateColumns="False"
+                      ItemsSource="{Binding ClosureData.Articles}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Ean"
+                                            Binding="{Binding Ean}"/>
+                    <DataGridTextColumn Header="Description"
+                                            Binding="{Binding Description}"/>
+                    <DataGridTextColumn Header="Quantity"
+                                            Binding="{Binding Quantity}"/>
+                    <DataGridTextColumn Header="Price"
+                                            Binding="{Binding Price, StringFormat=C}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <StackPanel Grid.Row="2"
+                        Orientation="Horizontal">
+                <Button Margin="5,2" 
+                        Width="80"
+                        Command="{Binding OkCommand}">
+                    <TextBlock Text="Ok"/>
+                </Button>
+                <Button Margin="5,2" 
+                        Width="80"
+                        Command="{Binding SendMailCommand}">
+                    <TextBlock Text="Send Mail"/>
+                </Button>
             </StackPanel>
-        </StackPanel>
-
-        <DataGrid Grid.Row="1"
-                  IsReadOnly="True"
-                  CanUserAddRows="False"
-                  CanUserDeleteRows="False"
-                  AutoGenerateColumns="False"
-                  ItemsSource="{Binding ClosureData.Articles}">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Ean"
-                                        Binding="{Binding Ean}"/>
-                <DataGridTextColumn Header="Description"
-                                        Binding="{Binding Description}"/>
-                <DataGridTextColumn Header="Quantity"
-                                        Binding="{Binding Quantity}"/>
-                <DataGridTextColumn Header="Price"
-                                        Binding="{Binding Price, StringFormat=C}"/>
-            </DataGrid.Columns>
-        </DataGrid>
-
-        <StackPanel Grid.Row="2"
-                    Orientation="Horizontal">
-            <Button Margin="5,2" 
-                    Width="80"
-                    Command="{Binding OkCommand}">
-                <TextBlock Text="Ok"/>
-            </Button>
-            <Button Margin="5,2" 
-                    Width="80"
-                    Command="{Binding SendMailCommand}">
-                <TextBlock Text="Send Mail"/>
-            </Button>
-        </StackPanel>
-    </Grid>
+        </Grid>
+    </Border>
 </UserControl>

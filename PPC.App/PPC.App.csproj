@@ -165,6 +165,10 @@
       <Project>{556ebfb5-473a-4ff5-8499-d9c0ce7167da}</Project>
       <Name>PPC.Sale</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PPC.Shop\PPC.Shop.csproj">
+      <Project>{c55d71f3-09ab-4b1a-b76f-cfdf52a680f0}</Project>
+      <Name>PPC.Shop</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="logo.ico" />

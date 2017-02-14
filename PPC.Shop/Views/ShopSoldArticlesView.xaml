@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="PPC.Shop.Views.ShopSoldArticlesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:viewModels="clr-namespace:PPC.Shop.ViewModels"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance viewModels:ShopViewModelDesignData, IsDesignTimeCreatable=True}"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0">
+            <TextBlock.Text>
+                <MultiBinding StringFormat="{}Summary: #Articles: {0}  Total: {1:C}  Cash: {2:C}  BC: {3:C}">
+                    <Binding Path="SoldArticlesCount"/>
+                    <Binding Path="SoldArticlesTotal"/>
+                    <Binding Path="SoldArticlesTotalCash"/>
+                    <Binding Path="SoldArticlesTotalBankCard"/>
+                </MultiBinding>
+            </TextBlock.Text>
+        </TextBlock>
+
+        <DataGrid Grid.Row="1"
+                  IsReadOnly="True"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  AutoGenerateColumns="False"
+                  ScrollViewer.CanContentScroll="True" 
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                  ItemsSource="{Binding SoldArticles}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Ean"
+                                    Binding="{Binding Article.Ean}"/>
+                <DataGridTextColumn Header="Description"
+                                    Binding="{Binding Article.Description}"/>
+                <DataGridTextColumn Header="Quantity"
+                                    Binding="{Binding Quantity}"/>
+                <DataGridTextColumn Header="Price"
+                                    Binding="{Binding Article.Price, StringFormat=C}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

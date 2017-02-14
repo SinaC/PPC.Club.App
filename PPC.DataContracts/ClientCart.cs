@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace PPC.DataContracts
@@ -16,5 +17,7 @@ namespace PPC.DataContracts
         public decimal Cash { get; set; }
         [DataMember]
         public decimal BankCard { get; set; }
+        [DataMember]
+        public DateTime PaymentTimeStamp { get; set; }
     }
 }

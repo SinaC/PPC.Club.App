@@ -9,8 +9,10 @@
         xmlns:controls="clr-namespace:PPC.Controls;assembly=PPC.Controls"
         xmlns:playersViewModels="clr-namespace:PPC.Players.ViewModels;assembly=PPC.Players"
         xmlns:saleViewModels="clr-namespace:PPC.Sale.ViewModels;assembly=PPC.Sale"
+        xmlns:shopViewModels="clr-namespace:PPC.Shop.ViewModels;assembly=PPC.Shop"
         xmlns:playersViews="clr-namespace:PPC.Players.Views;assembly=PPC.Players"
         xmlns:salesViews="clr-namespace:PPC.Sale.Views;assembly=PPC.Sale"
+        xmlns:shopViews="clr-namespace:PPC.Shop.Views;assembly=PPC.Shop"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         x:Name="AppMainWindow"
         mc:Ignorable="d"
@@ -19,6 +21,10 @@
         Icon="logo.png"
         Title="PPC Club" Height="600" Width="800"
         TextElement.FontSize="14">
+    <!--        
+    WindowStyle="None"
+    MouseLeftButtonDown="MainWindow_OnMouseLeftButtonDown"
+    -->
     <Window.Resources>
         <DataTemplate DataType="{x:Type playersViewModels:PlayersViewModel}">
             <playersViews:PlayersView DataContext="{Binding}"/>
@@ -26,9 +32,32 @@
         <DataTemplate DataType="{x:Type saleViewModels:SaleViewModel}">
             <salesViews:SaleView DataContext="{Binding}"/>
         </DataTemplate>
-        <SolidColorBrush Color="Black" Opacity=".20" x:Key="ModalPopupPresenterOverlayBrush"/>
+        <!--<DataTemplate DataType="{x:Type shopViewModels:ShopViewModel}">
+            <shopViews:ShopView DataContext="{Binding}"/>
+        </DataTemplate>-->
+        <SolidColorBrush Color="Black" 
+                         Opacity=".20" 
+                         x:Key="ModalPopupPresenterOverlayBrush"/>
     </Window.Resources>
-    <popup:ModalPopupPresenter x:Name="ModalPopupPresenter"
+    <!--<xctk:BusyIndicator IsBusy="{Binding IsWaiting}">
+        <xctk:BusyIndicator.BusyContentTemplate>
+            <DataTemplate>
+                <controls:LoadingWait Background="Transparent" />
+            </DataTemplate>
+        </xctk:BusyIndicator.BusyContentTemplate>
+        <xctk:BusyIndicator.OverlayStyle>
+            <Style TargetType="Rectangle">
+                <Setter Property="Fill" 
+                        Value="Transparent"/>
+            </Style>
+        </xctk:BusyIndicator.OverlayStyle>
+        <xctk:BusyIndicator.ProgressBarStyle>
+            <Style TargetType="ProgressBar">
+                <Setter Property="Visibility" 
+                        Value="Collapsed"/>
+            </Style>
+        </xctk:BusyIndicator.ProgressBarStyle>-->
+        <popup:ModalPopupPresenter x:Name="ModalPopupPresenter"
                                 OverlayBrush="{StaticResource ModalPopupPresenterOverlayBrush}">
         <controls:AdornedControl IsAdornerVisible="{Binding IsWaiting}">
             <controls:AdornedControl.AdornerContent>
@@ -53,4 +82,5 @@
             </TabControl>
         </controls:AdornedControl>
     </popup:ModalPopupPresenter>
+    <!--</xctk:BusyIndicator>-->
 </Window>

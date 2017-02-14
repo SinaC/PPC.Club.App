@@ -238,6 +238,7 @@ namespace PPC.Sale.ViewModels
 
         private void DisplayCreateArticlePopup()
         {
+            SelectedArticle = null;
             CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(PopupService, Categories, Producers, CreateArticle)
             {
                 IsEdition = false
@@ -261,12 +262,12 @@ namespace PPC.Sale.ViewModels
                 IsNewArticle = true,
             };
             ArticleDb.Articles.Add(article);
-            SelectedArticle = article;
+            ArticleDb.Save();
 
             RaisePropertyChanged(() => Articles);
             RaisePropertyChanged(() => Categories);
 
-            ArticleDb.Save();
+            SelectedArticle = article;
         }
 
         #endregion
@@ -369,6 +370,7 @@ namespace PPC.Sale.ViewModels
                     Quantity = 1,
                 }
             });
+            SelectedArticle = ShoppingCartArticles[0].Article;
         }
     }
 }

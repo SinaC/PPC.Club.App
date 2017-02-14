@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using PPC.Popup;
 
@@ -22,6 +23,11 @@ namespace PPC.App
             EasyIoc.IocContainer.Default.RegisterInstance<IPopupService>(ModalPopupPresenter);
 
             DataContext = new MainWindowViewModel();
+        }
+
+        private void MainWindow_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            DragMove();
         }
     }
 }

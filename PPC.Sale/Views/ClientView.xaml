@@ -75,8 +75,12 @@
                 
                     <Button Grid.Column="3"
                             Margin="5,2"
-                            Command="{Binding ReOpenCommand}">
-                        <TextBlock Text="ReOpen"/>
+                            Width="24"
+                            Command="{Binding ReOpenCommand}"
+                            ToolTip="Re-open client shopping cart">
+                        <Image RenderOptions.BitmapScalingMode="HighQuality"
+                               RenderOptions.EdgeMode="Aliased"
+                               Source="../Images/locked.png"/>
                     </Button>
                 </Grid>
             </GroupBox>

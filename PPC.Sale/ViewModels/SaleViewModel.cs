@@ -24,7 +24,7 @@ namespace PPC.Sale.ViewModels
     {
         private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
 
-        #region ShoppingCartTabBase
+        #region TabBase
 
         public override string Header => "Sale";
 
@@ -33,13 +33,18 @@ namespace PPC.Sale.ViewModels
         #region Tab management
 
         private ObservableCollection<ShoppingCartTabViewModelBase> _tabs;
+
         public ObservableCollection<ShoppingCartTabViewModelBase> Tabs
         {
             get { return _tabs; }
             protected set { Set(() => Tabs, ref _tabs, value); }
         }
 
+        private ICommand _selectTabCommand;
+        public ICommand SelectTabCommand => _selectTabCommand = _selectTabCommand ?? new RelayCommand<ShoppingCartTabViewModelBase>(tab => SelectedTab = tab);
+
         private ShoppingCartTabViewModelBase _selectedTab;
+
         public ShoppingCartTabViewModelBase SelectedTab
         {
             get { return _selectedTab; }
@@ -64,7 +69,7 @@ namespace PPC.Sale.ViewModels
             }
             else
             {
-                ShoppingCartTabViewModelBase newTab = new ClientViewModel(ReshreshSoldArticles, ReshreshSoldArticles)
+                ShoppingCartTabViewModelBase newTab = new ClientViewModel(RefreshSoldArticles, RefreshSoldArticles)
                 {
                     ClientName = name
                 };
@@ -82,7 +87,7 @@ namespace PPC.Sale.ViewModels
             if (client == null)
                 return;
             if (client.PaymentState == PaymentStates.Unpaid && client.ShoppingCart.ShoppingCartArticles.Any())
-                PopupService.DisplayQuestion($"Close {client.ClientName} tab", "Client has not paid yet. Tab cannot be closed.",
+                PopupService.DisplayQuestion($"Close {client.ClientName} tab", $"Client {client.ClientName} has not paid yet. Tab cannot be closed.",
                     new ActionButton
                     {
                         Caption = "Ok",
@@ -138,7 +143,7 @@ namespace PPC.Sale.ViewModels
                 PopupService.DisplayModal(vm, "Error while deleting backup file");
             }
             //
-            ReshreshSoldArticles();
+            RefreshSoldArticles();
         }
 
         #endregion
@@ -146,6 +151,7 @@ namespace PPC.Sale.ViewModels
         #region Shop
 
         private ShopViewModel _shop;
+
         public ShopViewModel Shop
         {
             get { return _shop; }
@@ -157,9 +163,10 @@ namespace PPC.Sale.ViewModels
         #region Sold articles
 
         private List<ShopArticleItem> _soldArticles;
+
         public List<ShopArticleItem> SoldArticles
         {
-            get {  return _soldArticles; }
+            get { return _soldArticles; }
             private set { Set(() => SoldArticles, ref _soldArticles, value); }
         }
 
@@ -173,17 +180,17 @@ namespace PPC.Sale.ViewModels
         private void Reload()
         {
             PopupService.DisplayQuestion("Reload", "Are you sure you want to reload from backup ?",
-                   new ActionButton
-                   {
-                       Order = 1,
-                       Caption = "Yes",
-                       ClickCallback = ReloadConfirmed
-                   },
-                   new ActionButton
-                   {
-                       Order = 2,
-                       Caption = "No"
-                   });
+                new ActionButton
+                {
+                    Order = 1,
+                    Caption = "Yes",
+                    ClickCallback = ReloadConfirmed
+                },
+                new ActionButton
+                {
+                    Order = 2,
+                    Caption = "No"
+                });
         }
 
         private void ReloadConfirmed()
@@ -203,7 +210,7 @@ namespace PPC.Sale.ViewModels
                     {
                         try
                         {
-                            ClientViewModel client = new ClientViewModel(ReshreshSoldArticles, ReshreshSoldArticles, filename);
+                            ClientViewModel client = new ClientViewModel(RefreshSoldArticles, RefreshSoldArticles, filename);
                             Tabs.Add(client);
                         }
                         catch (Exception ex)
@@ -218,7 +225,7 @@ namespace PPC.Sale.ViewModels
                     ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
                     PopupService.DisplayModal(vm, "Error while loading shop");
                 }
-                ReshreshSoldArticles();
+                RefreshSoldArticles();
             }
             else
             {
@@ -238,11 +245,11 @@ namespace PPC.Sale.ViewModels
         {
             if (Tabs.OfType<ClientViewModel>().Any(x => x.PaymentState == PaymentStates.Unpaid))
                 PopupService.DisplayQuestion("Warning", "There is 1 or more client shopping cart opened.",
-                     new ActionButton
-                     {
-                         Order = 1,
-                         Caption = "Ok"
-                     });
+                    new ActionButton
+                    {
+                        Order = 1,
+                        Caption = "Ok"
+                    });
             else
             {
                 PopupService.DisplayQuestion("Cash register closure", "Are you sure you want to close ?",
@@ -370,7 +377,7 @@ namespace PPC.Sale.ViewModels
         private async Task SendCashRegisterClosureMailAsync(CashRegisterClosure closure)
         {
             // Send cash register closure mail
-            Mediator.Default.Send(new ChangeWaitingMessage { IsWaiting = true });
+            Mediator.Default.Send(new ChangeWaitingMessage {IsWaiting = true});
             try
             {
                 string closureConfigFilename = ConfigurationManager.AppSettings["CashRegisterClosureConfigPath"];
@@ -401,7 +408,7 @@ namespace PPC.Sale.ViewModels
                         Credentials = new NetworkCredential(fromAddress.Address, closureConfig.SenderPassword)
                     })
                     {
-                        
+
                         using (var message = new MailMessage(fromAddress, toAddress)
                         {
                             Subject = $"Cloture caisse du club (date {DateTime.Now:F})",
@@ -420,7 +427,7 @@ namespace PPC.Sale.ViewModels
             }
             finally
             {
-                Mediator.Default.Send(new ChangeWaitingMessage { IsWaiting = false });
+                Mediator.Default.Send(new ChangeWaitingMessage {IsWaiting = false});
             }
         }
 
@@ -429,6 +436,7 @@ namespace PPC.Sale.ViewModels
         #region Computed values
 
         private int _soldArticlesCount;
+
         public int SoldArticlesCount
         {
             get { return _soldArticlesCount; }
@@ -436,6 +444,7 @@ namespace PPC.Sale.ViewModels
         }
 
         private decimal _soldArticlesTotal;
+
         public decimal SoldArticlesTotal
         {
             get { return _soldArticlesTotal; }
@@ -443,6 +452,7 @@ namespace PPC.Sale.ViewModels
         }
 
         private decimal _soldArticlesTotalCash;
+
         public decimal SoldArticlesTotalCash
         {
             get { return _soldArticlesTotalCash; }
@@ -450,6 +460,7 @@ namespace PPC.Sale.ViewModels
         }
 
         private decimal _soldArticlesTotalBankCard;
+
         public decimal SoldArticlesTotalBankCard
         {
             get { return _soldArticlesTotalBankCard; }
@@ -471,7 +482,7 @@ namespace PPC.Sale.ViewModels
             Mediator.Default.Register<PlayerSelectedMessage>(this, PlayerSelected);
 
             //
-            Shop = new ShopViewModel(ReshreshSoldArticles);
+            Shop = new ShopViewModel(RefreshSoldArticles);
             Tabs = new ObservableCollection<ShoppingCartTabViewModelBase>
             {
                 Shop
@@ -479,7 +490,7 @@ namespace PPC.Sale.ViewModels
             SelectedTab = Shop;
         }
 
-        private void ReshreshSoldArticles()
+        private void RefreshSoldArticles()
         {
             decimal totalCash = 0;
             decimal totalBankCard = 0;
@@ -536,7 +547,7 @@ namespace PPC.Sale.ViewModels
             ClientViewModel client = Tabs.OfType<ClientViewModel>().FirstOrDefault(x => (x.DciNumber == msg.DciNumber && x.ClientFirstName == msg.FirstName && x.ClientLastName == msg.LastName));
             if (client == null)
             {
-                ShoppingCartTabViewModelBase newTab = new ClientViewModel(ReshreshSoldArticles, ReshreshSoldArticles)
+                ShoppingCartTabViewModelBase newTab = new ClientViewModel(RefreshSoldArticles, RefreshSoldArticles)
                 {
                     ClientName = msg.FirstName,
                     ClientFirstName = msg.FirstName,
@@ -561,6 +572,12 @@ namespace PPC.Sale.ViewModels
                 Shop,
                 new ClientViewModelDesignData
                 {
+                    ClientName = $"un super long nom0",
+                    PaymentState = PaymentStates.Unpaid
+                },
+
+                new ClientViewModelDesignData
+                {
                     ClientName = "Joel",
                     PaymentState = PaymentStates.Paid
                 },
@@ -570,10 +587,10 @@ namespace PPC.Sale.ViewModels
                     PaymentState = PaymentStates.Unpaid
                 }
             };
-            Tabs.AddRange(Enumerable.Range(0, 5).Select(x => new ClientViewModelDesignData
+            Tabs.AddRange(Enumerable.Range(1, 5).Select(x => new ClientViewModelDesignData
             {
                 ClientName = $"un super long nom[{x}]",
-                PaymentState = x % 2 == 0 ? PaymentStates.Unpaid : PaymentStates.Paid
+                PaymentState = x%2 == 0 ? PaymentStates.Unpaid : PaymentStates.Paid
             }));
             SelectedTab = Tabs[0];
         }
