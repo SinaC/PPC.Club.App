@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Configuration;
+using System.Linq;
 using System.Windows.Input;
+using PPC.Helpers;
 using PPC.Messages;
 using PPC.MVVM;
 using PPC.Players.Models;
@@ -35,7 +37,7 @@ namespace PPC.Players.ViewModels
         {
             try
             {
-                Players = new ObservableCollection<PlayerModel>(PlayerManager.Load(ConfigurationManager.AppSettings["PlayersPath"]));
+                Players = new ObservableCollection<PlayerModel>(PlayerManager.Load(ConfigurationManager.AppSettings["PlayersPath"]).OrderBy(x => x.FirstName, new EmptyStringsAreLast()));
             }
             catch (Exception ex)
             {

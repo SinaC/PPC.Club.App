@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="DataContractSerializerExtensions.cs" />
     <Compile Include="DataGridHelpers.cs" />
+    <Compile Include="EmptyStringsAreLast.cs" />
     <Compile Include="ObservableCollectionExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringExtensions.cs" />

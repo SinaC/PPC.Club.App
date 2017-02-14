@@ -1,0 +1,148 @@
+﻿<UserControl x:Class="PPC.Shop.Views.CashRegisterView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:converters="clr-namespace:PPC.Shop.Converters"
+             xmlns:viewModels="clr-namespace:PPC.Shop.ViewModels"
+             xmlns:views="clr-namespace:PPC.Shop.Views"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance viewModels:CashRegisterViewModelDesignData, IsDesignTimeCreatable=True}"
+             d:DesignHeight="300" d:DesignWidth="800">
+    <UserControl.Resources>
+        <!-- Animate datagrid width (fixed width) -->
+        <!-- TODO: try use following link to get a dynamic width  (embed DataGrid in a grid/stackpanel and set animation on grid/stackpanel)
+            http://stackoverflow.com/questions/2186933/wpf-animation-binding-to-the-to-attribute-of-storyboard-animation/14164245#14164245
+        -->
+        <Duration x:Key="ExpandAnimationDuration">0:00:00.2</Duration>
+        <system:Double x:Key="ExpandAnimationMaxWidth">450</system:Double>
+        <Style TargetType="{x:Type DataGrid}" x:Key="DataGridExpandStyle">
+            <Setter Property="OverridesDefaultStyle" Value="False"/>
+            <Setter Property="Width" Value="0"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ElementName=ClosedTransactionToggleButton, Path=IsChecked}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Width"
+                                                 AutoReverse="False"
+                                                 From="0" 
+                                                 To="{StaticResource ExpandAnimationMaxWidth}"
+                                                 Duration="{StaticResource ExpandAnimationDuration}"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Width"
+                                                 AutoReverse="False"
+                                                 From="{StaticResource ExpandAnimationMaxWidth}"
+                                                 To="0" 
+                                                 Duration="{StaticResource ExpandAnimationDuration}"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="{x:Type DataGridRowHeader}" x:Key="TransactionRowHeaderStyle">
+            <Setter Property="Width" Value="16"/>
+            <Setter Property="Height" Value="16"/>
+            <Setter Property="Margin" Value="1"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridRowHeader}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <converters:VisibilityToNullableBooleanConverter x:Key="VisibilityToNullableBooleanConverter"/>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <!-- ShoppingCartView -->
+        <views:ShoppingCartView Grid.Column="0"
+                                DataContext="{Binding ShoppingCart}"/>
+        <!-- Closed transaction toggle button -->
+        <ToggleButton x:Name="ClosedTransactionToggleButton"
+                      Grid.Column="1"
+                      VerticalAlignment="Top"
+                      IsChecked="False">
+            <TextBlock Text="{Binding Transactions.Count, StringFormat={}#Closed transactions: {0}}">
+                <TextBlock.LayoutTransform>
+                    <TransformGroup>
+                        <RotateTransform Angle="90" />
+                    </TransformGroup>
+                </TextBlock.LayoutTransform>
+            </TextBlock>
+        </ToggleButton>
+        <!-- Following grid will be displayed over ShoppingCartView when ClosedTransactionToggleButton is checked -->
+        <DataGrid Grid.Column="0"
+                  IsReadOnly="True" 
+                  HorizontalAlignment="Right"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  AutoGenerateColumns="False"
+                  VerticalScrollBarVisibility="Auto"
+                  Style="{StaticResource DataGridExpandStyle}"
+                  RowHeaderStyle="{StaticResource TransactionRowHeaderStyle}"
+                  ItemsSource="{Binding Transactions}">
+            <DataGrid.RowDetailsTemplate>
+                <DataTemplate DataType="{x:Type viewModels:ShopTransactionItem}">
+                    <DataGrid MaxHeight="300"
+                              IsReadOnly="True"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              AutoGenerateColumns="False"
+                              VerticalScrollBarVisibility="Auto"
+                              ItemsSource="{Binding Articles}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Qty" 
+                                                Binding="{Binding Quantity}"/>
+                            <DataGridTextColumn Header="Description" 
+                                                Binding="{Binding Article.Description}"/>
+                            <DataGridTextColumn Header="Price" 
+                                                Binding="{Binding Article.Price, StringFormat=C}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DataTemplate>
+            </DataGrid.RowDetailsTemplate>
+            <DataGrid.RowHeaderTemplate>
+                <DataTemplate>
+                    <ToggleButton IsChecked="{Binding Path=DetailsVisibility, RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}, Converter={StaticResource VisibilityToNullableBooleanConverter}}">
+                        <Image>
+                            <Image.Style>
+                                <Style TargetType="{x:Type Image}">
+                                    <Setter Property="Source" Value="../Images/plus-round.png"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}" Value="True">
+                                            <Setter Property="Source" Value="../Images/minus-round.png"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Image.Style>
+                        </Image>
+                    </ToggleButton>
+                </DataTemplate>
+            </DataGrid.RowHeaderTemplate>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Timestamp"
+                                    Binding="{Binding Timestamp, StringFormat=dd/MM/yyyy HH:mm:ss}"/>
+                <DataGridTextColumn Header="Qty"
+                                    Binding="{Binding Articles.Count}"/>
+                <DataGridTextColumn Header="Cash"
+                                    Binding="{Binding Cash, StringFormat=C}"/>
+                <DataGridTextColumn Header="Bank card"
+                                    Binding="{Binding BankCard, StringFormat=C}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

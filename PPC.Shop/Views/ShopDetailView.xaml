@@ -4,17 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:PPC.Shop.ViewModels"
-             xmlns:saleViewViewModels="clr-namespace:PPC.Sale.ViewModels;assembly=PPC.Sale"
-             xmlns:saleViews="clr-namespace:PPC.Sale.Views;assembly=PPC.Sale"
+             xmlns:views="clr-namespace:PPC.Shop.Views"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance viewModels:ShopViewModelDesignData, IsDesignTimeCreatable=True}"
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type viewModels:CashRegisterViewModel}">
-            <saleViews:ShopView DataContext="{Binding}"/>
+            <views:CashRegisterView DataContext="{Binding}"/>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type saleViewViewModels:ClientViewModel}">
-            <saleViews:ClientView DataContext="{Binding}"/>
+        <DataTemplate DataType="{x:Type viewModels:ClientViewModel}">
+            <views:ClientView DataContext="{Binding}"/>
         </DataTemplate>
     </UserControl.Resources>
     <ContentControl Content="{Binding SelectedButton}"/>

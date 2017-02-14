@@ -5,82 +5,139 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:app="clr-namespace:PPC.App"
         xmlns:popup="clr-namespace:PPC.Popup;assembly=PPC.Popup" 
-        xmlns:mvvm="clr-namespace:PPC.MVVM;assembly=PPC.MVVM"
         xmlns:controls="clr-namespace:PPC.Controls;assembly=PPC.Controls"
         xmlns:playersViewModels="clr-namespace:PPC.Players.ViewModels;assembly=PPC.Players"
-        xmlns:saleViewModels="clr-namespace:PPC.Sale.ViewModels;assembly=PPC.Sale"
         xmlns:shopViewModels="clr-namespace:PPC.Shop.ViewModels;assembly=PPC.Shop"
         xmlns:playersViews="clr-namespace:PPC.Players.Views;assembly=PPC.Players"
-        xmlns:salesViews="clr-namespace:PPC.Sale.Views;assembly=PPC.Sale"
         xmlns:shopViews="clr-namespace:PPC.Shop.Views;assembly=PPC.Shop"
-        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         x:Name="AppMainWindow"
         mc:Ignorable="d"
         SnapsToDevicePixels="True"
         d:DataContext="{d:DesignInstance app:MainWindowViewModelDesignData, IsDesignTimeCreatable=True}"
+        WindowStyle="None"
+        ResizeMode="CanResizeWithGrip"
+        MouseLeftButtonDown="MainWindow_OnMouseLeftButtonDown"
         Icon="logo.png"
         Title="PPC Club" Height="600" Width="800"
         TextElement.FontSize="14">
-    <!--        
-    WindowStyle="None"
-    MouseLeftButtonDown="MainWindow_OnMouseLeftButtonDown"
-    -->
     <Window.Resources>
-        <DataTemplate DataType="{x:Type playersViewModels:PlayersViewModel}">
-            <playersViews:PlayersView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type saleViewModels:SaleViewModel}">
-            <salesViews:SaleView DataContext="{Binding}"/>
-        </DataTemplate>
-        <!--<DataTemplate DataType="{x:Type shopViewModels:ShopViewModel}">
-            <shopViews:ShopView DataContext="{Binding}"/>
-        </DataTemplate>-->
         <SolidColorBrush Color="Black" 
                          Opacity=".20" 
                          x:Key="ModalPopupPresenterOverlayBrush"/>
+
+        <Style TargetType="{x:Type Image}" x:Key="AutoDisableImageStyle">
+            <Setter Property="RenderOptions.EdgeMode" Value="Aliased"/>
+            <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.5" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <DataTemplate DataType="{x:Type app:MainWindowViewModel}" x:Key="ShopTemplate">
+            <shopViews:ShopView DataContext="{Binding ShopViewModel}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type app:MainWindowViewModel}" x:Key="PlayersTemplate">
+            <playersViews:PlayersView DataContext="{Binding PlayersViewModel}"/>
+        </DataTemplate>
     </Window.Resources>
-    <!--<xctk:BusyIndicator IsBusy="{Binding IsWaiting}">
-        <xctk:BusyIndicator.BusyContentTemplate>
-            <DataTemplate>
-                <controls:LoadingWait Background="Transparent" />
-            </DataTemplate>
-        </xctk:BusyIndicator.BusyContentTemplate>
-        <xctk:BusyIndicator.OverlayStyle>
-            <Style TargetType="Rectangle">
-                <Setter Property="Fill" 
-                        Value="Transparent"/>
-            </Style>
-        </xctk:BusyIndicator.OverlayStyle>
-        <xctk:BusyIndicator.ProgressBarStyle>
-            <Style TargetType="ProgressBar">
-                <Setter Property="Visibility" 
-                        Value="Collapsed"/>
-            </Style>
-        </xctk:BusyIndicator.ProgressBarStyle>-->
         <popup:ModalPopupPresenter x:Name="ModalPopupPresenter"
-                                OverlayBrush="{StaticResource ModalPopupPresenterOverlayBrush}">
+                                   OverlayBrush="{StaticResource ModalPopupPresenterOverlayBrush}">
         <controls:AdornedControl IsAdornerVisible="{Binding IsWaiting}">
             <controls:AdornedControl.AdornerContent>
                 <controls:LoadingWait />
             </controls:AdornedControl.AdornerContent>
-            <TabControl TabStripPlacement="Left"
-                            SnapsToDevicePixels="True"
-                            ItemsSource="{Binding Tabs}"
-                            SelectedItem="{Binding SelectedTab}">
-                <TabControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type mvvm:TabBase}">
-                        <TextBlock Margin="0,5"
-                                        Text="{Binding Header}">
-                            <TextBlock.LayoutTransform>
-                                <TransformGroup>
-                                    <RotateTransform Angle="-90" />
-                                </TransformGroup>
-                            </TextBlock.LayoutTransform>
-                        </TextBlock>
-                    </DataTemplate>
-                </TabControl.ItemTemplate>
-            </TabControl>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <!-- Go to shop summary -->
+                    <Button Grid.Column="0"
+                            Width="48"
+                            Margin="5,2"
+                            ToolTip="Return to shop"
+                            Command="{Binding SwitchToShopSummaryCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="Images/shop.png"/>
+                    </Button>
+                    <!-- Create new client -->
+                    <Button Grid.Column="1"
+                            Width="48"
+                            Margin="5,2"
+                            ToolTip="Add new client shopping cart tab"
+                            Command="{Binding AddNewClientCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="Images/plus-round.png"/>
+                    </Button>
+                    <!-- Go to sold articles -->
+                    <Button Grid.Column="2"
+                            Width="48"
+                            Margin="5,2"
+                            ToolTip="View sold articles"
+                            Command="{Binding SwitchToSoldArticlesCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="Images/list.png"/>
+                    </Button>
+                    <!-- Players -->
+                    <Button Grid.Column="3"
+                            Width="48"
+                            Margin="5,2"
+                            ToolTip="Manage players"
+                            Command="{Binding SwitchToPlayersCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="Images/players.png"/>
+                    </Button>
+                    <!-- dummy column 4 -->
+                    <!-- Reload -->
+                    <Button Grid.Column="5"
+                            Width="48"
+                            Margin="5,2"
+                            ToolTip="Load previous session"
+                            Command="{Binding ReloadCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="Images/refresh.png"/>
+                    </Button>
+                    <!-- Shutdown -->
+                    <Button Grid.Column="6"
+                            Width="48"
+                            Margin="5,2"
+                            ToolTip="Cash registry closure"
+                            Command="{Binding CloseCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="Images/power.png"/>
+                    </Button>
+                </Grid>
+
+                <ContentControl Grid.Row="1"
+                                Content="{Binding}">
+                    <ContentControl.Style>
+                        <Style TargetType="{x:Type ContentControl}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ApplicationMode}" Value="{x:Static app:ApplicationModes.Shop}">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource ShopTemplate}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ApplicationMode}" Value="{x:Static app:ApplicationModes.Players}">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource PlayersTemplate}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContentControl.Style>
+                </ContentControl>
+            </Grid>
         </controls:AdornedControl>
     </popup:ModalPopupPresenter>
-    <!--</xctk:BusyIndicator>-->
 </Window>

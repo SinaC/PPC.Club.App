@@ -3,11 +3,11 @@
 namespace PPC.Shop.Views
 {
     /// <summary>
-    /// Interaction logic for ShopView.xaml
+    /// Interaction logic for ShoppingCartView.xaml
     /// </summary>
-    public partial class ShopView : UserControl
+    public partial class ShoppingCartView : UserControl
     {
-        public ShopView()
+        public ShoppingCartView()
         {
             InitializeComponent();
         }

@@ -9,16 +9,6 @@
              d:DataContext="{d:DesignInstance viewModels:ShopViewModelDesignData, IsDesignTimeCreatable=True}"
              d:DesignHeight="600" d:DesignWidth="800">
     <UserControl.Resources>
-        <Style TargetType="{x:Type Image}" x:Key="AutoDisableImageStyle">
-            <Setter Property="RenderOptions.EdgeMode" Value="Aliased"/>
-            <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
-            <Style.Triggers>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Opacity" Value="0.5" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
         <DataTemplate DataType="{x:Type viewModels:ShopViewModel}" x:Key="SummaryTemplate">
             <views:ShopSummaryView DataContext="{Binding}"/>
         </DataTemplate>
@@ -31,80 +21,21 @@
             <views:ShopSoldArticlesView DataContext="{Binding }"/>
         </DataTemplate>
     </UserControl.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <!-- Main buttons -->
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <!-- Return to summary -->
-            <ToggleButton Grid.Column="0"
-                          Width="48"
-                          Margin="5,2"
-                          ToolTip="Return to summary"
-                          IsChecked="{Binding IsStateSummary}"
-                          Command="{Binding ReturnToSummaryCommand}">
-                <Image Style="{StaticResource AutoDisableImageStyle}"
-                       Source="../Images/home.png"/>
-            </ToggleButton>
-            <!-- Sold articles -->
-            <ToggleButton Grid.Column="1"
-                          Width="48"
-                          Margin="5,2"
-                          ToolTip="View sold articles"
-                          IsChecked="{Binding IsStateSoldArticles}"
-                    Command="{Binding ViewSoldArticlesCommand}">
-                <Image Style="{StaticResource AutoDisableImageStyle}"
-                       Source="../Images/list.png"/>
-            </ToggleButton>
-            <!-- New client -->
-            <Button Grid.Column="2"
-                    Width="48"
-                    Margin="5,2"
-                    ToolTip="Add new client shopping cart tab"
-                    Command="{Binding AddNewClientCommand}">
-                <Image Style="{StaticResource AutoDisableImageStyle}"
-                       Source="../Images/plus-round.png"/>
-            </Button>
-            <!-- dummy column 3 -->
-            <!-- Reload -->
-            <Button Grid.Column="4"
-                    Width="48"
-                    Margin="5,2"
-                    ToolTip="Load previous session"
-                    Command="{Binding ReloadCommand}">
-                <Image Style="{StaticResource AutoDisableImageStyle}"
-                       Source="../Images/refresh.png"/>
-            </Button>
-        </Grid>
-
-        <!-- Summary/Detail -->
-        <ContentControl Grid.Row="1"
-                        Content="{Binding}">
-            <ContentControl.Style>
-                <Style TargetType="{x:Type ContentControl}">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding ShopState}" Value="{x:Static viewModels:ShopStates.Summary}">
-                            <Setter Property="ContentTemplate" Value="{StaticResource SummaryTemplate}"/>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding ShopState}" Value="{x:Static viewModels:ShopStates.Detail}">
-                            <Setter Property="ContentTemplate" Value="{StaticResource DetailTemplate}"/>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding ShopState}" Value="{x:Static viewModels:ShopStates.SoldArticles}">
-                            <Setter Property="ContentTemplate" Value="{StaticResource SoldArticles}"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </ContentControl.Style>
-        </ContentControl>
-    </Grid>
+    <ContentControl Content="{Binding}">
+        <ContentControl.Style>
+            <Style TargetType="{x:Type ContentControl}">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding ShopState}" Value="{x:Static viewModels:ShopStates.Summary}">
+                        <Setter Property="ContentTemplate" Value="{StaticResource SummaryTemplate}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding ShopState}" Value="{x:Static viewModels:ShopStates.Detail}">
+                        <Setter Property="ContentTemplate" Value="{StaticResource DetailTemplate}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding ShopState}" Value="{x:Static viewModels:ShopStates.SoldArticles}">
+                        <Setter Property="ContentTemplate" Value="{StaticResource SoldArticles}"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </ContentControl.Style>
+    </ContentControl>
 </UserControl>

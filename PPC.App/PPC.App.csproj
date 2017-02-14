@@ -161,10 +161,6 @@
       <Project>{c06f804c-58a5-48ea-a3b4-935470804b05}</Project>
       <Name>PPC.Popup</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PPC.Sale\PPC.Sale.csproj">
-      <Project>{556ebfb5-473a-4ff5-8499-d9c0ce7167da}</Project>
-      <Name>PPC.Sale</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PPC.Shop\PPC.Shop.csproj">
       <Project>{c55d71f3-09ab-4b1a-b76f-cfdf52a680f0}</Project>
       <Name>PPC.Shop</Name>
@@ -175,6 +171,15 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="logo.png" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Images\list.png" />
+    <Resource Include="Images\players.png" />
+    <Resource Include="Images\plus-round.png" />
+    <Resource Include="Images\power.png" />
+    <Resource Include="Images\refresh.png" />
+    <Resource Include="Images\shop.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
