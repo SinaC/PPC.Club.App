@@ -9,7 +9,9 @@
              d:DesignHeight="300" d:DesignWidth="300"
              MaxWidth="400"
              MaxHeight="300">
-    <Border BorderBrush="Black" BorderThickness="1" Background="LightGray">
+    <Border BorderBrush="Black" 
+            BorderThickness="1" 
+            Background="{x:Static SystemColors.ControlLightBrush}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>

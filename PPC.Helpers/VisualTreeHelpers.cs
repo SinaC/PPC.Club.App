@@ -3,7 +3,7 @@ using System.Windows.Media;
 
 namespace PPC.Helpers
 {
-    public class VisualTreeHelpers
+    public static class VisualTreeHelpers
     {
         public static T FindAncestor<T>(DependencyObject dependencyObject)
             where T : DependencyObject

@@ -6,7 +6,9 @@
              xmlns:popup="clr-namespace:PPC.Popup"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance popup:QuestionPopupViewModelDesignData, IsDesignTimeCreatable=True}">
-    <Border BorderBrush="Black" BorderThickness="1" Background="{x:Static SystemColors.ControlLightBrush}">
+    <Border BorderBrush="Black" 
+            BorderThickness="1" 
+            Background="{x:Static SystemColors.ControlLightBrush}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>

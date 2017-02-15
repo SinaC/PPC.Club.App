@@ -46,28 +46,28 @@ namespace PPC.Helpers
 
         public static void AttachOrRemoveDataGridDoubleClickEvent(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
-            DataGrid dataGrid = obj as DataGrid;
-            if (dataGrid != null)
+            DataGrid @this = obj as DataGrid;
+            if (@this != null)
             {
                 if (args.OldValue == null && args.NewValue != null)
-                    dataGrid.MouseDoubleClick += ExecuteDataGridDoubleClick;
+                    @this.MouseDoubleClick += ExecuteDataGridDoubleClick;
                 else if (args.OldValue != null && args.NewValue == null)
-                    dataGrid.MouseDoubleClick -= ExecuteDataGridDoubleClick;
+                    @this.MouseDoubleClick -= ExecuteDataGridDoubleClick;
             }
         }
 
         private static void ExecuteDataGridDoubleClick(object sender, MouseButtonEventArgs args)
         {
-            FrameworkElement obj = sender as FrameworkElement;
+            DataGrid @this = sender as DataGrid;
             ICommand cmd;
             if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
-                 cmd = obj?.GetValue(DataGridDoubleClickWithModifierProperty) as ICommand;
+                 cmd = @this?.GetValue(DataGridDoubleClickWithModifierProperty) as ICommand;
             else
-                cmd = obj?.GetValue(DataGridDoubleClickProperty) as ICommand;
+                cmd = @this?.GetValue(DataGridDoubleClickProperty) as ICommand;
             if (cmd == null)
                 return;
             DataGridRow row = VisualTreeHelpers.FindAncestor<DataGridRow>(args.OriginalSource as DependencyObject);
-            object parameter = row?.DataContext;
+            object parameter = row?.DataContext ?? @this.SelectedItem;
             if (cmd.CanExecute(parameter))
                 cmd.Execute(parameter);
         }

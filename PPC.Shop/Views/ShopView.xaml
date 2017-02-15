@@ -9,8 +9,8 @@
              d:DataContext="{d:DesignInstance viewModels:ShopViewModelDesignData, IsDesignTimeCreatable=True}"
              d:DesignHeight="600" d:DesignWidth="800">
     <UserControl.Resources>
-        <DataTemplate DataType="{x:Type viewModels:ShopViewModel}" x:Key="SummaryTemplate">
-            <views:ShopSummaryView DataContext="{Binding}"/>
+        <DataTemplate DataType="{x:Type viewModels:ShopViewModel}" x:Key="ShoppingCartsTemplate">
+            <views:ShopShoppingCartsView DataContext="{Binding}"/>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type viewModels:ShopViewModel}" x:Key="DetailTemplate">
@@ -25,8 +25,8 @@
         <ContentControl.Style>
             <Style TargetType="{x:Type ContentControl}">
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding ShopState}" Value="{x:Static viewModels:ShopStates.Summary}">
-                        <Setter Property="ContentTemplate" Value="{StaticResource SummaryTemplate}"/>
+                    <DataTrigger Binding="{Binding ShopState}" Value="{x:Static viewModels:ShopStates.ShoppingCarts}">
+                        <Setter Property="ContentTemplate" Value="{StaticResource ShoppingCartsTemplate}"/>
                     </DataTrigger>
                     <DataTrigger Binding="{Binding ShopState}" Value="{x:Static viewModels:ShopStates.Detail}">
                         <Setter Property="ContentTemplate" Value="{StaticResource DetailTemplate}"/>

@@ -6,7 +6,10 @@
              xmlns:popup="clr-namespace:PPC.Popup"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance popup:MessagePopupViewModelDesignData, IsDesignTimeCreatable=True}">
-    <Border BorderBrush="Black" BorderThickness="1" Background="White" Width="400">
+    <Border BorderBrush="Black" 
+            BorderThickness="1" 
+            Background="White" 
+            Width="400">
         <ItemsControl ItemsSource="{Binding Messages}" Margin="5">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>

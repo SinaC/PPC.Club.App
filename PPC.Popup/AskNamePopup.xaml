@@ -10,7 +10,20 @@
              Width="300"
              MaxWidth="500"
              MaxHeight="100">
-    <Border BorderBrush="Black" BorderThickness="1" Background="{x:Static SystemColors.ControlLightBrush}">
+    <UserControl.Resources>
+        <Style TargetType="{x:Type Image}" x:Key="AutoDisableImageStyle">
+            <Setter Property="RenderOptions.EdgeMode" Value="Aliased"/>
+            <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.5" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <Border BorderBrush="Black" 
+            BorderThickness="1" 
+            Background="{x:Static SystemColors.ControlLightBrush}">
         <Grid FocusManager.FocusedElement="{Binding ElementName=NameTextBox}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -23,18 +36,17 @@
                      Text="{Binding Name}">
                 <TextBox.InputBindings>
                     <KeyBinding Key="Return" 
-                        Command="{Binding EnterCommand}"
-                        CommandParameter="{Binding ElementName=NameTextBox, Path=Text}"/>
+                                Command="{Binding EnterCommand}"
+                                CommandParameter="{Binding ElementName=NameTextBox, Path=Text}"/>
                 </TextBox.InputBindings>
             </TextBox>
-                 
-        
-            <Button x:Name="BtnOk"
-                    Grid.Row="1" 
+             
+            <Button Grid.Row="1" 
                     Margin="5,2"
-                    Width="50"
+                    Width="32"
                     Command="{Binding OkCommand}">
-                <TextBlock Text="Ok"/>
+                <Image Style="{StaticResource AutoDisableImageStyle}"
+                       Source="/PPC.Popup;component/Images/checkmark-round.png"/>
             </Button>
         </Grid>
     </Border>

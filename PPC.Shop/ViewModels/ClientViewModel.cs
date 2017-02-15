@@ -163,6 +163,8 @@ namespace PPC.Shop.ViewModels
     {
         public ClientViewModelDesignData() : base(() => { }, () => { })
         {
+            ShoppingCart = new ShoppingCartViewModelDesignData();
+
             ClientName = "Toto";
             ClientFirstName = "Toto";
             ClientLastName = "Tsekwa";

@@ -5,6 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:viewModels="clr-namespace:PPC.Players.ViewModels"
              xmlns:helpers="clr-namespace:PPC.Helpers;assembly=PPC.Helpers"
+             xmlns:controls="clr-namespace:PPC.Controls;assembly=PPC.Controls"
+             xmlns:models="clr-namespace:PPC.Players.Models"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance viewModels:PlayersViewModelDesignData, IsDesignTimeCreatable=True}"
              d:DesignHeight="300" d:DesignWidth="800">
@@ -24,9 +26,28 @@
                     Command="{Binding SaveCommand}">
                 <TextBlock Text="Save"/>
             </Button>
+            <controls:KeyFriendlyAutoCompleteBox Margin="5,2"
+                                                 Width="300"
+                                                 IsTextCompletionEnabled="False"
+                                                 FilterMode="ContainsOrdinal"
+                                                 MinimumPopulateDelay="0"
+                                                 MinimumPrefixLength="3"
+                                                 ValueMemberPath="AutoCompleteSearchValue"
+                                                 ItemsSource="{Binding Players}"
+                                                 SelectedItem="{Binding SelectedPlayer}">
+                <controls:KeyFriendlyAutoCompleteBox.InputBindings>
+                    <KeyBinding Key="Enter" Command="{Binding SelectPlayerCommand}" CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type controls:KeyFriendlyAutoCompleteBox}}}"/>
+                </controls:KeyFriendlyAutoCompleteBox.InputBindings>
+                <controls:KeyFriendlyAutoCompleteBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type models:PlayerModel}">
+                        <TextBlock Text="{Binding AutoCompleteSearchValue}"/>
+                    </DataTemplate>
+                </controls:KeyFriendlyAutoCompleteBox.ItemTemplate>
+            </controls:KeyFriendlyAutoCompleteBox>
         </StackPanel>
 
-        <DataGrid x:Name="PlayersDataGrid"  Grid.Row="1"
+        <DataGrid x:Name="PlayersDataGrid" 
+                  Grid.Row="1"
                   ItemsSource="{Binding Players}"
                   AutoGenerateColumns="False"
                   ScrollViewer.CanContentScroll="True" 

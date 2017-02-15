@@ -9,7 +9,20 @@
              d:DesignHeight="300" d:DesignWidth="300"
              MaxWidth="700"
              MaxHeight="500">
-    <Border BorderBrush="Black" BorderThickness="1" Background="{x:Static SystemColors.ControlLightBrush}">
+    <UserControl.Resources>
+        <Style TargetType="{x:Type Image}" x:Key="AutoDisableImageStyle">
+            <Setter Property="RenderOptions.EdgeMode" Value="Aliased"/>
+            <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.5" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <Border BorderBrush="Black" 
+            BorderThickness="1" 
+            Background="{x:Static SystemColors.ControlLightBrush}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -56,14 +69,18 @@
             <StackPanel Grid.Row="2"
                         Orientation="Horizontal">
                 <Button Margin="5,2" 
-                        Width="80"
+                        Width="32"
+                        ToolTip="Delete backup files and close application"
                         Command="{Binding OkCommand}">
-                    <TextBlock Text="Ok"/>
+                    <Image Style="{StaticResource AutoDisableImageStyle}"
+                           Source="Images/checkmark-round.png"/>
                 </Button>
                 <Button Margin="5,2" 
-                        Width="80"
+                        Width="32"
+                        ToolTip="Send closure mail"
                         Command="{Binding SendMailCommand}">
-                    <TextBlock Text="Send Mail"/>
+                    <Image Style="{StaticResource AutoDisableImageStyle}"
+                           Source="Images/mail.png"/>
                 </Button>
             </StackPanel>
         </Grid>

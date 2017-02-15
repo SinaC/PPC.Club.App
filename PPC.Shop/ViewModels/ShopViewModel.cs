@@ -20,23 +20,18 @@ using PPC.Popup;
 
 namespace PPC.Shop.ViewModels
 {
-    // TODO: move referenced classes from Sale to Shop
     public enum ShopStates
     {
-        Summary,
+        ShoppingCarts,
         Detail,
         SoldArticles
     }
 
-    public class ShopViewModel : TabBase
+    public class ShopViewModel : ObservableObject
     {
         private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
 
-        #region TabBase
-
-        public override string Header => "Shop";
-
-        #endregion
+        public const string ShopFilename = "_shop.xml";
 
         #region View state
 
@@ -47,13 +42,13 @@ namespace PPC.Shop.ViewModels
             set { Set(() => ShopState, ref _shopState, value); }
         }
 
-        private ICommand _viewSummaryCommand;
-        public ICommand ViewSummaryCommand => _viewSummaryCommand = _viewSummaryCommand ?? new RelayCommand(ViewSummary);
+        private ICommand _viewShoppingCartsCommand;
+        public ICommand ViewShoppingCartsCommand => _viewShoppingCartsCommand = _viewShoppingCartsCommand ?? new RelayCommand(ViewShoppingCarts);
 
-        private void ViewSummary()
+        private void ViewShoppingCarts()
         {
             SelectedButton = null;
-            ShopState = ShopStates.Summary;
+            ShopState = ShopStates.ShoppingCarts;
         }
 
         private ICommand _viewSoldArticlesCommand;
@@ -89,7 +84,7 @@ namespace PPC.Shop.ViewModels
                 if (Set(() => SelectedButton, ref _selectedButton, value))
                 {
                     if (value == null)
-                        ShopState = ShopStates.Summary; // switch back to summary when no button are selected
+                        ShopState = ShopStates.ShoppingCarts; // switch back to summary when no button are selected
                     else
                         ShopState = ShopStates.Detail;
                 }
@@ -111,15 +106,15 @@ namespace PPC.Shop.ViewModels
 
         private void AddNewClient()
         {
-            AskNamePopupViewModel vm = new AskNamePopupViewModel(PopupService, AddNewTabNameSelected);
+            AskNamePopupViewModel vm = new AskNamePopupViewModel(PopupService, AddNewClientNameSelected);
             PopupService.DisplayModal(vm, "Client name?");
         }
 
-        private void AddNewTabNameSelected(string name)
+        private void AddNewClientNameSelected(string name)
         {
             if (Buttons.OfType<ClientViewModel>().Any(x => x.ClientName == name))
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel("A tab with that client name has already been opened!");
+                ErrorPopupViewModel vm = new ErrorPopupViewModel("A shopping cart with that client name has already been opened!");
                 PopupService.DisplayModal(vm, "Error");
             }
             else
@@ -130,8 +125,83 @@ namespace PPC.Shop.ViewModels
                 };
                 Buttons.Add(newClient);
                 SelectedButton = newClient;
+                //
+                RaisePropertyChanged(() => PaidClientShoppingCarts);
+                RaisePropertyChanged(() => UnpaidClientShoppingCarts);
             }
         }
+
+        private ICommand _closeClientCommand;
+        public ICommand CloseClientCommand => _closeClientCommand = _closeClientCommand ?? new RelayCommand<ClientViewModel>(CloseClient);
+
+        private void CloseClient(ClientViewModel client)
+        {
+            if (client.PaymentState == PaymentStates.Unpaid && client.ShoppingCart.ShoppingCartArticles.Any())
+                PopupService.DisplayQuestion($"Close {client.ClientName} shopping cart", $"Client {client.ClientName} has not paid yet. shopping cart cannot be closed.",
+                    new ActionButton
+                    {
+                        Caption = "Ok",
+                        Order = 2,
+                        ClickCallback = () => { }
+                    });
+            else
+                PopupService.DisplayQuestion($"Close {client.ClientName} shopping cart", "Are you sure ?",
+                    new ActionButton
+                    {
+                        Caption = "Yes",
+                        Order = 1,
+                        ClickCallback = () => CloseClientConfirmed(client)
+                    },
+                    new ActionButton
+                    {
+                        Caption = "No",
+                        Order = 2,
+                        ClickCallback = () => { }
+                    });
+        }
+
+        private void CloseClientConfirmed(ClientViewModel client)
+        {
+            if (SelectedButton == client)
+                SelectedButton = CashRegisterViewModel;
+            Buttons.Remove(client);
+            if (client.ShoppingCart.ShoppingCartArticles.Any())
+            {
+                // Create a transaction and add it to transactions
+                ShopTransactionItem transaction = new ShopTransactionItem
+                {
+                    Timestamp = DateTime.Now,
+                    Articles = client.ShoppingCart.ShoppingCartArticles.Select(x => new ShopArticleItem
+                    {
+                        Article = x.Article,
+                        Quantity = x.Quantity
+                    }).ToList(),
+                    Cash = client.Cash,
+                    BankCard = client.BankCard
+                };
+                AddTransaction(transaction);
+            }
+            // Delete backup file
+            try
+            {
+                string filename = client.Filename;
+                File.Delete(filename);
+            }
+            catch (Exception ex)
+            {
+                ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
+                PopupService.DisplayModal(vm, "Error while deleting backup file");
+            }
+            //
+            RaisePropertyChanged(() => PaidClientShoppingCarts);
+            RaisePropertyChanged(() => UnpaidClientShoppingCarts);
+        }
+
+        public int ClientShoppingCarts => Buttons.OfType<ClientViewModel>().Count();
+
+        public int PaidClientShoppingCarts => Buttons.OfType<ClientViewModel>().Count(x => x.PaymentState == PaymentStates.Paid);
+
+        public int UnpaidClientShoppingCarts => Buttons.OfType<ClientViewModel>().Count(x => x.PaymentState == PaymentStates.Unpaid);
 
         #endregion
 
@@ -173,26 +243,13 @@ namespace PPC.Shop.ViewModels
             {
                 try
                 {
-                    SelectedButton = CashRegisterViewModel; // Select shop tab
-                    // Reload shop (sold articles)
-                    CashRegisterViewModel.Load();
+                    SelectedButton = CashRegisterViewModel; // View cash register
+                    // Reload transactions
+                    LoadTransactions();
                     // Reload clients
                     //  remove existing clients
                     Buttons.RemoveOfType<ShoppingCartBasedViewModelBase, ClientViewModel>();
-                    //  add backup clients
-                    foreach (string filename in Directory.EnumerateFiles(ConfigurationManager.AppSettings["BackupPath"], "*.xml", SearchOption.TopDirectoryOnly).Where(x => !x.Contains(CashRegisterViewModel.ShopFile)))
-                    {
-                        try
-                        {
-                            ClientViewModel client = new ClientViewModel(RefreshSoldArticles, RefreshSoldArticles, filename);
-                            Buttons.Add(client);
-                        }
-                        catch (Exception ex)
-                        {
-                            ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
-                            PopupService.DisplayModal(vm, $"Error while loading {filename} cart");
-                        }
-                    }
+                    LoadClients();
                 }
                 catch (Exception ex)
                 {
@@ -205,6 +262,65 @@ namespace PPC.Shop.ViewModels
             {
                 ErrorPopupViewModel vm = new ErrorPopupViewModel("Backup path not found");
                 PopupService.DisplayModal(vm, "Error while loading shop");
+            }
+        }
+
+        private void LoadTransactions()
+        {
+            try
+            {
+                string filename = $"{ConfigurationManager.AppSettings["BackupPath"]}{ShopFilename}";
+                if (File.Exists(filename))
+                {
+                    DataContracts.Shop shop;
+                    using (XmlTextReader reader = new XmlTextReader(filename))
+                    {
+                        DataContractSerializer serializer = new DataContractSerializer(typeof(DataContracts.Shop));
+                        shop = (DataContracts.Shop)serializer.ReadObject(reader);
+                    }
+                    Transactions.Clear();
+                    Transactions.AddRange(shop.Transactions.Select(t => new ShopTransactionItem
+                    {
+                        Timestamp = t.Timestamp,
+                        Articles = t.Articles.Select(a => new ShopArticleItem
+                        {
+                            Article = ArticleDb.Articles.FirstOrDefault(x => x.Guid == a.Guid),
+                            Quantity = a.Quantity
+                        }).ToList(),
+                        Cash = t.Cash,
+                        BankCard = t.BankCard
+                    }));
+                    CashRegisterViewModel.Cash = Transactions.Sum(x => x.Cash);
+                    CashRegisterViewModel.BankCard = Transactions.Sum(x => x.BankCard);
+                }
+                else
+                {
+                    ErrorPopupViewModel vm = new ErrorPopupViewModel("Shop file not found");
+                    PopupService.DisplayModal(vm, "Error while loading shop");
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
+                PopupService.DisplayModal(vm, "Error while loading shop");
+            }
+        }
+
+        private void LoadClients()
+        {
+            //  add backup clients
+            foreach (string filename in Directory.EnumerateFiles(ConfigurationManager.AppSettings["BackupPath"], "*.xml", SearchOption.TopDirectoryOnly).Where(x => !x.Contains(ShopFilename)))
+            {
+                try
+                {
+                    ClientViewModel client = new ClientViewModel(RefreshSoldArticles, RefreshSoldArticles, filename);
+                    Buttons.Add(client);
+                }
+                catch (Exception ex)
+                {
+                    ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
+                    PopupService.DisplayModal(vm, $"Error while loading {filename} cart");
+                }
             }
         }
 
@@ -243,9 +359,9 @@ namespace PPC.Shop.ViewModels
 
         private async Task CashRegisterClosureConfirmedAsync()
         {
-            // Compute cash register closure
-            //  transactions from shop
-            List<TransactionFullArticle> transactions = new List<TransactionFullArticle>(CashRegisterViewModel.Transactions.Select(t => new TransactionFullArticle
+            // Compute shop closure
+            //  transactions from cash register
+            List<TransactionFullArticle> transactions = new List<TransactionFullArticle>(Transactions.Select(t => new TransactionFullArticle
             {
                 Timestamp = t.Timestamp,
                 Articles = t.Articles.Select(x => new FullArticle
@@ -259,7 +375,7 @@ namespace PPC.Shop.ViewModels
                 Cash = t.Cash,
                 BankCard = t.BankCard
             }));
-            //  transactions from tabs
+            //  transactions from shopping client carts
             foreach (ClientViewModel client in Buttons.OfType<ClientViewModel>())
             {
                 transactions.Add(new TransactionFullArticle
@@ -350,7 +466,7 @@ namespace PPC.Shop.ViewModels
 
         private async Task SendCashRegisterClosureMailAsync(CashRegisterClosure closure)
         {
-            // Send cash register closure mail
+            // Send shop closure mail
             Mediator.Default.Send(new ChangeWaitingMessage { IsWaiting = true });
             try
             {
@@ -443,11 +559,60 @@ namespace PPC.Shop.ViewModels
 
         #endregion
 
+        #region Transactions
+
+        public ObservableCollection<ShopTransactionItem> Transactions { get; }
+
+        private void AddTransaction(ShopTransactionItem transaction)
+        {
+            Transactions.Add(transaction);
+            SaveTransactions();
+            RefreshSoldArticles();
+        }
+
+        private void SaveTransactions()
+        {
+            try
+            {
+                if (!Directory.Exists(ConfigurationManager.AppSettings["BackupPath"]))
+                    Directory.CreateDirectory(ConfigurationManager.AppSettings["BackupPath"]);
+                DataContracts.Shop shop = new DataContracts.Shop
+                {
+                    Transactions = Transactions.Select(t => new ShopTransaction
+                    {
+                        Timestamp = t.Timestamp,
+                        Articles = t.Articles.Select(a => new Item
+                        {
+                            Guid = a.Article.Guid,
+                            Quantity = a.Quantity,
+                        }).ToList(),
+                        Cash = t.Cash,
+                        BankCard = t.BankCard
+                    }).ToList(),
+                };
+                string filename = $"{ConfigurationManager.AppSettings["BackupPath"]}{ShopFilename}";
+                using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
+                {
+                    writer.Formatting = Formatting.Indented;
+                    DataContractSerializer serializer = new DataContractSerializer(typeof(DataContracts.Shop));
+                    serializer.WriteObject(writer, shop);
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
+                PopupService.DisplayModal(vm, "Error while saving shop");
+            }
+        }
+
+        #endregion
+
         public ShopViewModel()
         {
-            ShopState = ShopStates.Summary;
+            ShopState = ShopStates.ShoppingCarts;
 
-            CashRegisterViewModel = new CashRegisterViewModel(RefreshSoldArticles);
+            Transactions = new ObservableCollection<ShopTransactionItem>();
+            CashRegisterViewModel = new CashRegisterViewModel(AddTransaction);
 
             Buttons = new ObservableCollection<ShoppingCartBasedViewModelBase>
             {
@@ -465,8 +630,8 @@ namespace PPC.Shop.ViewModels
             decimal totalCash = 0;
             decimal totalBankCard = 0;
             Dictionary<Guid, ShopArticleItem> soldItems = new Dictionary<Guid, ShopArticleItem>();
-            // Gather sold items in current shopping cart
-            foreach (ShopArticleItem item in CashRegisterViewModel.Transactions.SelectMany(x => x.Articles))
+            // Gather sold items in closed transactions
+            foreach (ShopArticleItem item in Transactions.SelectMany(x => x.Articles))
             {
                 ShopArticleItem soldItem;
                 if (!soldItems.TryGetValue(item.Article.Guid, out soldItem))
@@ -509,11 +674,14 @@ namespace PPC.Shop.ViewModels
             SoldArticlesTotal = SoldArticles.Sum(x => x.Total);
             SoldArticlesTotalCash = totalCash;
             SoldArticlesTotalBankCard = totalBankCard;
+            //
+            RaisePropertyChanged(() => PaidClientShoppingCarts);
+            RaisePropertyChanged(() => UnpaidClientShoppingCarts);
         }
 
         private void PlayerSelected(PlayerSelectedMessage msg)
         {
-            // Select tab or create it
+            // Select shopping cart or create it
             ClientViewModel client = Buttons.OfType<ClientViewModel>().FirstOrDefault(x => (x.DciNumber == msg.DciNumber && x.ClientFirstName == msg.FirstName && x.ClientLastName == msg.LastName));
             if (client == null)
             {
@@ -526,6 +694,9 @@ namespace PPC.Shop.ViewModels
                 };
                 Buttons.Add(newClient);
                 SelectedButton = newClient;
+                //
+                RaisePropertyChanged(() => PaidClientShoppingCarts);
+                RaisePropertyChanged(() => UnpaidClientShoppingCarts);
             }
             else
                 SelectedButton = client;
@@ -564,7 +735,7 @@ namespace PPC.Shop.ViewModels
                 PaymentState = x%2 == 0 ? PaymentStates.Unpaid : PaymentStates.Paid
             }));
 
-            ShopState = ShopStates.Summary;
+            ShopState = ShopStates.ShoppingCarts;
         }
     }
 }

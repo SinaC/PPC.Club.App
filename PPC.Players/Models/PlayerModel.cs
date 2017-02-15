@@ -1,4 +1,6 @@
-﻿using PPC.MVVM;
+﻿using System;
+using System.Linq;
+using PPC.MVVM;
 
 namespace PPC.Players.Models
 {
@@ -8,14 +10,22 @@ namespace PPC.Players.Models
         public string DCINumber
         {
             get { return _dciNumber; }
-            set { Set(() => DCINumber, ref _dciNumber, value); }
+            set
+            {
+                if (Set(() => DCINumber, ref _dciNumber, value))
+                    RaisePropertyChanged(() => AutoCompleteSearchValue);
+            }
         }
 
         private string _firstName;
         public string FirstName
         {
             get { return _firstName; }
-            set { Set(() => FirstName, ref _firstName, value); }
+            set
+            {
+                if (Set(() => FirstName, ref _firstName, value))
+                    RaisePropertyChanged(() => AutoCompleteSearchValue);
+            }
         }
 
         private string _middleName;
@@ -29,7 +39,11 @@ namespace PPC.Players.Models
         public string LastName
         {
             get { return _lastName; }
-            set { Set(() => LastName, ref _lastName, value); }
+            set
+            {
+                if (Set(() => LastName, ref _lastName, value))
+                    RaisePropertyChanged(() => AutoCompleteSearchValue);
+            }
         }
 
         private string _countryCode;
@@ -45,5 +59,7 @@ namespace PPC.Players.Models
             get { return _isJudge; }
             set { Set(() => IsJudge, ref _isJudge, value); }
         }
+
+        public string AutoCompleteSearchValue => (DCINumber ?? string.Empty) + " " + (FirstName ?? string.Empty) + " " + (LastName ?? string.Empty);
     }
 }

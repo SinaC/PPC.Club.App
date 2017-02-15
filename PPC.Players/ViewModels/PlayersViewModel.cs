@@ -11,21 +11,22 @@ using PPC.Popup;
 
 namespace PPC.Players.ViewModels
 {
-    public class PlayersViewModel : TabBase
+    public class PlayersViewModel : ObservableObject
     {
         private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
-
-        #region TabBase
-
-        public override string Header => "Players";
-
-        #endregion
 
         private ObservableCollection<PlayerModel> _players;
         public ObservableCollection<PlayerModel> Players
         {
             get { return _players; }
             protected set { Set(() => Players, ref _players, value); }
+        }
+
+        private PlayerModel _selectedPlayer;
+        public PlayerModel SelectedPlayer
+        {
+            get { return _selectedPlayer; }
+            set { Set(() => SelectedPlayer, ref _selectedPlayer, value); }
         }
 
         #region Load
@@ -78,15 +79,16 @@ namespace PPC.Players.ViewModels
         private ICommand _selectPlayerWithModifierCommand;
         public ICommand SelectPlayerWithModifierCommand => _selectPlayerWithModifierCommand = _selectPlayerWithModifierCommand ?? new RelayCommand<PlayerModel>(pm => SelectPlayer(pm, false));
 
-        private void SelectPlayer(PlayerModel player, bool switchToSaleTab)
+        private void SelectPlayer(PlayerModel player, bool switchToShop)
         {
-            Mediator.Default.Send(new PlayerSelectedMessage
-            {
-                DciNumber = player.DCINumber,
-                FirstName = player.FirstName,
-                LastName = player.LastName,
-                SwitchToSaleTab = switchToSaleTab
-            });
+            if (player != null)
+                Mediator.Default.Send(new PlayerSelectedMessage
+                {
+                    DciNumber = player.DCINumber,
+                    FirstName = player.FirstName,
+                    LastName = player.LastName,
+                    SwitchToShop = switchToShop
+                });
         }
 
         #endregion

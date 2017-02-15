@@ -3,17 +3,106 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:viewModels="clr-namespace:PPC.Shop.ViewModels"
+             xmlns:viewModels="clr-namespace:PPC.Shop.ViewModels" 
+             xmlns:converters="clr-namespace:PPC.Shop.Converters"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance viewModels:ShopViewModelDesignData, IsDesignTimeCreatable=True}"
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="500">
+    <UserControl.Resources>
+        <converters:VisibilityToNullableBooleanConverter x:Key="VisibilityToNullableBooleanConverter"/>
+        <Style TargetType="{x:Type DataGridRowHeader}" x:Key="TransactionRowHeaderStyle">
+            <Setter Property="Width" Value="16"/>
+            <Setter Property="Height" Value="16"/>
+            <Setter Property="Margin" Value="1"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridRowHeader}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0">
+        <StackPanel Grid.Row="0"
+                    Orientation="Horizontal">
+            <TextBlock Margin="5,2"
+                       FontWeight="SemiBold"
+                       Text="Transactions:"/>
+            <TextBlock Margin="0,2"
+                       Text="{Binding Transactions.Count}"/>
+        </StackPanel>
+
+        <!-- mouse wheel scroll: http://stackoverflow.com/questions/2922303/mouse-scroll-not-working-in-a-scroll-viewer-with-a-wpf-datagrid-and-additional-u-->
+        <ScrollViewer Grid.Row="1"
+                      PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
+            <DataGrid Margin="5,2"
+                      IsReadOnly="True" 
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      AutoGenerateColumns="False"
+                      RowHeaderStyle="{StaticResource TransactionRowHeaderStyle}"
+                      ItemsSource="{Binding Transactions}">
+                <DataGrid.RowDetailsTemplate>
+                    <DataTemplate DataType="{x:Type viewModels:ShopTransactionItem}">
+                        <DataGrid IsReadOnly="True"
+                                  CanUserAddRows="False"
+                                  CanUserDeleteRows="False"
+                                  AutoGenerateColumns="False"
+                                  ItemsSource="{Binding Articles}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Qty" 
+                                                    Binding="{Binding Quantity}"/>
+                                <DataGridTextColumn Header="Description" 
+                                                    Binding="{Binding Article.Description}"/>
+                                <DataGridTextColumn Header="Price" 
+                                                    Binding="{Binding Article.Price, StringFormat=C}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </DataTemplate>
+                </DataGrid.RowDetailsTemplate>
+                <DataGrid.RowHeaderTemplate>
+                    <DataTemplate>
+                        <ToggleButton IsChecked="{Binding Path=DetailsVisibility, RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}, Converter={StaticResource VisibilityToNullableBooleanConverter}}">
+                            <Image>
+                                <Image.Style>
+                                    <Style TargetType="{x:Type Image}">
+                                        <Setter Property="Source" Value="../Images/plus-round.png"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}" Value="True">
+                                                <Setter Property="Source" Value="../Images/minus-round.png"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Image.Style>
+                            </Image>
+                        </ToggleButton>
+                    </DataTemplate>
+                </DataGrid.RowHeaderTemplate>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Timestamp"
+                                        Binding="{Binding Timestamp, StringFormat=dd/MM/yyyy HH:mm:ss}"/>
+                    <DataGridTextColumn Header="Qty"
+                                        Binding="{Binding Articles.Count}"/>
+                    <DataGridTextColumn Header="Cash"
+                                        Binding="{Binding Cash, StringFormat=C}"/>
+                    <DataGridTextColumn Header="Bank card"
+                                        Binding="{Binding BankCard, StringFormat=C}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </ScrollViewer>
+        <TextBlock Grid.Row="2"
+                   Margin="5,2"
+                   FontWeight="SemiBold">
             <TextBlock.Text>
                 <MultiBinding StringFormat="{}Summary: #Articles: {0}  Total: {1:C}  Cash: {2:C}  BC: {3:C}">
                     <Binding Path="SoldArticlesCount"/>
@@ -24,7 +113,8 @@
             </TextBlock.Text>
         </TextBlock>
 
-        <DataGrid Grid.Row="1"
+        <DataGrid Grid.Row="3"
+                  Margin="5,2"
                   IsReadOnly="True"
                   CanUserAddRows="False"
                   CanUserDeleteRows="False"

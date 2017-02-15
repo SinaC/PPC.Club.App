@@ -6,8 +6,6 @@
         xmlns:app="clr-namespace:PPC.App"
         xmlns:popup="clr-namespace:PPC.Popup;assembly=PPC.Popup" 
         xmlns:controls="clr-namespace:PPC.Controls;assembly=PPC.Controls"
-        xmlns:playersViewModels="clr-namespace:PPC.Players.ViewModels;assembly=PPC.Players"
-        xmlns:shopViewModels="clr-namespace:PPC.Shop.ViewModels;assembly=PPC.Shop"
         xmlns:playersViews="clr-namespace:PPC.Players.Views;assembly=PPC.Players"
         xmlns:shopViews="clr-namespace:PPC.Shop.Views;assembly=PPC.Shop"
         x:Name="AppMainWindow"
@@ -49,80 +47,117 @@
                 <controls:LoadingWait />
             </controls:AdornedControl.AdornerContent>
             <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="2"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
                 <!-- Header -->
-                <Grid Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <!-- Go to shop summary -->
-                    <Button Grid.Column="0"
-                            Width="48"
-                            Margin="5,2"
-                            ToolTip="Return to shop"
-                            Command="{Binding SwitchToShopSummaryCommand}">
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <!-- Go to shopping carts -->
+                    <Button Grid.Row="0"
+                            Width="64"
+                            Margin="5"
+                            Command="{Binding SwitchToShoppingCartsCommand}">
+                        <Button.ToolTip>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="{Binding ShopViewModel.ClientShoppingCarts, StringFormat={}Shopping carts: {0}}"/>
+                                <TextBlock Text="{Binding ShopViewModel.UnpaidClientShoppingCarts, StringFormat={}Unpaid shopping carts: {0}}"/>
+                                <TextBlock Text="{Binding ShopViewModel.PaidClientShoppingCarts, StringFormat={}Paid shopping carts: {0}}"/>
+                            </StackPanel>
+                        </Button.ToolTip>
                         <Image Style="{StaticResource AutoDisableImageStyle}"
                                Source="Images/shop.png"/>
                     </Button>
                     <!-- Create new client -->
-                    <Button Grid.Column="1"
-                            Width="48"
-                            Margin="5,2"
-                            ToolTip="Add new client shopping cart tab"
+                    <Button Grid.Row="1"
+                            Width="64"
+                            Margin="5"
+                            ToolTip="Add new client shopping cart"
                             Command="{Binding AddNewClientCommand}">
                         <Image Style="{StaticResource AutoDisableImageStyle}"
                                Source="Images/plus-round.png"/>
                     </Button>
                     <!-- Go to sold articles -->
-                    <Button Grid.Column="2"
-                            Width="48"
-                            Margin="5,2"
-                            ToolTip="View sold articles"
+                    <Button Grid.Row="2"
+                            Width="64"
+                            Margin="5"
                             Command="{Binding SwitchToSoldArticlesCommand}">
-                        <Image Style="{StaticResource AutoDisableImageStyle}"
-                               Source="Images/list.png"/>
+                        <Button.ToolTip>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="Sold articles and transactions"/>
+                                <TextBlock Text="{Binding ShopViewModel.SoldArticlesTotalCash, StringFormat={}Cash: {0:C}}"/>
+                                <TextBlock Text="{Binding ShopViewModel.SoldArticlesTotalBankCard, StringFormat={}Bank card: {0:C}}"/>
+                                <TextBlock Text="{Binding ShopViewModel.SoldArticlesTotal, StringFormat={}Total: {0:C}}"/>
+                            </StackPanel>
+                        </Button.ToolTip>
+                        <Grid>
+                            <Image Style="{StaticResource AutoDisableImageStyle}"
+                                   Source="Images/transactions.png"/>
+                            <!--<StackPanel Orientation="Vertical"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center">
+                                <StackPanel.Resources>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Setter Property="Opacity" Value="0.8"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="Foreground" Value="CornflowerBlue"/>
+                                    </Style>
+                                </StackPanel.Resources>
+                                <TextBlock Text="{Binding ShopViewModel.SoldArticlesTotalCash, StringFormat=C}"/>
+                                <TextBlock Text="{Binding ShopViewModel.SoldArticlesTotalBankCard, StringFormat=C}"/>
+                                <TextBlock Text="{Binding ShopViewModel.SoldArticlesTotal, StringFormat=C}"/>
+                            </StackPanel>-->
+                        </Grid>
                     </Button>
                     <!-- Players -->
-                    <Button Grid.Column="3"
-                            Width="48"
-                            Margin="5,2"
-                            ToolTip="Manage players"
+                    <Button Grid.Row="3"
+                            Width="64"
+                            Margin="5"
+                            ToolTip="Players"
                             Command="{Binding SwitchToPlayersCommand}">
                         <Image Style="{StaticResource AutoDisableImageStyle}"
                                Source="Images/players.png"/>
                     </Button>
-                    <!-- dummy column 4 -->
+                    <!-- dummy row 4 -->
                     <!-- Reload -->
-                    <Button Grid.Column="5"
-                            Width="48"
-                            Margin="5,2"
+                    <Button Grid.Row="5"
+                            Width="64"
+                            Margin="5"
                             ToolTip="Load previous session"
                             Command="{Binding ReloadCommand}">
                         <Image Style="{StaticResource AutoDisableImageStyle}"
                                Source="Images/refresh.png"/>
                     </Button>
                     <!-- Shutdown -->
-                    <Button Grid.Column="6"
-                            Width="48"
-                            Margin="5,2"
+                    <Button Grid.Row="6"
+                            Width="64"
+                            Margin="5"
                             ToolTip="Cash registry closure"
                             Command="{Binding CloseCommand}">
                         <Image Style="{StaticResource AutoDisableImageStyle}"
                                Source="Images/power.png"/>
                     </Button>
                 </Grid>
+                
+                <!-- Vertical separator -->
+                <Separator Grid.Column="1"
+                           Margin="0,2"
+                           Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
 
-                <ContentControl Grid.Row="1"
+                <!-- Content -->
+                <ContentControl Grid.Column="2"
+                                Margin="3"
                                 Content="{Binding}">
                     <ContentControl.Style>
                         <Style TargetType="{x:Type ContentControl}">

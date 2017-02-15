@@ -8,6 +8,5 @@ namespace PPC.Helpers
         {
             return source.IndexOf(toCheck, comp) >= 0;
         }
-
     }
 }

@@ -27,7 +27,9 @@
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
-    <Border BorderBrush="Black" BorderThickness="1" Background="{x:Static SystemColors.ControlLightBrush}">
+    <Border BorderBrush="Black" 
+            BorderThickness="1" 
+            Background="{x:Static SystemColors.ControlLightBrush}">
         <Grid>
             <Grid.Style>
                 <Style TargetType="{x:Type Grid}">

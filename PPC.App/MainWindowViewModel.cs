@@ -44,13 +44,13 @@ namespace PPC.App
             set { Set(() => ApplicationMode, ref _applicationMode, value); }
         }
 
-        private ICommand _switchToShopSummaryCommand;
-        public ICommand SwitchToShopSummaryCommand => _switchToShopSummaryCommand = _switchToShopSummaryCommand ?? new RelayCommand(SwitchToShopSummary);
+        private ICommand _switchToShoppingCartsCommand;
+        public ICommand SwitchToShoppingCartsCommand => _switchToShoppingCartsCommand = _switchToShoppingCartsCommand ?? new RelayCommand(SwitchToShoppingCarts);
 
-        private void SwitchToShopSummary()
+        private void SwitchToShoppingCarts()
         {
             ApplicationMode = ApplicationModes.Shop;
-            ShopViewModel.ViewSummaryCommand.Execute(null);
+            ShopViewModel.ViewShoppingCartsCommand.Execute(null);
         }
 
         private ICommand _switchToSoldArticlesCommand;
@@ -125,7 +125,7 @@ namespace PPC.App
 
         private void PlayerSelected(PlayerSelectedMessage msg)
         {
-            if (msg.SwitchToSaleTab)
+            if (msg.SwitchToShop)
                 ApplicationMode = ApplicationModes.Shop;
         }
     }
@@ -136,6 +136,8 @@ namespace PPC.App
         {
             PlayersViewModel = new PlayersViewModelDesignData();
             ShopViewModel = new ShopViewModelDesignData();
+
+            ApplicationMode = ApplicationModes.Shop;
 
             IsWaiting = false;
         }

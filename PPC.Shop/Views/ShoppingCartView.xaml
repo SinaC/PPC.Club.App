@@ -271,20 +271,14 @@
             </DataGrid>
         </GroupBox>
         <GroupBox Grid.Row="2"
-                  Header="Total">
+                  Header="Payment">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="1"
-                           Margin="5,2"
-                           VerticalAlignment="Center"
-                           FontWeight="Bold"
-                           Text="{Binding Total, StringFormat=C}"/>
-                <Button Grid.Column="2"
+                <Button Grid.Column="0"
                         Width="48"
                         Height="48"
                         Margin="5,2"
@@ -293,7 +287,7 @@
                     <Image Style="{StaticResource AutoDisableImageStyle}"
                            Source="../Images/cash.png"/>
                 </Button>
-                <Button Grid.Column="3" 
+                <Button Grid.Column="1" 
                         Width="48"
                         Height="48"
                         Margin="5,2"
@@ -302,6 +296,16 @@
                     <Image Style="{StaticResource AutoDisableImageStyle}"
                            Source="../Images/bankcard.png"/>
                 </Button>
+                <StackPanel Grid.Column="2"
+                            VerticalAlignment="Center"
+                            Orientation="Vertical">
+                    <TextBlock Margin="5,2"
+                               FontWeight="Bold"
+                               Text="Total:"/>
+                    <TextBlock Margin="5,2"
+                               FontWeight="SemiBold"
+                               Text="{Binding Total, StringFormat=C}"/>
+                </StackPanel>
             </Grid>
         </GroupBox>
     </Grid>

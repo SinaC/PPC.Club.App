@@ -4,11 +4,8 @@ transaction edition
 article DB (real DB instead of xml file)
 
 players: autocompletebox to select a player
-
 new project: PPC.Style containing style used in multiple views
-
-Popup/PaymentPopup: images
-Popup/CashRegistryClosure: mail image
 
 known issues:
 after creating a new article, article cannot be added to shopping cart with enter
+autocompletebox: frédéric and frederic doesn't match :/  (search autocompletebox without diacritics)

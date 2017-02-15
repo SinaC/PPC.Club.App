@@ -107,8 +107,8 @@
     <Compile Include="Views\ShopSoldArticlesView.xaml.cs">
       <DependentUpon>ShopSoldArticlesView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ShopSummaryView.xaml.cs">
-      <DependentUpon>ShopSummaryView.xaml</DependentUpon>
+    <Compile Include="Views\ShopShoppingCartsView.xaml.cs">
+      <DependentUpon>ShopShoppingCartsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ShopView.xaml.cs">
       <DependentUpon>ShopView.xaml</DependentUpon>
@@ -151,14 +151,10 @@
     <Resource Include="Images\cash.png" />
     <Resource Include="Images\close-round.png" />
     <Resource Include="Images\edit.png" />
-    <Resource Include="Images\home.png" />
     <Resource Include="Images\locked.png" />
     <Resource Include="Images\minus-round.png" />
     <Resource Include="Images\plus-circled.png" />
     <Resource Include="Images\plus-round.png" />
-    <Resource Include="Images\power.png" />
-    <Resource Include="Images\refresh.png" />
-    <Resource Include="Images\shop.png" />
     <Resource Include="Images\unlocked.png" />
   </ItemGroup>
   <ItemGroup>
@@ -182,7 +178,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ShopSummaryView.xaml">
+    <Page Include="Views\ShopShoppingCartsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -192,10 +188,10 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\list.png" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Resource Include="Images\sum.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
