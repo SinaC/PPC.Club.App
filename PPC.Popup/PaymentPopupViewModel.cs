@@ -174,7 +174,10 @@ namespace PPC.Popup
             Cash = 0;
             BankCard = 0;
             if (isCashFirst || total < MinBankCard)
+            {
                 Cash = total;
+                ClientCash = total;
+            }
             else
                 BankCard = total;
             HasBeenInitializedFromCash = isCashFirst;

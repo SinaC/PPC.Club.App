@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
 using PPC.Helpers;
@@ -15,11 +17,58 @@ namespace PPC.Players.ViewModels
     {
         private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
 
+        #region Filtered players
+
+        private IEnumerable<PlayerModel> _filteredPlayers;
+        public IEnumerable<PlayerModel> FilteredPlayers
+        {
+            get { return _filteredPlayers;}
+            set { Set(() => FilteredPlayers, ref _filteredPlayers, value); }
+        }
+
+        private string _filter;
+        public string Filter
+        {
+            get { return _filter; }
+            set
+            {
+                if (Set(() => Filter, ref _filter, value))
+                    FilterPlayers();
+            }
+        }
+
+        private bool FilterPlayer(PlayerModel p)
+        {
+            if (string.IsNullOrWhiteSpace(Filter))
+                return true;
+            //http://stackoverflow.com/questions/359827/ignoring-accented-letters-in-string-comparison/7720903#7720903
+            return CultureInfo.CurrentCulture.CompareInfo.IndexOf(p.FirstName, Filter, CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreCase) >= 0
+                || CultureInfo.CurrentCulture.CompareInfo.IndexOf(p.LastName, Filter, CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreCase) >= 0
+                || CultureInfo.CurrentCulture.CompareInfo.IndexOf(p.DCINumber, Filter, CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreCase) >= 0;
+        }
+
+        private void FilterPlayers()
+        {
+            if (Players == null)
+                return;
+             FilteredPlayers = Players?.Where(FilterPlayer).ToList();
+            //// If only one player, select it
+            //if (FilteredPlayers.Count() == 1)
+            //    SelectedPlayer = FilteredPlayers.First();
+            SelectedPlayer = FilteredPlayers.FirstOrDefault();
+        }
+
+        #endregion
+
         private ObservableCollection<PlayerModel> _players;
         public ObservableCollection<PlayerModel> Players
         {
             get { return _players; }
-            protected set { Set(() => Players, ref _players, value); }
+            protected set
+            {
+                if (Set(() => Players, ref _players, value))
+                    FilterPlayers();
+            }
         }
 
         private PlayerModel _selectedPlayer;
@@ -71,7 +120,7 @@ namespace PPC.Players.ViewModels
 
         #endregion
 
-        #region DoubleClick
+        #region Select player
 
         private ICommand _selectPlayerCommand;
         public ICommand SelectPlayerCommand => _selectPlayerCommand = _selectPlayerCommand ?? new RelayCommand<PlayerModel>(pm => SelectPlayer(pm, true));
@@ -82,6 +131,7 @@ namespace PPC.Players.ViewModels
         private void SelectPlayer(PlayerModel player, bool switchToShop)
         {
             if (player != null)
+            {
                 Mediator.Default.Send(new PlayerSelectedMessage
                 {
                     DciNumber = player.DCINumber,
@@ -89,6 +139,8 @@ namespace PPC.Players.ViewModels
                     LastName = player.LastName,
                     SwitchToShop = switchToShop
                 });
+                Filter = string.Empty;
+            }
         }
 
         #endregion

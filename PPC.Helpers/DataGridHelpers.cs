@@ -9,7 +9,6 @@ namespace PPC.Helpers
 {
     public static class DataGridHelpers
     {
-
         #region DoubleClick
 
         public static readonly DependencyProperty DataGridDoubleClickProperty = DependencyProperty.RegisterAttached(
@@ -36,7 +35,7 @@ namespace PPC.Helpers
 
         public static ICommand GetDataGridDoubleClickWithModifierCommand(DependencyObject obj)
         {
-            return (ICommand)obj.GetValue(DataGridDoubleClickWithModifierProperty);
+            return (ICommand) obj.GetValue(DataGridDoubleClickWithModifierProperty);
         }
 
         public static void SetDataGridDoubleClickWithModifierCommand(DependencyObject obj, ICommand value)
@@ -61,7 +60,7 @@ namespace PPC.Helpers
             DataGrid @this = sender as DataGrid;
             ICommand cmd;
             if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
-                 cmd = @this?.GetValue(DataGridDoubleClickWithModifierProperty) as ICommand;
+                cmd = @this?.GetValue(DataGridDoubleClickWithModifierProperty) as ICommand;
             else
                 cmd = @this?.GetValue(DataGridDoubleClickProperty) as ICommand;
             if (cmd == null)
@@ -90,13 +89,13 @@ namespace PPC.Helpers
             if (dataGrid == null)
                 throw new InvalidOperationException("Dependency object is not DataGrid.");
 
-            if ((bool)args.OldValue)
+            if ((bool) args.OldValue)
             {
                 Unsubscribe(dataGrid);
                 dataGrid.Unloaded -= DataGridOnUnloaded;
                 dataGrid.Loaded -= DataGridOnLoaded;
             }
-            if ((bool)args.NewValue)
+            if ((bool) args.NewValue)
             {
                 Subscribe(dataGrid);
                 dataGrid.Unloaded += DataGridOnUnloaded;
@@ -112,7 +111,7 @@ namespace PPC.Helpers
                 return;
             handler = (sender, eventArgs) => ScrollToEnd(dataGrid);
             HandlersDict.Add(dataGrid, handler);
-            ((INotifyCollectionChanged)dataGrid.Items).CollectionChanged += handler;
+            ((INotifyCollectionChanged) dataGrid.Items).CollectionChanged += handler;
             ScrollToEnd(dataGrid);
         }
 
@@ -122,20 +121,20 @@ namespace PPC.Helpers
             HandlersDict.TryGetValue(dataGrid, out handler);
             if (handler == null)
                 return;
-            ((INotifyCollectionChanged)dataGrid.Items).CollectionChanged -= handler;
+            ((INotifyCollectionChanged) dataGrid.Items).CollectionChanged -= handler;
             HandlersDict.Remove(dataGrid);
         }
 
         private static void DataGridOnLoaded(object sender, RoutedEventArgs routedEventArgs)
         {
-            var dataGrid = (DataGrid)sender;
+            var dataGrid = (DataGrid) sender;
             if (GetAutoscroll(dataGrid))
                 Subscribe(dataGrid);
         }
 
         private static void DataGridOnUnloaded(object sender, RoutedEventArgs routedEventArgs)
         {
-            var dataGrid = (DataGrid)sender;
+            var dataGrid = (DataGrid) sender;
             if (GetAutoscroll(dataGrid))
                 Unsubscribe(dataGrid);
         }
@@ -154,7 +153,76 @@ namespace PPC.Helpers
 
         public static bool GetAutoscroll(DependencyObject element)
         {
-            return (bool)element.GetValue(AutoscrollProperty);
+            return (bool) element.GetValue(AutoscrollProperty);
+        }
+
+        #endregion
+
+        #region Edit mode tracker http://stackoverflow.com/questions/3248023/code-to-check-if-a-cell-of-a-datagrid-is-currently-edited
+
+        public static bool GetIsInEditMode(DataGrid dataGrid)
+        {
+            return (bool) dataGrid.GetValue(IsInEditModeProperty);
+        }
+
+        private static void SetIsInEditMode(DataGrid dataGrid, bool value)
+        {
+            dataGrid.SetValue(IsInEditModePropertyKey, value);
+        }
+
+        // TODO: how am I supposed to use following property
+        private static readonly DependencyPropertyKey IsInEditModePropertyKey = DependencyProperty.RegisterAttachedReadOnly(
+            "IsInEditMode",
+            typeof(bool),
+            typeof(DataGridHelpers),
+            new UIPropertyMetadata(false));
+
+        public static readonly DependencyProperty IsInEditModeProperty = IsInEditModePropertyKey.DependencyProperty;
+
+        //
+
+        public static bool GetProcessIsInEditMode(DataGrid dataGrid)
+        {
+            return (bool) dataGrid.GetValue(ProcessIsInEditModeProperty);
+        }
+
+        public static void SetProcessIsInEditMode(DataGrid dataGrid, bool value)
+        {
+            dataGrid.SetValue(ProcessIsInEditModeProperty, value);
+        }
+
+        public static readonly DependencyProperty ProcessIsInEditModeProperty = DependencyProperty.RegisterAttached(
+            "ProcessIsInEditMode",
+            typeof(bool),
+            typeof(DataGridHelpers),
+            new FrameworkPropertyMetadata(false, delegate(DependencyObject d, DependencyPropertyChangedEventArgs e)
+            {
+
+                DataGrid dataGrid = d as DataGrid;
+                if (null == dataGrid)
+                {
+                    throw new InvalidOperationException("ProcessIsInEditMode can only be used with instances of the DataGrid-class");
+                }
+                if ((bool) e.NewValue)
+                {
+                    dataGrid.BeginningEdit += dataGrid_BeginningEdit;
+                    dataGrid.CellEditEnding += dataGrid_CellEditEnding;
+                }
+                else
+                {
+                    dataGrid.BeginningEdit -= dataGrid_BeginningEdit;
+                    dataGrid.CellEditEnding -= dataGrid_CellEditEnding;
+                }
+            }));
+
+        static void dataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            SetIsInEditMode((DataGrid) sender, false);
+        }
+
+        static void dataGrid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
+        {
+            SetIsInEditMode((DataGrid) sender, true);
         }
 
         #endregion

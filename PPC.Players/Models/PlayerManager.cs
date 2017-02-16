@@ -44,6 +44,12 @@ namespace PPC.Players.Models
                 }).ToArray()
             };
 
+            if (File.Exists(path))
+            {
+                string backupPath = path.Replace(".xml", $"_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.xml");
+                File.Copy(path, backupPath);
+            }
+
             using (StreamWriter sw = new StreamWriter(path))
             {
                 var settings = new XmlWriterSettings

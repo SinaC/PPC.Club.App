@@ -4,57 +4,82 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:viewModels="clr-namespace:PPC.Players.ViewModels"
-             xmlns:helpers="clr-namespace:PPC.Helpers;assembly=PPC.Helpers"
-             xmlns:controls="clr-namespace:PPC.Controls;assembly=PPC.Controls"
              xmlns:models="clr-namespace:PPC.Players.Models"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance viewModels:PlayersViewModelDesignData, IsDesignTimeCreatable=True}"
              d:DesignHeight="300" d:DesignWidth="800">
-    <Grid>
+    <UserControl.Resources>
+        <Style TargetType="{x:Type Image}" x:Key="AutoDisableImageStyle">
+            <Setter Property="RenderOptions.EdgeMode" Value="Aliased"/>
+            <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.5" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <Grid FocusManager.FocusedElement="{Binding ElementName=FilterTextBox}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0"
-                    Orientation="Horizontal">
-            <Button Margin="5,2"
-                    Command="{Binding LoadCommand}">
-                <TextBlock Text="Load"/>
-            </Button>
-            <Button Margin="5,2"
-                    Command="{Binding SaveCommand}">
-                <TextBlock Text="Save"/>
-            </Button>
-            <controls:KeyFriendlyAutoCompleteBox Margin="5,2"
-                                                 Width="300"
-                                                 IsTextCompletionEnabled="False"
-                                                 FilterMode="ContainsOrdinal"
-                                                 MinimumPopulateDelay="0"
-                                                 MinimumPrefixLength="3"
-                                                 ValueMemberPath="AutoCompleteSearchValue"
-                                                 ItemsSource="{Binding Players}"
-                                                 SelectedItem="{Binding SelectedPlayer}">
-                <controls:KeyFriendlyAutoCompleteBox.InputBindings>
-                    <KeyBinding Key="Enter" Command="{Binding SelectPlayerCommand}" CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type controls:KeyFriendlyAutoCompleteBox}}}"/>
-                </controls:KeyFriendlyAutoCompleteBox.InputBindings>
-                <controls:KeyFriendlyAutoCompleteBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type models:PlayerModel}">
-                        <TextBlock Text="{Binding AutoCompleteSearchValue}"/>
-                    </DataTemplate>
-                </controls:KeyFriendlyAutoCompleteBox.ItemTemplate>
-            </controls:KeyFriendlyAutoCompleteBox>
-        </StackPanel>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Column 0 -->
+            <TextBox x:Name="FilterTextBox"
+                     Grid.Column="0"
+                     Margin="5,2"
+                     Width="200"
+                     PreviewKeyDown="FilterTextBox_OnPreviewKeyDown"
+                     Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}">
+                <TextBox.InputBindings>
+                    <KeyBinding Key="Enter" Command="{Binding SelectPlayerCommand}" CommandParameter="{Binding SelectedPlayer}"/>
+                    <KeyBinding Key="Return" Command="{Binding SelectPlayerCommand}" CommandParameter="{Binding SelectedPlayer}"/>
+                </TextBox.InputBindings>
+                <TextBox.Style>
+                    <Style TargetType="{x:Type TextBox}">
+                        <Setter Property="IsEnabled" Value="True"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsInEditMode, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" Value="True">
+                                <Setter Property="IsEnabled" Value="False"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
+
+            <!-- dummy column 1 -->
+
+            <!-- Column 2 -->
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal">
+                <Button Margin="5,2"
+                        Command="{Binding LoadCommand}">
+                    <TextBlock Text="Load"/>
+                </Button>
+                <Button Margin="5,2"
+                        Command="{Binding SaveCommand}">
+                    <TextBlock Text="Save"/>
+                </Button>
+            </StackPanel>
+        </Grid>
 
         <DataGrid x:Name="PlayersDataGrid" 
                   Grid.Row="1"
-                  ItemsSource="{Binding Players}"
+                  ItemsSource="{Binding FilteredPlayers}"
+                  SelectedItem="{Binding SelectedPlayer}"
                   AutoGenerateColumns="False"
                   ScrollViewer.CanContentScroll="True" 
                   ScrollViewer.VerticalScrollBarVisibility="Auto"
                   ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                  helpers:DataGridHelpers.DataGridDoubleClickCommand="{Binding SelectPlayerCommand}"
-                  helpers:DataGridHelpers.DataGridDoubleClickWithModifierCommand="{Binding SelectPlayerWithModifierCommand}"
+                  CellEditEnding="DataGrid_OnCellEditEnding"
                   BeginningEdit="DataGrid_OnBeginningEdit">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="DCI" Binding="{Binding DCINumber}"/>
@@ -62,6 +87,29 @@
                 <DataGridTextColumn Header="Last Name" Binding="{Binding LastName}"/>
                 <DataGridTextColumn Header="Country" Binding="{Binding CountryCode}"/>
                 <DataGridCheckBoxColumn Header="Judge?" Binding="{Binding IsJudge}"/>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type models:PlayerModel}">
+                            <Button Width="16"
+                                    Height="16"
+                                    Command="{Binding DataContext.SelectPlayerCommand, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"
+                                    CommandParameter="{Binding}">
+                                <Button.Style>
+                                    <Style TargetType="{x:Type Button}">
+                                        <Setter Property="IsEnabled" Value="True"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsInEditMode, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" Value="True">
+                                                <Setter Property="IsEnabled" Value="False"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <Image Style="{StaticResource AutoDisableImageStyle}"
+                                       Source="../Images/add-shopping-cart.png"/>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>
