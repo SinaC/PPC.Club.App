@@ -1,7 +1,12 @@
-﻿using System.Windows.Input;
+﻿using System;
+using System.Windows;
+using System.Windows.Input;
+using PPC.Data.Articles;
+using PPC.Inventory.ViewModels;
 using PPC.Messages;
 using PPC.MVVM;
 using PPC.Players.ViewModels;
+using PPC.Popup;
 using PPC.Shop.ViewModels;
 
 namespace PPC.App
@@ -9,11 +14,14 @@ namespace PPC.App
     public enum ApplicationModes
     {
         Shop,
-        Players
+        Players,
+        Inventory
     }
 
     public class MainWindowViewModel : ObservableObject
     {
+        private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
+
         private bool _isWaiting;
         public bool IsWaiting
         {
@@ -32,7 +40,14 @@ namespace PPC.App
         public ShopViewModel ShopViewModel
         {
             get { return _shopViewModel; }
-            set { Set(() => ShopViewModel, ref _shopViewModel, value); }
+            protected set { Set(() => ShopViewModel, ref _shopViewModel, value); }
+        }
+
+        private InventoryViewModel _inventoryViewModel;
+        public InventoryViewModel InventoryViewModel
+        {
+            get { return _inventoryViewModel; }
+            protected set { Set(() => InventoryViewModel, ref _inventoryViewModel, value); }
         }
 
         #region Buttons + application mode
@@ -79,6 +94,14 @@ namespace PPC.App
             ApplicationMode = ApplicationModes.Players;
         }
 
+        private ICommand _switchToInventoryCommand;
+        public ICommand SwitchToInventoryCommand => _switchToInventoryCommand = _switchToInventoryCommand ?? new RelayCommand(SwitchToInventory);
+
+        private void SwitchToInventory()
+        {
+            ApplicationMode = ApplicationModes.Inventory;
+        }
+
         #endregion
 
         #region Reload
@@ -101,16 +124,64 @@ namespace PPC.App
 
         private void Close()
         {
+            //ShopViewModel.CashRegisterClosureCommand.Execute(null);
+            PopupService.DisplayQuestion("Close application", "Do you want to perform cash registry closure",
+                new ActionButton
+                {
+                    Caption = "Yes",
+                    Order = 1,
+                    ClickCallback = () => ShopViewModel.CashRegisterClosureCommand.Execute(null)
+                },
+                new ActionButton
+                {
+                    Caption = "No",
+                    Order = 2,
+                    ClickCallback = () => Application.Current.Shutdown(0)
+                },
+                new ActionButton
+                {
+                    Caption = "Cancel",
+                    Order = 3,
+                });
+            // TODO: check if players have been saved, check if one or more shopping carts articles still opened: new method string PrepareClose (return null if ready or error message otherwise)
             // TODO
-            ShopViewModel.CashRegisterClosureCommand.Execute(null);
+            //PopupService.DisplayQuestion("Close application", String.Empty,
+            //    new ActionButton
+            //    {
+            //        Caption = "Perform cash registry closure",
+            //        Order = 1,
+            //        ClickCallback = () => ShopViewModel.PerformClosure(() => Application.Current.Shutdown(0)) // ShopViewModel is not responsible for closing application
+            //    },
+            //    new ActionButton
+            //    {
+            //        Caption = "Exit with closure",
+            //        Order = 2,
+            //        ClickCallback = () => Application.Current.Shutdown(0)
+            //    },
+            //    new ActionButton
+            //    {
+            //        Caption = "Cancel",
+            //        Order = 3,
+            //    });
         }
 
         #endregion
 
         public MainWindowViewModel()
         {
+            try
+            {
+                ArticlesDb.Instance.Load();
+            }
+            catch (Exception ex)
+            {
+                ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, ex);
+                PopupService.DisplayModal(vm, "Error while loading articles DB");
+            }
+
             PlayersViewModel = new PlayersViewModel();
             ShopViewModel = new ShopViewModel();
+            InventoryViewModel = new InventoryViewModel();
 
             ApplicationMode = ApplicationModes.Shop;
 

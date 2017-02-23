@@ -7,25 +7,38 @@
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:PaymentPopupViewModelDesignData, IsDesignTimeCreatable=True}"
-             d:DesignHeight="300" d:DesignWidth="500"
+             d:DesignWidth="500"
              Width="500"
              MaxHeight="300">
     <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-        <Style x:Key="ClientChangeTextBlockStyle" TargetType="{x:Type TextBlock}">
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding IsClientChangePositive}" Value="True">
-                    <Setter Property="Foreground" Value="Green"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-        <Style x:Key="ClientCashTextBlockStyle" TargetType="{x:Type TextBlock}">
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding IsClientCashNotEnough}" Value="True">
-                    <Setter Property="Foreground" Value="Red"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Images.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataTextBlockStyle}" x:Key="ClientChangeDataTextBlockStyle">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsClientChangePositive}" Value="True">
+                        <Setter Property="Foreground" Value="Green"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource HeaderTextBlockStyle}" x:Key="CurrentTotalHeaderTextBlockStyle">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsPaidButtonActive}" Value="False">
+                        <Setter Property="Foreground" Value="Red"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataTextBlockStyle}" x:Key="CurrentTotalDataTextBlockStyle">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsPaidButtonActive}" Value="False">
+                        <Setter Property="Foreground" Value="Red"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
     </UserControl.Resources>
     <Border BorderBrush="Black" 
             BorderThickness="1" 
@@ -47,12 +60,15 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0"
                         Orientation="Horizontal">
                 <TextBlock Margin="5,2"
+                           Style="{StaticResource HeaderTextBlockStyle}"
                            Text="Total:"/>
                 <TextBlock Margin="5,2"
+                           Style="{StaticResource DataTextBlockStyle}"
                            Text="{Binding Total, StringFormat=C}"/>
                 <TextBlock Margin="5,2"
                            Text="{Binding TotalWithoutDiscount, StringFormat={}(without discount: {0:C})}"/>
@@ -62,14 +78,11 @@
                        Fill="Black"/>
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto" MinWidth="80"/>
+                    <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto" MinWidth="80"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto" MinWidth="80"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -78,130 +91,165 @@
                 </Grid.RowDefinitions>
 
                 <!-- Cash -->
-                <TextBlock Grid.Row="0" 
-                            Grid.Column="0"
-                            Margin="5,2"
-                            Text="Cash:"/>
-                <xctk:DecimalUpDown Grid.Row="0"
-                                    Grid.Column="1"
-                                    Margin="5,2"
-                                    Minimum="0" 
-                                    Maximum="{Binding Total}"
-                                    Increment="0.01"
-                                    FormatString="C"
-                                    GotFocus="DecimalUpDown_OnGotFocus"
-                                    ValueChanged="DecimalUpDown_OnValueChanged"
-                                    Value="{Binding Cash}"/>
+                <Grid Grid.Row="0"
+                      Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition MinWidth="80"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.Column="0"
+                           Margin="5,2"
+                           Width="32"
+                           Style="{StaticResource AutoDisableImageStyle}"
+                           ToolTip="Cash"
+                           Source="{StaticResource CashImage}"/>
+                    <xctk:DecimalUpDown Grid.Column="1"
+                                        Margin="5,2"
+                                        Minimum="0" 
+                                        Maximum="{Binding Total}"
+                                        Increment="0.01"
+                                        FormatString="C"
+                                        GotFocus="DecimalUpDown_OnGotFocus"
+                                        ValueChanged="DecimalUpDown_OnValueChanged"
+                                        Value="{Binding Cash}"/>
+                </Grid>
 
                 <!-- Client cash -->
-                <TextBlock Grid.Row="1" 
-                            Grid.Column="0"
-                            Margin="5,2"
-                            Style="{StaticResource ClientCashTextBlockStyle}"
-                            Text="Client cash:"/>
-                <xctk:DecimalUpDown x:Name="ClientCashDecimalUpDown"
-                                    Grid.Row="1"
-                                    Grid.Column="1"
-                                    Margin="5,2"
-                                    Minimum="0" 
-                                    Maximum="999"
-                                    Increment="0.01"
-                                    FormatString="C"
-                                    GotFocus="DecimalUpDown_OnGotFocus"
-                                    KeyDown="ClientCashDecimalUpDown_OnKeyDown"
-                                    ValueChanged="DecimalUpDown_OnValueChanged"
-                                    Value="{Binding ClientCash}"/>
- 
+                <Grid Grid.Row="1"
+                      Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition MinWidth="80"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.Column="0"
+                           Margin="5,2"
+                           Width="32"
+                           Style="{StaticResource AutoDisableImageStyle}"
+                           ToolTip="Client cash"
+                           Source="{StaticResource ClientCashImage}"/>
+                    <xctk:DecimalUpDown x:Name="ClientCashDecimalUpDown"
+                                        Grid.Column="1"
+                                        Margin="5,2"
+                                        Minimum="0" 
+                                        Maximum="999"
+                                        Increment="0.01"
+                                        FormatString="C"
+                                        GotFocus="DecimalUpDown_OnGotFocus"
+                                        KeyDown="ClientCashDecimalUpDown_OnKeyDown"
+                                        ValueChanged="DecimalUpDown_OnValueChanged"
+                                        Value="{Binding ClientCash}"/>
+                </Grid>
                 <!-- Client change -->
-                <TextBlock Grid.Row="2" 
-                            Grid.Column="0"
-                            Margin="5,2"
-                            Style="{StaticResource ClientChangeTextBlockStyle}"
-                            Text="Client change:"/>
-                <TextBlock Grid.Row="2"
-                            Grid.Column="1"
-                            Margin="5,2"
-                            Style="{StaticResource ClientChangeTextBlockStyle}"
-                            Text="{Binding ClientChange, StringFormat=C}"/>
-
+                <Grid Grid.Row="2"
+                      Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition MinWidth="80"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.Column="0"
+                           Margin="5,2"
+                           Width="32"
+                           Style="{StaticResource AutoDisableImageStyle}"
+                           ToolTip="Client change"
+                           Source="{StaticResource CashChangeImage}"/>
+                    <TextBlock Grid.Column="1"
+                               Margin="5,2"
+                               VerticalAlignment="Center"
+                               Style="{StaticResource ClientChangeDataTextBlockStyle}"
+                               Text="{Binding ClientChange, StringFormat=C}"/>
+                </Grid>
                 <!-- Separator -->
                 <Rectangle Grid.Row="0"
-                            Grid.RowSpan="3"
-                            Grid.Column="2"
-                            Margin="5,2"
-                            Width="1"
-                            Fill="Black"/>
+                           Grid.RowSpan="3"
+                           Grid.Column="1"
+                           Margin="5,2"
+                           Width="1"
+                           Fill="Black"/>
 
                 <!-- Bank card -->
-                <TextBlock Grid.Row="0"
-                            Grid.Column="3"
-                            Margin="5,2"
-                            Text="Bank card:"/>
-                <xctk:DecimalUpDown Grid.Row="0"
-                                    Grid.Column="4"
-                                    Margin="5,2"
-                                    Minimum="{Binding MinBankCard}"
-                                    Maximum="{Binding Total}"
-                                    Increment="0.01"
-                                    FormatString="C"
-                                    GotFocus="DecimalUpDown_OnGotFocus"
-                                    ValueChanged="DecimalUpDown_OnValueChanged"
-                                    Value="{Binding BankCard}"/>
-
+                <Grid Grid.Row="0"
+                      Grid.Column="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition MinWidth="80"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.Column="0"
+                           Margin="5,2"
+                           Width="32"
+                           Style="{StaticResource AutoDisableImageStyle}"
+                           ToolTip="Bank card"
+                           Source="{StaticResource BankCardImage}"/>
+                    <xctk:DecimalUpDown Grid.Column="1"
+                                        Margin="5,2"
+                                        Minimum="{Binding MinBankCard}"
+                                        Maximum="{Binding Total}"
+                                        Increment="0.01"
+                                        FormatString="C"
+                                        GotFocus="DecimalUpDown_OnGotFocus"
+                                        ValueChanged="DecimalUpDown_OnValueChanged"
+                                        Value="{Binding BankCard}"/>
+                </Grid>
                 <!-- Separator -->
                 <Rectangle Grid.Row="0"
-                            Grid.RowSpan="3"
-                            Grid.Column="5"
-                            Margin="5,2"
-                            Width="1"
-                            Fill="Black"/>
+                           Grid.RowSpan="3"
+                           Grid.Column="3"
+                           Margin="5,2"
+                           Width="1"
+                           Fill="Black"/>
 
                 <!-- Discount -->
-                <TextBlock Grid.Row="0"
-                            Grid.Column="6"
-                            Margin="5,2"
-                            Text="Discount:"/>
-                <xctk:DecimalUpDown Grid.Row="0"
-                                    Grid.Column="7"
-                                    Margin="5,2"
-                                    Minimum="0"
-                                    Maximum="{Binding TotalWithoutDiscount}"
-                                    Increment="0.01"
-                                    FormatString="C"
-                                    GotFocus="DecimalUpDown_OnGotFocus"
-                                    ValueChanged="DecimalUpDown_OnValueChanged"
-                                    Value="{Binding Discount}"/>
+                <Grid Grid.Row="0"
+                      Grid.Column="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition MinWidth="80"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.Column="0"
+                           Margin="5,2"
+                           Width="32"
+                           Style="{StaticResource AutoDisableImageStyle}"
+                           ToolTip="Discount"
+                           Source="{StaticResource DiscountImage}"/>
+                    <xctk:DecimalUpDown Grid.Column="1"
+                                        Margin="5,2"
+                                        Minimum="0"
+                                        Maximum="{Binding TotalWithoutDiscount}"
+                                        Increment="0.01"
+                                        FormatString="C"
+                                        GotFocus="DecimalUpDown_OnGotFocus"
+                                        ValueChanged="DecimalUpDown_OnValueChanged"
+                                        Value="{Binding Discount}"/>
+                </Grid>
             </Grid>
             <!-- Separator -->
             <Rectangle Grid.Row="3"
                        Height="1"
                        Fill="Black"/>
-            <!-- Total + Paid button -->
+            <!-- Total -->
             <StackPanel Grid.Row="4"
                         Orientation="Horizontal">
                 <TextBlock Margin="5,2"
-                           Text="{Binding CurrentTotal, StringFormat={}Current Total: {0:C}}">
-                    <TextBlock.Style>
-                        <Style TargetType="{x:Type TextBlock}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsPaidButtonActive}" Value="False">
-                                    <Setter Property="Foreground" Value="Red"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
+                           Style="{StaticResource CurrentTotalHeaderTextBlockStyle}"
+                           Text="Current Total:"/>
+                <TextBlock Margin="0,2"
+                           Style="{StaticResource CurrentTotalDataTextBlockStyle}"
+                           Text="{Binding CurrentTotal, StringFormat=C}"/>
                 <TextBlock Margin="5,2"
                            Visibility="{Binding HasDiscount, Converter={StaticResource BooleanToVisibilityConverter}}"
                            Foreground="LimeGreen"
-                           Text="{Binding Discount, StringFormat={}with a discount of {0:C}}"></TextBlock>
-                <Button x:Name="PaidButton"
-                        Width="80"
-                        Margin="5,2"
-                        Command="{Binding PaidCommand}">
-                    <TextBlock Text="Paid"/>
-                </Button>
+                           Text="{Binding Discount, StringFormat={}with a discount of {0:C}}"/>
             </StackPanel>
+            <!-- Paid button -->
+            <Button x:Name="PaidButton"
+                    Grid.Row="5"
+                    Width="32"
+                    Height="32"    
+                    Margin="5,2"
+                    ToolTip="Payment done"
+                    Command="{Binding PaidCommand}">
+                <Image Style="{StaticResource AutoDisableImageStyle}"
+                       Source="{StaticResource CheckmarkImage}"/>
+            </Button>
         </Grid>
     </Border>
 </UserControl>

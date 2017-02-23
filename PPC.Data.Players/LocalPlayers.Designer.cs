@@ -10,7 +10,8 @@
 
 #pragma warning disable 1591
 
-namespace PPC.Players.Models {
+namespace PPC.Data.Players
+{
     
     
     /// <summary>

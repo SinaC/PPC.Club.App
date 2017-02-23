@@ -158,9 +158,17 @@
       <Project>{04cd3c36-e320-4a14-952b-1e09340e9b58}</Project>
       <Name>PPC.Controls</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PPC.Data.Articles\PPC.Data.Articles.csproj">
+      <Project>{99b36c5f-3b72-4e79-b34c-29f3a8a4cc99}</Project>
+      <Name>PPC.Data.Articles</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PPC.DataContracts\PPC.DataContracts.csproj">
       <Project>{73f28b1d-02d3-4bdf-891a-df4ee2248353}</Project>
       <Name>PPC.DataContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Inventory\PPC.Inventory.csproj">
+      <Project>{e734f70a-12e8-46bb-857d-35d606169a11}</Project>
+      <Name>PPC.Inventory</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Messages\PPC.Messages.csproj">
       <Project>{137EF3D3-E60D-45E9-8A3B-43042FC36105}</Project>
@@ -182,25 +190,16 @@
       <Project>{c55d71f3-09ab-4b1a-b76f-cfdf52a680f0}</Project>
       <Name>PPC.Shop</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PPC.Styles\PPC.Styles.csproj">
+      <Project>{d75a55fb-738b-4771-be10-7db9008c412f}</Project>
+      <Name>PPC.Styles</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="logo.ico" />
   </ItemGroup>
   <ItemGroup>
     <SplashScreen Include="logo.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\transactions.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\list.png" />
-    <Resource Include="Images\players.png" />
-    <Resource Include="Images\plus-round.png" />
-    <Resource Include="Images\power.png" />
-    <Resource Include="Images\refresh.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\shop.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">

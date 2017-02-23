@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Windows.Input;
 using PPC.MVVM;
 
 namespace PPC.Popup
 {
     public class ErrorPopupViewModel : ObservableObject
     {
+        public IPopupService PopupService { get; }
+
         private string _summary;
         public string Summary
         {
@@ -22,17 +25,36 @@ namespace PPC.Popup
                     RaisePropertyChanged(() => HasDetails);
             }
         }
-
+        
         public bool HasDetails => !string.IsNullOrWhiteSpace(Details);
 
-        public ErrorPopupViewModel(Exception ex)
+        private ICommand _clickCommand;
+        public ICommand ClickCommand
         {
+            get
+            {
+                _clickCommand = _clickCommand ?? new RelayCommand<QuestionPopupAnswerItem>(Click);
+                return _clickCommand;
+            }
+        }
+
+        private void Click(QuestionPopupAnswerItem answer)
+        {
+            PopupService.Close(this);
+        }
+
+        public ErrorPopupViewModel(IPopupService popupService, Exception ex)
+        {
+            PopupService = popupService;
+
             Summary = ex.Message;
             Details = ex.ToString();
         }
 
-        public ErrorPopupViewModel(string error)
+        public ErrorPopupViewModel(IPopupService popupService, string error)
         {
+            PopupService = popupService;
+
             Summary = error;
             Details = null;
         }
@@ -40,7 +62,7 @@ namespace PPC.Popup
 
     public class ErrorPopupViewModelDesignData : ErrorPopupViewModel
     {
-        public ErrorPopupViewModelDesignData() : base(new Exception())
+        public ErrorPopupViewModelDesignData() : base(null, new Exception())
         {
             Summary = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas mattis, magna convallis euismod vehicula, ligula tellus commodo ipsum, a mollis felis ligula elementum eros. Sed non molestie eros. Etiam quis venenatis justo. Phasellus commodo leo ut nibh aliquam, id ornare eros elementum. Nullam non turpis sagittis, scelerisque magna faucibus, posuere mauris. Quisque eu quam sit amet augue aliquam pretium nec in magna. Ut dui nulla, facilisis dignissim ultrices eu, fringilla vel odio. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec vitae mi ac ante convallis sodales. Nulla finibus augue ac eleifend commodo. Cras eu turpis nunc. Morbi in ex vel lectus dignissim tincidunt. Suspendisse lobortis magna massa.";
             Details =

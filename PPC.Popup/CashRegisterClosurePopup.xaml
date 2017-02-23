@@ -10,15 +10,12 @@
              MaxWidth="700"
              MaxHeight="500">
     <UserControl.Resources>
-        <Style TargetType="{x:Type Image}" x:Key="AutoDisableImageStyle">
-            <Setter Property="RenderOptions.EdgeMode" Value="Aliased"/>
-            <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
-            <Style.Triggers>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Opacity" Value="0.5" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Images.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </UserControl.Resources>
     <Border BorderBrush="Black" 
             BorderThickness="1" 
@@ -30,23 +27,36 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
         
-            <StackPanel Grid.Row="0" 
-                        Orientation="Horizontal">
-                <StackPanel Orientation="Vertical">
-                    <TextBlock Margin="5,2"
-                               FontWeight="Bold"
-                               Text="Cash:"/>
-                    <TextBlock Margin="5,2"
+            <UniformGrid Grid.Row="0"
+                         Rows="1">
+                <StackPanel Margin="5,2"
+                            Orientation="Vertical">
+                    <Image Width="32"
+                           Style="{StaticResource AutoDisableImageStyle}"
+                           Source="{StaticResource SumImage}"/>
+                    <TextBlock HorizontalAlignment="Center"
+                               Style="{StaticResource DataTextBlockStyle}"
+                               Text="{Binding ClosureData.Total, StringFormat=C}"/>
+                </StackPanel>
+                <StackPanel Margin="5,2"
+                            Orientation="Vertical">
+                    <Image Width="32"
+                           Style="{StaticResource AutoDisableImageStyle}"
+                           Source="{StaticResource CashImage}"/>
+                    <TextBlock HorizontalAlignment="Center"
+                               Style="{StaticResource DataTextBlockStyle}"
                                Text="{Binding ClosureData.Cash, StringFormat=C}"/>
                 </StackPanel>
-                <StackPanel Orientation="Vertical">
-                    <TextBlock Margin="5,2"
-                               FontWeight="Bold"
-                               Text="Bank card:"/>
-                    <TextBlock Margin="5,2"
+                <StackPanel Margin="5,2"
+                            Orientation="Vertical">
+                    <Image Width="32"
+                           Style="{StaticResource AutoDisableImageStyle}"
+                           Source="{StaticResource BankCardImage}"/>
+                    <TextBlock HorizontalAlignment="Center"
+                               Style="{StaticResource DataTextBlockStyle}"
                                Text="{Binding ClosureData.BankCard, StringFormat=C}"/>
                 </StackPanel>
-            </StackPanel>
+            </UniformGrid>
 
             <DataGrid Grid.Row="1"
                       IsReadOnly="True"
@@ -67,20 +77,21 @@
             </DataGrid>
 
             <StackPanel Grid.Row="2"
+                        HorizontalAlignment="Center"
                         Orientation="Horizontal">
-                <Button Margin="5,2" 
+                <Button Margin="15,2" 
                         Width="32"
                         ToolTip="Delete backup files and close application"
                         Command="{Binding OkCommand}">
                     <Image Style="{StaticResource AutoDisableImageStyle}"
-                           Source="Images/checkmark-round.png"/>
+                           Source="{StaticResource CheckmarkImage}"/>
                 </Button>
-                <Button Margin="5,2" 
+                <Button Margin="15,2" 
                         Width="32"
                         ToolTip="Send closure mail"
                         Command="{Binding SendMailCommand}">
                     <Image Style="{StaticResource AutoDisableImageStyle}"
-                           Source="Images/mail.png"/>
+                           Source="{StaticResource MailImage}"/>
                 </Button>
             </StackPanel>
         </Grid>

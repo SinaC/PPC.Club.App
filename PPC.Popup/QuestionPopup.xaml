@@ -18,7 +18,8 @@
             <TextBlock Grid.Row="0" FontWeight="Bold" Margin="10"
                        Text="{Binding Question}"/>
             
-            <ItemsControl Grid.Row="1" ItemsSource="{Binding AnswerItems}">
+            <ItemsControl x:Name="AnswerButtons"
+                          Grid.Row="1" ItemsSource="{Binding AnswerItems}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <UniformGrid Rows="1"/>
@@ -26,10 +27,11 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type popup:QuestionPopupAnswerItem}">
-                        <Button MaxWidth="100" Margin="5,2"
-                                Command="{Binding DataContext.ClickCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                        <Button Command="{Binding DataContext.ClickCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                                 CommandParameter="{Binding}">
-                            <TextBlock TextWrapping="Wrap"  Text="{Binding Caption}"/>
+                            <TextBlock TextWrapping="Wrap"
+                                       TextAlignment="Center"
+                                       Text="{Binding Caption}"/>
                         </Button>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

@@ -2,14 +2,28 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Xml;
 using System.Xml.Serialization;
+using PPC.DataContracts;
 
-namespace PPC.Players.Models
+namespace PPC.Data.Players
 {
-    internal static class PlayerManager
+    public class PlayersDb
     {
-        public static List<PlayerModel> Load(string path)
+        #region Singleton
+
+        private static readonly Lazy<PlayersDb> Lazy = new Lazy<PlayersDb>(() => new PlayersDb(), LazyThreadSafetyMode.ExecutionAndPublication);
+        public static PlayersDb Instance => Lazy.Value;
+
+        private PlayersDb()
+        {
+            // TODO: ideally Load should be called here but if an exception occurs in Load, it will not bubble
+        }
+
+        #endregion
+
+        public List<Player> Load(string path)
         {
             global::LocalPlayers localPlayers;
             using (StreamReader sr = new StreamReader(path))
@@ -18,7 +32,7 @@ namespace PPC.Players.Models
                 localPlayers = (global::LocalPlayers) serializer.Deserialize(sr);
             }
 
-            return localPlayers.Items.Select(x => new PlayerModel
+            return localPlayers.Items.Select(x => new Player
             {
                 DCINumber = x.DciNumber,
                 FirstName = x.FirstName,
@@ -29,7 +43,7 @@ namespace PPC.Players.Models
             }).ToList();
         }
 
-        public static void Save(string path, IEnumerable<PlayerModel> players)
+        public void Save(string path, IEnumerable<Player> players)
         {
             global::LocalPlayers localPlayers = new global::LocalPlayers
             {

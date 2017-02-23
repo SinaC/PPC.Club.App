@@ -11,15 +11,12 @@
              Width="400"
              MaxHeight="300">
     <UserControl.Resources>
-        <Style TargetType="{x:Type Image}" x:Key="AutoDisableImageStyle">
-            <Setter Property="RenderOptions.EdgeMode" Value="Aliased"/>
-            <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
-            <Style.Triggers>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Opacity" Value="0.5" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Images.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </UserControl.Resources>
     <Border BorderBrush="Black" 
             BorderThickness="1" 
@@ -48,6 +45,7 @@
                 <TextBlock Grid.Row="0"
                            Grid.Column="0"
                            Margin="5,2"
+                           Style="{StaticResource HeaderTextBlockStyle}"
                            Text="EAN:"/>
                 <TextBox Grid.Row="0"
                          Grid.Column="1"
@@ -59,6 +57,7 @@
                 <TextBlock Grid.Row="1"
                            Grid.Column="0"
                            Margin="5,2"
+                           Style="{StaticResource HeaderTextBlockStyle}"
                            Text="Name:"/>
                 <TextBox x:Name="NameTextBox"
                          Grid.Row="1"
@@ -70,6 +69,7 @@
                 <TextBlock Grid.Row="2"
                            Grid.Column="0"
                            Margin="5,2"
+                           Style="{StaticResource HeaderTextBlockStyle}"
                            Text="Category:"/>
                 <ComboBox Grid.Row="2"
                           Grid.Column="1"
@@ -84,6 +84,7 @@
                 <TextBlock Grid.Row="3"
                            Grid.Column="0"
                            Margin="5,2"
+                           Style="{StaticResource HeaderTextBlockStyle}"
                            Text="Producer/seller:"/>
                 <ComboBox Grid.Row="3"
                           Grid.Column="1"
@@ -98,6 +99,7 @@
                 <TextBlock Grid.Row="4"
                            Grid.Column="0"
                            Margin="5,2"
+                           Style="{StaticResource HeaderTextBlockStyle}"
                            Text="Supplier price:"/>
                 <xctk:DecimalUpDown Grid.Row="4"
                                     Grid.Column="1"
@@ -112,6 +114,7 @@
                 <TextBlock Grid.Row="5"
                            Grid.Column="0"
                            Margin="5,2"
+                           Style="{StaticResource HeaderTextBlockStyle}"
                            Text="Vat:"/>
                 <ComboBox Grid.Row="5"
                           Grid.Column="1"
@@ -125,6 +128,7 @@
                 <TextBlock Grid.Row="6"
                            Grid.Column="0"
                            Margin="5,2"
+                           Style="{StaticResource HeaderTextBlockStyle}"
                            Text="Price:"/>
                 <xctk:DecimalUpDown Grid.Row="6"
                                     Grid.Column="1"
@@ -139,6 +143,7 @@
                 <TextBlock Grid.Row="7"
                            Grid.Column="0"
                            Margin="5,2"
+                           Style="{StaticResource HeaderTextBlockStyle}"
                            Text="Stock:"/>
                 <xctk:IntegerUpDown Grid.Row="7"
                                     Grid.Column="1"
@@ -152,7 +157,7 @@
                     Margin="5,2"
                     Command="{Binding SaveArticleCommand}">
                 <Image Style="{StaticResource AutoDisableImageStyle}"
-                       Source="Images/checkmark-round.png"/>
+                       Source="{StaticResource CheckmarkImage}"/>
             </Button>
         </Grid>
     </Border>

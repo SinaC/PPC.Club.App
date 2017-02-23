@@ -82,7 +82,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArticleDb.cs" />
     <Compile Include="Converters\VisibilityToNullableBooleanConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\CashRegisterViewModel.cs" />
@@ -123,6 +122,10 @@
       <Project>{04cd3c36-e320-4a14-952b-1e09340e9b58}</Project>
       <Name>PPC.Controls</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PPC.Data.Articles\PPC.Data.Articles.csproj">
+      <Project>{99b36c5f-3b72-4e79-b34c-29f3a8a4cc99}</Project>
+      <Name>PPC.Data.Articles</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PPC.DataContracts\PPC.DataContracts.csproj">
       <Project>{73f28b1d-02d3-4bdf-891a-df4ee2248353}</Project>
       <Name>PPC.DataContracts</Name>
@@ -143,19 +146,10 @@
       <Project>{c06f804c-58a5-48ea-a3b4-935470804b05}</Project>
       <Name>PPC.Popup</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\add-shopping-cart.png" />
-    <Resource Include="Images\bankcard.png" />
-    <Resource Include="Images\cash-register.png" />
-    <Resource Include="Images\cash.png" />
-    <Resource Include="Images\close-round.png" />
-    <Resource Include="Images\edit.png" />
-    <Resource Include="Images\locked.png" />
-    <Resource Include="Images\minus-round.png" />
-    <Resource Include="Images\plus-circled.png" />
-    <Resource Include="Images\plus-round.png" />
-    <Resource Include="Images\unlocked.png" />
+    <ProjectReference Include="..\PPC.Styles\PPC.Styles.csproj">
+      <Project>{d75a55fb-738b-4771-be10-7db9008c412f}</Project>
+      <Name>PPC.Styles</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Page Include="Views\CashRegisterView.xaml">
@@ -189,9 +183,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\sum.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

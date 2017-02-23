@@ -9,95 +9,91 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
-        <Style TargetType="{x:Type Image}" x:Key="AutoDisableImageStyle">
-            <Setter Property="RenderOptions.EdgeMode" Value="Aliased"/>
-            <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
-            <Style.Triggers>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Opacity" Value="0.5" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <DataTemplate DataType="{x:Type viewModels:CashRegisterViewModel}">
-            <Button Width="96"
-                    Height="96"
-                    Margin="5,2"
-                    ToolTip="Go to shop"
-                    Command="{Binding DataContext.SelectButtonCommand, RelativeSource={RelativeSource AncestorType={x:Type views:ShopShoppingCartsView}}}"
-                    CommandParameter="{Binding}">
-                <Image Style="{StaticResource AutoDisableImageStyle}"
-                       Source="../Images/cash-register.png"/>
-            </Button>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModels:ClientViewModel}">
-            <Button Width="96"
-                    Height="96"
-                    Margin="5,2"
-                    Command="{Binding DataContext.SelectButtonCommand, RelativeSource={RelativeSource AncestorType={x:Type views:ShopShoppingCartsView}}}"
-                    CommandParameter="{Binding}">
-                <Button.ToolTip>
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock Text="{Binding ClientName, StringFormat={}Go to {0} shopping cart}"/>
-                        <!-- Unpaid -->
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Images.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <DataTemplate DataType="{x:Type viewModels:CashRegisterViewModel}">
+                <Button Width="96"
+                        Height="96"
+                        Margin="5,2"
+                        ToolTip="Go to shop"
+                        Command="{Binding DataContext.SelectButtonCommand, RelativeSource={RelativeSource AncestorType={x:Type views:ShopShoppingCartsView}}}"
+                        CommandParameter="{Binding}">
+                    <Image Style="{StaticResource AutoDisableImageStyle}"
+                           Source="{StaticResource CashRegisterImage}"/>
+                </Button>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:ClientViewModel}">
+                <Button Width="96"
+                        Height="96"
+                        Margin="5,2"
+                        Command="{Binding DataContext.SelectButtonCommand, RelativeSource={RelativeSource AncestorType={x:Type views:ShopShoppingCartsView}}}"
+                        CommandParameter="{Binding}">
+                    <Button.ToolTip>
                         <StackPanel Orientation="Vertical">
-                            <StackPanel.Style>
-                                <Style TargetType="{x:Type StackPanel}">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding PaymentState}" Value="{x:Static viewModels:PaymentStates.Unpaid}">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </StackPanel.Style>
-                            <TextBlock Text="{Binding ShoppingCart.Total, StringFormat={}Unpaid: {0:C}}"/>
+                            <TextBlock Text="{Binding DisplayName, StringFormat={}Go to {0} shopping cart}"/>
+                            <!-- Unpaid -->
+                            <StackPanel Orientation="Vertical">
+                                <StackPanel.Style>
+                                    <Style TargetType="{x:Type StackPanel}">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding PaymentState}" Value="{x:Static viewModels:PaymentStates.Unpaid}">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <TextBlock Text="{Binding ShoppingCart.Total, StringFormat={}Unpaid: {0:C}}"/>
+                            </StackPanel>
+                            <!-- Paid -->
+                            <StackPanel Orientation="Vertical">
+                                <StackPanel.Style>
+                                    <Style TargetType="{x:Type StackPanel}">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding PaymentState}" Value="{x:Static viewModels:PaymentStates.Paid}">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <TextBlock Text="{Binding Cash, StringFormat={}Cash: {0:C}}"/>
+                                <TextBlock Text="{Binding BankCard, StringFormat={}Bank card: {0:C}}"/>
+                            </StackPanel>
                         </StackPanel>
-                        <!-- Paid -->
-                        <StackPanel Orientation="Vertical">
-                            <StackPanel.Style>
-                                <Style TargetType="{x:Type StackPanel}">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding PaymentState}" Value="{x:Static viewModels:PaymentStates.Paid}">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </StackPanel.Style>
-                            <TextBlock Text="{Binding Cash, StringFormat={}Cash: {0:C}}"/>
-                            <TextBlock Text="{Binding BankCard, StringFormat={}Bank card: {0:C}}"/>
-                        </StackPanel>
-                    </StackPanel>
-                </Button.ToolTip>
-                <Button.Style>
-                    <Style TargetType="{x:Type Button}">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding PaymentState}" Value="{x:Static viewModels:PaymentStates.Paid}">
-                                <Setter Property="Background" Value="LimeGreen"/>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding PaymentState}" Value="{x:Static viewModels:PaymentStates.Unpaid}">
-                                <Setter Property="Background" Value="Crimson"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Image Grid.Row="0"
-                           Style="{StaticResource AutoDisableImageStyle}"
-                           Source="../Images/add-shopping-cart.png"/>
-                    <TextBlock Grid.Row="1"
-                               HorizontalAlignment="Center"
-                               FontWeight="Bold"
-                               TextTrimming="CharacterEllipsis"
-                               Text="{Binding ClientName}"/>
-                </Grid>
-            </Button>
-        </DataTemplate>
+                    </Button.ToolTip>
+                    <Button.Style>
+                        <Style TargetType="{x:Type Button}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding PaymentState}" Value="{x:Static viewModels:PaymentStates.Paid}">
+                                    <Setter Property="Background" Value="LimeGreen"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding PaymentState}" Value="{x:Static viewModels:PaymentStates.Unpaid}">
+                                    <Setter Property="Background" Value="Crimson"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Image Grid.Row="0"
+                               Style="{StaticResource AutoDisableImageStyle}"
+                               Source="{StaticResource AddShoppingCartImage}"/>
+                        <TextBlock Grid.Row="1"
+                                   HorizontalAlignment="Center"
+                                   FontWeight="Bold"
+                                   TextTrimming="CharacterEllipsis"
+                                   Text="{Binding DisplayName}"/>
+                    </Grid>
+                </Button>
+            </DataTemplate>
+        </ResourceDictionary>
     </UserControl.Resources>
     <ItemsControl ItemsSource="{Binding Buttons}">
         <ItemsControl.ItemsPanel>

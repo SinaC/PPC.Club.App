@@ -79,7 +79,7 @@ namespace PPC.Popup
                         },
                     new QuestionPopupAnswerItem
                         {
-                            Caption = "I dont' care"
+                            Caption = "I don't care"
                         },
                 };
         }

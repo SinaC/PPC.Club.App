@@ -10,7 +10,7 @@
 
 using System.Xml.Serialization;
 
-namespace PPC.Players.Models
+namespace PPC.Data.Players
 {
 }
 

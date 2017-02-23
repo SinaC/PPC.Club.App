@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Windows.Input;
 using System.Xml;
+using PPC.Data.Articles;
 using PPC.DataContracts;
 using PPC.Helpers;
 using PPC.MVVM;
@@ -20,7 +21,7 @@ namespace PPC.Shop.ViewModels
         private readonly Action _cartPaidAction;
         private readonly Action _cartReopenedAction;
 
-        public string Filename => $"{ConfigurationManager.AppSettings["BackupPath"]}{ClientName.ToLowerInvariant()}.xml";
+        public string Filename => $"{ConfigurationManager.AppSettings["BackupPath"]}{(HasFullPlayerInfos ? DciNumber : ClientName.ToLowerInvariant())}.xml";
 
         public DateTime PaymentTimestamp { get; private set; }
 
@@ -53,6 +54,15 @@ namespace PPC.Shop.ViewModels
             get { return _dciNumber; }
             set { Set(() => DciNumber, ref _dciNumber, value); }
         }
+
+        private bool _hasFullPlayerInfos;
+        public bool HasFullPlayerInfos
+        {
+            get { return _hasFullPlayerInfos; }
+            set { Set(() => HasFullPlayerInfos, ref _hasFullPlayerInfos, value); }
+        }
+
+        public string DisplayName => HasFullPlayerInfos ? $"{ClientFirstName} {ClientLastName}" : ClientName;
 
         #endregion
 
@@ -106,6 +116,10 @@ namespace PPC.Shop.ViewModels
                 cart = (ClientCart)serializer.ReadObject(reader);
             }
             ClientName = cart.ClientName;
+            ClientFirstName = cart.ClientFirstName;
+            ClientLastName = cart.ClientLastName;
+            DciNumber = cart.DciNumber;
+            HasFullPlayerInfos = cart.HasFullPlayerInfos;
             PaymentState = cart.IsPaid 
                 ? PaymentStates.Paid 
                 : PaymentStates.Unpaid;
@@ -115,7 +129,7 @@ namespace PPC.Shop.ViewModels
             ShoppingCart.ShoppingCartArticles.Clear();
             ShoppingCart.ShoppingCartArticles.AddRange(cart.Articles.Select(x => new ShopArticleItem
             {
-                Article = ArticleDb.Articles.FirstOrDefault(a => a.Guid == x.Guid),
+                Article = ArticlesDb.Instance.Articles.FirstOrDefault(a => a.Guid == x.Guid),
                 Quantity = x.Quantity
             }));
 
@@ -131,6 +145,10 @@ namespace PPC.Shop.ViewModels
                 ClientCart cart = new ClientCart
                 {
                     ClientName = ClientName,
+                    ClientFirstName = ClientFirstName,
+                    ClientLastName = ClientLastName,
+                    DciNumber = DciNumber,
+                    HasFullPlayerInfos = HasFullPlayerInfos,
                     IsPaid = PaymentState == PaymentStates.Paid,
                     PaymentTimeStamp = PaymentTimestamp,
                     Cash = Cash,
@@ -151,7 +169,7 @@ namespace PPC.Shop.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
+                ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, ex);
                 PopupService.DisplayModal(vm, "Error while saving client cart");
             }
         }
@@ -165,6 +183,7 @@ namespace PPC.Shop.ViewModels
         {
             ShoppingCart = new ShoppingCartViewModelDesignData();
 
+            HasFullPlayerInfos = true;
             ClientName = "Toto";
             ClientFirstName = "Toto";
             ClientLastName = "Tsekwa";

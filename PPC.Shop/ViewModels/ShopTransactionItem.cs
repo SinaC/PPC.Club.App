@@ -24,14 +24,24 @@ namespace PPC.Shop.ViewModels
         public decimal Cash
         {
             get { return _cash; }
-            set { Set(() => Cash, ref _cash, value); }
+            set
+            {
+                if (Set(() => Cash, ref _cash, value))
+                    RaisePropertyChanged(() => Total);
+            }
         }
 
         private decimal _bankCard;
         public decimal BankCard
         {
             get { return _bankCard; }
-            set { Set(() => BankCard, ref _bankCard, value); }
+            set
+            {
+                if (Set(() => BankCard, ref _bankCard, value))
+                    RaisePropertyChanged(() => Total);
+            }
         }
+
+        public decimal Total => Cash + BankCard;
     }
 }

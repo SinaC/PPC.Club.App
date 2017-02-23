@@ -6,9 +6,7 @@
              xmlns:local="clr-namespace:PPC.Popup"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:ErrorPopupViewModelDesignData, IsDesignTimeCreatable=True}"
-             d:DesignHeight="300" d:DesignWidth="300"
-             MaxWidth="400"
-             MaxHeight="300">
+             d:DesignHeight="300" d:DesignWidth="300">
     <Border BorderBrush="Black" 
             BorderThickness="1" 
             Background="{x:Static SystemColors.ControlLightBrush}">
@@ -16,6 +14,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0"
                        Margin="5,2"
@@ -39,6 +38,11 @@
                              Text="{Binding Details}"/>
                 </ScrollViewer>
             </Expander>
+            <Button Grid.Row="2"
+                    Width="80"
+                    Command="{Binding ClickCommand}">
+                <TextBlock Text="Ok"/>
+            </Button>
         </Grid>
     </Border>
 </UserControl>

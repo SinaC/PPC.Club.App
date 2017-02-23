@@ -18,6 +18,8 @@ namespace PPC.DataContracts
         [DataMember]
         public List<TransactionFullArticle> Transactions { get; set; }
 
+        public decimal Total => Cash + BankCard;
+
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();

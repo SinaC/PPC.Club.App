@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using PPC.Data.Articles;
 using PPC.DataContracts;
 using PPC.Helpers;
 using PPC.MVVM;
@@ -13,14 +14,17 @@ namespace PPC.Shop.ViewModels
     public class ShoppingCartViewModel : ObservableObject
     {
         private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
-        private static readonly string[] EmptyCategory =  {string.Empty};
+        private static readonly string[] EmptyCategory = {string.Empty};
 
         private readonly Action<decimal, decimal> _paymentAction;
         private readonly Action _cartModifiedAction;
 
-        public IEnumerable<Article> Articles => (string.IsNullOrWhiteSpace(SelectedCategory) ? ArticleDb.Articles : ArticleDb.Articles.Where(x => x.Category == SelectedCategory)).OrderBy(x => x.Description);
-        public IEnumerable<string> Categories => EmptyCategory.Concat(ArticleDb.Articles.GroupBy(x => x.Category, (category, articles) => category));
-        public IEnumerable<string> Producers => ArticleDb.Articles.GroupBy(x => x.Producer, (producer, articles) => producer);
+        public IEnumerable<Article> Articles => (string.IsNullOrWhiteSpace(SelectedCategory)
+            ? ArticlesDb.Instance.Articles
+            : ArticlesDb.Instance.Articles.Where(x => x.Category == SelectedCategory)).OrderBy(x => x.Description);
+
+        public IEnumerable<string> Categories => EmptyCategory.Concat(ArticlesDb.Instance.Articles.GroupBy(x => x.Category, (category, articles) => category));
+        public IEnumerable<string> Producers => ArticlesDb.Instance.Articles.GroupBy(x => x.Producer, (producer, articles) => producer);
 
         #region Cart articles
 
@@ -32,6 +36,7 @@ namespace PPC.Shop.ViewModels
         #region Ean
 
         private string _ean;
+
         public string Ean
         {
             get { return _ean; }
@@ -43,7 +48,7 @@ namespace PPC.Shop.ViewModels
                     {
                         if (_ean.Length == 13)
                         {
-                            Article article = ArticleDb.Articles.FirstOrDefault(x => x.Ean == _ean);
+                            Article article = ArticlesDb.Instance.Articles.FirstOrDefault(x => x.Ean == _ean);
                             if (article != null)
                                 SelectedArticle = article;
                             else
@@ -61,9 +66,10 @@ namespace PPC.Shop.ViewModels
         #region Selected article
 
         private string _selectedCategory;
+
         public string SelectedCategory
         {
-            get { return _selectedCategory;}
+            get { return _selectedCategory; }
             set
             {
                 if (Set(() => SelectedCategory, ref _selectedCategory, value))
@@ -72,6 +78,7 @@ namespace PPC.Shop.ViewModels
         }
 
         private Article _selectedArticle;
+
         public Article SelectedArticle
         {
             get { return _selectedArticle; }
@@ -93,9 +100,10 @@ namespace PPC.Shop.ViewModels
         #region Quantity
 
         private int? _quantity;
+
         public int? Quantity
         {
-            get {  return _quantity;}
+            get { return _quantity; }
             set { Set(() => Quantity, ref _quantity, value); }
         }
 
@@ -105,6 +113,7 @@ namespace PPC.Shop.ViewModels
 
         private ICommand _incrementSelectedArticleCommand;
         public ICommand IncrementSelectedArticleCommand => _incrementSelectedArticleCommand = _incrementSelectedArticleCommand ?? new RelayCommand(IncrementSelectedArticle, () => SelectedArticle != null);
+
         private void IncrementSelectedArticle()
         {
             if (SelectedArticle == null)
@@ -121,6 +130,7 @@ namespace PPC.Shop.ViewModels
 
         private ICommand _decrementSelectedArticleCommand;
         public ICommand DecrementSelectedArticleCommand => _decrementSelectedArticleCommand = _decrementSelectedArticleCommand ?? new RelayCommand(DecrementSelectedArticle, () => SelectedArticle != null);
+
         private void DecrementSelectedArticle()
         {
             if (SelectedArticle == null)
@@ -140,6 +150,7 @@ namespace PPC.Shop.ViewModels
 
         private ICommand _addSelectedArticleCommand;
         public ICommand AddSelectedArticleCommand => _addSelectedArticleCommand = _addSelectedArticleCommand ?? new RelayCommand(AddSelectedArticle, () => SelectedArticle != null);
+
         private void AddSelectedArticle()
         {
             if (SelectedArticle == null)
@@ -167,6 +178,7 @@ namespace PPC.Shop.ViewModels
 
         private ICommand _deleteArticleCommand;
         public ICommand DeleteArticleCommand => _deleteArticleCommand = _deleteArticleCommand ?? new RelayCommand<ShopArticleItem>(DeleteArticle);
+
         private void DeleteArticle(ShopArticleItem item)
         {
             ShoppingCartArticles.Remove(item);
@@ -180,6 +192,7 @@ namespace PPC.Shop.ViewModels
 
         private ICommand _incrementArticleCommand;
         public ICommand IncrementArticleCommand => _incrementArticleCommand = _incrementArticleCommand ?? new RelayCommand<ShopArticleItem>(IncrementArticle);
+
         private void IncrementArticle(ShopArticleItem item)
         {
             item.Quantity++;
@@ -193,6 +206,7 @@ namespace PPC.Shop.ViewModels
 
         private ICommand _decrementArticleCommand;
         public ICommand DecrementArticleCommand => _decrementArticleCommand = _decrementArticleCommand ?? new RelayCommand<ShopArticleItem>(DecrementArticle);
+
         private void DecrementArticle(ShopArticleItem item)
         {
             if (item.Quantity == 1)
@@ -261,11 +275,19 @@ namespace PPC.Shop.ViewModels
                 VatRate = vm.VatRate,
                 IsNewArticle = true,
             };
-            ArticleDb.Articles.Add(article);
-            ArticleDb.Save();
 
             RaisePropertyChanged(() => Articles);
             RaisePropertyChanged(() => Categories);
+
+            try
+            {
+                ArticlesDb.Instance.Add(article);
+            }
+            catch (Exception ex)
+            {
+                ErrorPopupViewModel errorVm = new ErrorPopupViewModel(PopupService, ex);
+                PopupService.DisplayModal(errorVm, "Error while saving articles DB");
+            }
 
             SelectedArticle = article;
         }
@@ -311,7 +333,15 @@ namespace PPC.Shop.ViewModels
             RaisePropertyChanged(() => Articles);
             RaisePropertyChanged(() => Categories);
 
-            ArticleDb.Save();
+            try
+            {
+                ArticlesDb.Instance.Save();
+            }
+            catch (Exception ex)
+            {
+                ErrorPopupViewModel errorVm = new ErrorPopupViewModel(PopupService, ex);
+                PopupService.DisplayModal(errorVm, "Error while saving articles DB");
+            }
         }
 
         #endregion
@@ -334,10 +364,10 @@ namespace PPC.Shop.ViewModels
 
     public class ShoppingCartViewModelDesignData : ShoppingCartViewModel
     {
-        public ShoppingCartViewModelDesignData() : base((d,d1) => { }, () => { })
+        public ShoppingCartViewModelDesignData() : base((d, d1) => { }, () => { })
         {
             ShoppingCartArticles.Clear();
-            ShoppingCartArticles.AddRange(new []
+            ShoppingCartArticles.AddRange(new[]
             {
                 new ShopArticleItem
                 {

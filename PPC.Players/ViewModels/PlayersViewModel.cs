@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Windows.Input;
+using PPC.Data.Players;
+using PPC.DataContracts;
 using PPC.Helpers;
 using PPC.Messages;
 using PPC.MVVM;
@@ -81,17 +84,29 @@ namespace PPC.Players.ViewModels
         #region Load
 
         private ICommand _loadCommand;
-        public ICommand LoadCommand => _loadCommand = _loadCommand ?? new RelayCommand(Load);
+        public ICommand LoadCommand => _loadCommand = _loadCommand ?? new RelayCommand(() => Load(false));
 
-        private void Load()
+        private void Load(bool onlyIfExists)
         {
             try
             {
-                Players = new ObservableCollection<PlayerModel>(PlayerManager.Load(ConfigurationManager.AppSettings["PlayersPath"]).OrderBy(x => x.FirstName, new EmptyStringsAreLast()));
+                string filename = ConfigurationManager.AppSettings["PlayersPath"];
+                if (onlyIfExists && !File.Exists(filename))
+                    return;
+                List<Player> players = PlayersDb.Instance.Load(filename);
+                Players = new ObservableCollection<PlayerModel>(players.Select(x => new PlayerModel
+                {
+                    DCINumber = x.DCINumber,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    MiddleName = x.MiddleName,
+                    CountryCode = x.CountryCode,
+                    IsJudge = x.IsJudge
+                }).OrderBy(x => x.FirstName, new EmptyStringsAreLast()));
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
+                ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, ex);
                 PopupService.DisplayModal(vm, "Error while loading player file");
             }
         }
@@ -108,12 +123,21 @@ namespace PPC.Players.ViewModels
         {
             try
             {
-                PlayerManager.Save(ConfigurationManager.AppSettings["PlayersPath"], Players);
-                Load(); // crappy workaround to reset row.IsNewItem
+                List<Player> players = Players.Select(x => new Player
+                {
+                    DCINumber = x.DCINumber,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    MiddleName = x.MiddleName,
+                    CountryCode = x.CountryCode,
+                    IsJudge = x.IsJudge
+                }).ToList();
+                PlayersDb.Instance.Save(ConfigurationManager.AppSettings["PlayersPath"], players);
+                Load(false); //TODO crappy workaround to reset row.IsNewItem
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
+                ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, ex);
                 PopupService.DisplayModal(vm, "Error while saving player file");
             }
         }
@@ -144,6 +168,11 @@ namespace PPC.Players.ViewModels
         }
 
         #endregion
+
+        public PlayersViewModel()
+        {
+            Load(true);
+        }
     }
 
     public class PlayersViewModelDesignData : PlayersViewModel

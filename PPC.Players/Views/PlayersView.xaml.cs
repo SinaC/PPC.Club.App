@@ -25,9 +25,12 @@ namespace PPC.Players.Views
                 {
                     _isInEditMode = value;
                     OnPropertyChanged();
+                    OnPropertyChanged("IsNotInEditMode");
                 }
             }
         }
+
+        public bool IsNotInEditMode => !IsInEditMode;
 
         private void DataGrid_OnBeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {

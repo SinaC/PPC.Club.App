@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using PPC.MVVM;
+﻿using PPC.MVVM;
 
 namespace PPC.Players.Models
 {

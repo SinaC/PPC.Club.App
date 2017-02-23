@@ -1,11 +1,20 @@
+check each module (players, shop, inventory) before closing application
+in question popup set focus on first button
 form validation
 payback (client doesn't want anymore an already paid article !! only for cash payment)
 transaction edition
 article DB (real DB instead of xml file)
+replace ArticlesDb/PlayersDb singleton with IOC RegisterInstance (IArticlesDb + IPlayersDb)
+PlayersDb: store the list of players (similar to ArticlesDb + call load from MainViewModel)
+Players -> remove save button, save automatically once a modification has been done
 
-players: autocompletebox to select a player
-new project: PPC.Style containing style used in multiple views
+new module: inventory
 
 known issues:
 after creating a new article, article cannot be added to shopping cart with enter
-autocompletebox: frédéric and frederic doesn't match :/  (search autocompletebox without diacritics)
+
+workaround to fix:
+PlayerViewModel: Load must be called after Save to reset row.IsNewItem
+
+icons:
+http://www.flaticon.com/packs/black-friday-5

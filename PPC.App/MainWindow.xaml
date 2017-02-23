@@ -8,6 +8,7 @@
         xmlns:controls="clr-namespace:PPC.Controls;assembly=PPC.Controls"
         xmlns:playersViews="clr-namespace:PPC.Players.Views;assembly=PPC.Players"
         xmlns:shopViews="clr-namespace:PPC.Shop.Views;assembly=PPC.Shop"
+        xmlns:inventoryViews="clr-namespace:PPC.Inventory.Views;assembly=PPC.Inventory"
         x:Name="AppMainWindow"
         mc:Ignorable="d"
         SnapsToDevicePixels="True"
@@ -19,26 +20,24 @@
         Title="PPC Club" Height="600" Width="800"
         TextElement.FontSize="14">
     <Window.Resources>
-        <SolidColorBrush Color="Black" 
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Images.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <SolidColorBrush Color="Black" 
                          Opacity=".20" 
                          x:Key="ModalPopupPresenterOverlayBrush"/>
-
-        <Style TargetType="{x:Type Image}" x:Key="AutoDisableImageStyle">
-            <Setter Property="RenderOptions.EdgeMode" Value="Aliased"/>
-            <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
-            <Style.Triggers>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Opacity" Value="0.5" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <DataTemplate DataType="{x:Type app:MainWindowViewModel}" x:Key="ShopTemplate">
-            <shopViews:ShopView DataContext="{Binding ShopViewModel}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type app:MainWindowViewModel}" x:Key="PlayersTemplate">
-            <playersViews:PlayersView DataContext="{Binding PlayersViewModel}"/>
-        </DataTemplate>
+            <DataTemplate DataType="{x:Type app:MainWindowViewModel}" x:Key="ShopTemplate">
+                <shopViews:ShopView DataContext="{Binding ShopViewModel}"/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type app:MainWindowViewModel}" x:Key="PlayersTemplate">
+                <playersViews:PlayersView DataContext="{Binding PlayersViewModel}"/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type app:MainWindowViewModel}" x:Key="InventoryTemplate">
+                <inventoryViews:InventoryView DataContext="{Binding InventoryViewModel}"/>
+            </DataTemplate>
+        </ResourceDictionary>
     </Window.Resources>
         <popup:ModalPopupPresenter x:Name="ModalPopupPresenter"
                                    OverlayBrush="{StaticResource ModalPopupPresenterOverlayBrush}">
@@ -60,6 +59,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -71,13 +71,13 @@
                             Command="{Binding SwitchToShoppingCartsCommand}">
                         <Button.ToolTip>
                             <StackPanel Orientation="Vertical">
-                                <TextBlock Text="{Binding ShopViewModel.ClientShoppingCarts, StringFormat={}Shopping carts: {0}}"/>
-                                <TextBlock Text="{Binding ShopViewModel.UnpaidClientShoppingCarts, StringFormat={}Unpaid shopping carts: {0}}"/>
-                                <TextBlock Text="{Binding ShopViewModel.PaidClientShoppingCarts, StringFormat={}Paid shopping carts: {0}}"/>
+                                <TextBlock Text="{Binding ShopViewModel.ClientShoppingCartsCount, StringFormat={}Shopping carts: {0}}"/>
+                                <TextBlock Text="{Binding ShopViewModel.UnpaidClientShoppingCartsCount, StringFormat={}Unpaid shopping carts: {0}}"/>
+                                <TextBlock Text="{Binding ShopViewModel.PaidClientShoppingCartsCount, StringFormat={}Paid shopping carts: {0}}"/>
                             </StackPanel>
                         </Button.ToolTip>
                         <Image Style="{StaticResource AutoDisableImageStyle}"
-                               Source="Images/shop.png"/>
+                               Source="{StaticResource ShopImage}"/>
                     </Button>
                     <!-- Create new client -->
                     <Button Grid.Row="1"
@@ -86,7 +86,7 @@
                             ToolTip="Add new client shopping cart"
                             Command="{Binding AddNewClientCommand}">
                         <Image Style="{StaticResource AutoDisableImageStyle}"
-                               Source="Images/plus-round.png"/>
+                               Source="{StaticResource PlusImage}"/>
                     </Button>
                     <!-- Go to sold articles -->
                     <Button Grid.Row="2"
@@ -103,7 +103,8 @@
                         </Button.ToolTip>
                         <Grid>
                             <Image Style="{StaticResource AutoDisableImageStyle}"
-                                   Source="Images/transactions.png"/>
+                                   Source="{StaticResource TransactionsImage}"/>
+                            
                             <!--<StackPanel Orientation="Vertical"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center">
@@ -127,26 +128,35 @@
                             ToolTip="Players"
                             Command="{Binding SwitchToPlayersCommand}">
                         <Image Style="{StaticResource AutoDisableImageStyle}"
-                               Source="Images/players.png"/>
+                               Source="{StaticResource PlayersImage}"/>
                     </Button>
-                    <!-- dummy row 4 -->
+                    <!-- Inventory -->
+                    <Button Grid.Row="4"
+                            Width="64"
+                            Margin="5"
+                            ToolTip="Players"
+                            Command="{Binding SwitchToInventoryCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="{StaticResource ListImage}"/>
+                    </Button>
+                    <!-- dummy row 5 -->
                     <!-- Reload -->
-                    <Button Grid.Row="5"
+                    <Button Grid.Row="6"
                             Width="64"
                             Margin="5"
                             ToolTip="Load previous session"
                             Command="{Binding ReloadCommand}">
                         <Image Style="{StaticResource AutoDisableImageStyle}"
-                               Source="Images/refresh.png"/>
+                               Source="{StaticResource RefreshImage}"/>
                     </Button>
                     <!-- Shutdown -->
-                    <Button Grid.Row="6"
+                    <Button Grid.Row="7"
                             Width="64"
                             Margin="5"
                             ToolTip="Cash registry closure"
                             Command="{Binding CloseCommand}">
                         <Image Style="{StaticResource AutoDisableImageStyle}"
-                               Source="Images/power.png"/>
+                               Source="{StaticResource PowerImage}"/>
                     </Button>
                 </Grid>
                 
@@ -167,6 +177,9 @@
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding ApplicationMode}" Value="{x:Static app:ApplicationModes.Players}">
                                     <Setter Property="ContentTemplate" Value="{StaticResource PlayersTemplate}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ApplicationMode}" Value="{x:Static app:ApplicationModes.Inventory}">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource InventoryTemplate}"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>

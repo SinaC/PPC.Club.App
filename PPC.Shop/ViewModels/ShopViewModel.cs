@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Xml;
+using PPC.Data.Articles;
 using PPC.DataContracts;
 using PPC.Helpers;
 using PPC.Messages;
@@ -33,7 +34,7 @@ namespace PPC.Shop.ViewModels
 
         public const string ShopFilename = "_shop.xml";
 
-        #region View state
+        #region Shop state
 
         private ShopStates _shopState;
         public ShopStates ShopState
@@ -73,7 +74,7 @@ namespace PPC.Shop.ViewModels
 
         #endregion
 
-        #region Cash register/client buttons
+        #region Cash register/client shopping carts buttons
 
         private ShoppingCartBasedViewModelBase _selectedButton;
         public ShoppingCartBasedViewModelBase SelectedButton
@@ -114,20 +115,22 @@ namespace PPC.Shop.ViewModels
         {
             if (Buttons.OfType<ClientViewModel>().Any(x => x.ClientName == name))
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel("A shopping cart with that client name has already been opened!");
+                ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, "A shopping cart with that client name has already been opened!");
                 PopupService.DisplayModal(vm, "Error");
             }
             else
             {
                 ClientViewModel newClient = new ClientViewModel(RefreshSoldArticles, RefreshSoldArticles)
                 {
-                    ClientName = name
+                    HasFullPlayerInfos = false,
+                    ClientName = name,
                 };
                 Buttons.Add(newClient);
                 SelectedButton = newClient;
                 //
-                RaisePropertyChanged(() => PaidClientShoppingCarts);
-                RaisePropertyChanged(() => UnpaidClientShoppingCarts);
+                RaisePropertyChanged(() => ClientShoppingCartsCount);
+                RaisePropertyChanged(() => PaidClientShoppingCartsCount);
+                RaisePropertyChanged(() => UnpaidClientShoppingCartsCount);
             }
         }
 
@@ -189,19 +192,20 @@ namespace PPC.Shop.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
+                ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, ex);
                 PopupService.DisplayModal(vm, "Error while deleting backup file");
             }
             //
-            RaisePropertyChanged(() => PaidClientShoppingCarts);
-            RaisePropertyChanged(() => UnpaidClientShoppingCarts);
+            RaisePropertyChanged(() => ClientShoppingCartsCount);
+            RaisePropertyChanged(() => PaidClientShoppingCartsCount);
+            RaisePropertyChanged(() => UnpaidClientShoppingCartsCount);
         }
 
-        public int ClientShoppingCarts => Buttons.OfType<ClientViewModel>().Count();
+        public int ClientShoppingCartsCount => Buttons.OfType<ClientViewModel>().Count();
 
-        public int PaidClientShoppingCarts => Buttons.OfType<ClientViewModel>().Count(x => x.PaymentState == PaymentStates.Paid);
+        public int PaidClientShoppingCartsCount => Buttons.OfType<ClientViewModel>().Count(x => x.PaymentState == PaymentStates.Paid);
 
-        public int UnpaidClientShoppingCarts => Buttons.OfType<ClientViewModel>().Count(x => x.PaymentState == PaymentStates.Unpaid);
+        public int UnpaidClientShoppingCartsCount => Buttons.OfType<ClientViewModel>().Count(x => x.PaymentState == PaymentStates.Unpaid);
 
         #endregion
 
@@ -253,14 +257,14 @@ namespace PPC.Shop.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
+                    ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, ex);
                     PopupService.DisplayModal(vm, "Error while loading shop");
                 }
                 RefreshSoldArticles();
             }
             else
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel("Backup path not found");
+                ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, "Backup path not found");
                 PopupService.DisplayModal(vm, "Error while loading shop");
             }
         }
@@ -284,7 +288,7 @@ namespace PPC.Shop.ViewModels
                         Timestamp = t.Timestamp,
                         Articles = t.Articles.Select(a => new ShopArticleItem
                         {
-                            Article = ArticleDb.Articles.FirstOrDefault(x => x.Guid == a.Guid),
+                            Article = ArticlesDb.Instance.Articles.FirstOrDefault(x => x.Guid == a.Guid),
                             Quantity = a.Quantity
                         }).ToList(),
                         Cash = t.Cash,
@@ -295,13 +299,13 @@ namespace PPC.Shop.ViewModels
                 }
                 else
                 {
-                    ErrorPopupViewModel vm = new ErrorPopupViewModel("Shop file not found");
+                    ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, "Shop file not found");
                     PopupService.DisplayModal(vm, "Error while loading shop");
                 }
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
+                ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, ex);
                 PopupService.DisplayModal(vm, "Error while loading shop");
             }
         }
@@ -318,7 +322,7 @@ namespace PPC.Shop.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
+                    ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, ex);
                     PopupService.DisplayModal(vm, $"Error while loading {filename} cart");
                 }
             }
@@ -342,7 +346,7 @@ namespace PPC.Shop.ViewModels
                     });
             else
             {
-                PopupService.DisplayQuestion("Cash register closure", "Are you sure you want to close ?",
+                PopupService.DisplayQuestion("Cash register closure", "Are you sure you want to perform closure ?",
                     new ActionButton
                     {
                         Order = 1,
@@ -410,7 +414,7 @@ namespace PPC.Shop.ViewModels
             };
 
             // Display popup
-            CashRegisterClosurePopupViewModel vm = new CashRegisterClosurePopupViewModel(PopupService, closure, CloseApplication, async c => await SendCashRegisterClosureMailAsync(closure));
+            CashRegisterClosurePopupViewModel vm = new CashRegisterClosurePopupViewModel(PopupService, closure, CloseApplicationAfterClosure, async c => await SendCashRegisterClosureMailAsync(closure));
             PopupService.DisplayModal(vm, "Cash register closure"); // !! Shutdown application on close
 
             // Dump cash register closure file
@@ -423,7 +427,7 @@ namespace PPC.Shop.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vmError = new ErrorPopupViewModel(ex);
+                ErrorPopupViewModel vmError = new ErrorPopupViewModel(PopupService, ex);
                 PopupService.DisplayModal(vmError, "Error");
             }
             //  xml
@@ -439,12 +443,12 @@ namespace PPC.Shop.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vmError = new ErrorPopupViewModel(ex);
+                ErrorPopupViewModel vmError = new ErrorPopupViewModel(PopupService, ex);
                 PopupService.DisplayModal(vmError, "Error");
             }
         }
 
-        private void CloseApplication()
+        private void CloseApplicationAfterClosure()
         {
             // Delete backup files
             try
@@ -457,7 +461,7 @@ namespace PPC.Shop.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vmError = new ErrorPopupViewModel(ex);
+                ErrorPopupViewModel vmError = new ErrorPopupViewModel(PopupService, ex);
                 PopupService.DisplayModal(vmError, "Error");
             }
 
@@ -473,7 +477,7 @@ namespace PPC.Shop.ViewModels
                 string closureConfigFilename = ConfigurationManager.AppSettings["CashRegisterClosureConfigPath"];
                 if (!File.Exists(closureConfigFilename))
                 {
-                    ErrorPopupViewModel vmError = new ErrorPopupViewModel("Cash register closure config file not found -> Cannot send automatically cash register closure mail.");
+                    ErrorPopupViewModel vmError = new ErrorPopupViewModel(PopupService, "Cash register closure config file not found -> Cannot send automatically cash register closure mail.");
                     PopupService.DisplayModal(vmError, "Warning");
                 }
                 else
@@ -512,7 +516,7 @@ namespace PPC.Shop.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vmError = new ErrorPopupViewModel(ex);
+                ErrorPopupViewModel vmError = new ErrorPopupViewModel(PopupService, ex);
                 PopupService.DisplayModal(vmError, "Error");
             }
             finally
@@ -600,7 +604,7 @@ namespace PPC.Shop.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel(ex);
+                ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, ex);
                 PopupService.DisplayModal(vm, "Error while saving shop");
             }
         }
@@ -618,9 +622,6 @@ namespace PPC.Shop.ViewModels
             {
                 CashRegisterViewModel
             };
-
-            if (!DesignMode.IsInDesignModeStatic)
-                ArticleDb.Load();
 
             Mediator.Default.Register<PlayerSelectedMessage>(this, PlayerSelected);
         }
@@ -675,18 +676,19 @@ namespace PPC.Shop.ViewModels
             SoldArticlesTotalCash = totalCash;
             SoldArticlesTotalBankCard = totalBankCard;
             //
-            RaisePropertyChanged(() => PaidClientShoppingCarts);
-            RaisePropertyChanged(() => UnpaidClientShoppingCarts);
+            RaisePropertyChanged(() => PaidClientShoppingCartsCount);
+            RaisePropertyChanged(() => UnpaidClientShoppingCartsCount);
         }
 
         private void PlayerSelected(PlayerSelectedMessage msg)
         {
             // Select shopping cart or create it
-            ClientViewModel client = Buttons.OfType<ClientViewModel>().FirstOrDefault(x => (x.DciNumber == msg.DciNumber && x.ClientFirstName == msg.FirstName && x.ClientLastName == msg.LastName));
+            ClientViewModel client = Buttons.OfType<ClientViewModel>().FirstOrDefault(x => x.DciNumber == msg.DciNumber && x.ClientFirstName == msg.FirstName && x.ClientLastName == msg.LastName);
             if (client == null)
             {
                 ClientViewModel newClient = new ClientViewModel(RefreshSoldArticles, RefreshSoldArticles)
                 {
+                    HasFullPlayerInfos = true,
                     ClientName = msg.FirstName,
                     ClientFirstName = msg.FirstName,
                     ClientLastName = msg.LastName,
@@ -695,8 +697,9 @@ namespace PPC.Shop.ViewModels
                 Buttons.Add(newClient);
                 SelectedButton = newClient;
                 //
-                RaisePropertyChanged(() => PaidClientShoppingCarts);
-                RaisePropertyChanged(() => UnpaidClientShoppingCarts);
+                RaisePropertyChanged(() => ClientShoppingCartsCount);
+                RaisePropertyChanged(() => PaidClientShoppingCartsCount);
+                RaisePropertyChanged(() => UnpaidClientShoppingCartsCount);
             }
             else
                 SelectedButton = client;

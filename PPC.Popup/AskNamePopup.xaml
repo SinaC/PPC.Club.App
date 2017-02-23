@@ -6,20 +6,17 @@
              xmlns:local="clr-namespace:PPC.Popup"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:AskNamePopupViewModelDesignData, IsDesignTimeCreatable=True}"
-             d:DesignHeight="300" d:DesignWidth="300"
+             d:DesignWidth="300"
              Width="300"
              MaxWidth="500"
              MaxHeight="100">
     <UserControl.Resources>
-        <Style TargetType="{x:Type Image}" x:Key="AutoDisableImageStyle">
-            <Setter Property="RenderOptions.EdgeMode" Value="Aliased"/>
-            <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
-            <Style.Triggers>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Opacity" Value="0.5" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Images.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </UserControl.Resources>
     <Border BorderBrush="Black" 
             BorderThickness="1" 
@@ -46,7 +43,7 @@
                     Width="32"
                     Command="{Binding OkCommand}">
                 <Image Style="{StaticResource AutoDisableImageStyle}"
-                       Source="/PPC.Popup;component/Images/checkmark-round.png"/>
+                       Source="{StaticResource CheckmarkImage}"/>
             </Button>
         </Grid>
     </Border>

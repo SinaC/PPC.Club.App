@@ -10,6 +10,14 @@ namespace PPC.DataContracts
         [DataMember]
         public string ClientName { get; set; }
         [DataMember]
+        public string ClientFirstName { get; set; }
+        [DataMember]
+        public string ClientLastName { get; set; }
+        [DataMember]
+        public string DciNumber { get; set; }
+        [DataMember]
+        public bool HasFullPlayerInfos { get; set; }
+        [DataMember]
         public List<Item> Articles { get; set; }
         [DataMember]
         public bool IsPaid { get; set; }
