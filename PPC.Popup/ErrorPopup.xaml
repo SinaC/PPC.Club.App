@@ -7,6 +7,14 @@
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:ErrorPopupViewModelDesignData, IsDesignTimeCreatable=True}"
              d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Images.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Border BorderBrush="Black" 
             BorderThickness="1" 
             Background="{x:Static SystemColors.ControlLightBrush}">
@@ -16,10 +24,20 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0"
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Image Width="32"
+                       VerticalAlignment="Top"
+                       Style="{StaticResource AutoDisableImageStyle}"
+                       Source="{StaticResource ErrorImage}"/>
+            <TextBlock Grid.Column="1"
                        Margin="5,2"
                        TextWrapping="Wrap"
                        Text="{Binding Summary}"/>
+            </Grid>
             <Expander Grid.Row="1"
                       IsExpanded="False"
                       Header="Details">
@@ -40,6 +58,7 @@
             </Expander>
             <Button Grid.Row="2"
                     Width="80"
+                    Margin="5,2"
                     Command="{Binding ClickCommand}">
                 <TextBlock Text="Ok"/>
             </Button>

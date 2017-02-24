@@ -222,7 +222,7 @@ namespace EasyIoc
             return (TInterface) resolved;
         }
 
-        public TInterface Resolve<TInterface>(IEnumerable<ParameterValue> parameters) where TInterface : class
+        public TInterface Resolve<TInterface>(IEnumerable<IParameterValue> parameters) where TInterface : class
         {
             Type interfaceType = typeof (TInterface);
 
@@ -235,7 +235,7 @@ namespace EasyIoc
             {
                 // Don't search in resolve tree cache: ResolveTree may be different with or without parameters
                 // Create resolve tree
-                List<ParameterValue> parametersList = parameters?.ToList();
+                List<IParameterValue> parametersList = parameters?.ToList();
                 resolveTree = BuildResolveTree(interfaceType, parametersList);
             }
             // Check errors
@@ -363,7 +363,7 @@ namespace EasyIoc
             }
         }
 
-        private ResolveNodeBase BuildResolveTree(Type interfaceType, List<ParameterValue> userDefinedParameters = null)
+        private ResolveNodeBase BuildResolveTree(Type interfaceType, List<IParameterValue> userDefinedParameters = null)
         {
             List<Type> discoveredTypes = new List<Type>
             {
@@ -372,7 +372,7 @@ namespace EasyIoc
             return InnerBuildResolveTree(interfaceType, discoveredTypes, userDefinedParameters);
         }
 
-        private ResolveNodeBase InnerBuildResolveTree(Type interfaceType, ICollection<Type> discoveredTypes, List<ParameterValue> userDefinedParameters = null)
+        private ResolveNodeBase InnerBuildResolveTree(Type interfaceType, ICollection<Type> discoveredTypes, List<IParameterValue> userDefinedParameters = null)
         {
             // Factory ?
             Func<object> factory;
@@ -428,7 +428,7 @@ namespace EasyIoc
                 bool ok = true;
                 foreach (ParameterInfo parameterInfo in c.Parameters)
                 {
-                    ParameterValue parameterValue = userDefinedParameters?.FirstOrDefault(x => x.Name == parameterInfo.Name);
+                    IParameterValue parameterValue = userDefinedParameters?.FirstOrDefault(x => x.Name == parameterInfo.Name);
                     if (parameterValue != null)
                     {
                         ValueNode parameter = new ValueNode

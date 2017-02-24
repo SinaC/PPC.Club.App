@@ -36,6 +36,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.Data.Players", "PPC.Dat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.Inventory", "PPC.Inventory\PPC.Inventory.csproj", "{E734F70A-12E8-46BB-857D-35D606169A11}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.Services", "PPC.Services\PPC.Services.csproj", "{DAAB6105-1A4D-4AF9-9CAE-B76204B411D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -98,6 +100,10 @@ Global
 		{E734F70A-12E8-46BB-857D-35D606169A11}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E734F70A-12E8-46BB-857D-35D606169A11}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E734F70A-12E8-46BB-857D-35D606169A11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAAB6105-1A4D-4AF9-9CAE-B76204B411D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAAB6105-1A4D-4AF9-9CAE-B76204B411D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAAB6105-1A4D-4AF9-9CAE-B76204B411D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAAB6105-1A4D-4AF9-9CAE-B76204B411D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

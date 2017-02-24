@@ -1,4 +1,9 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using PPC.Helpers;
 
 namespace PPC.Popup
 {
@@ -10,6 +15,17 @@ namespace PPC.Popup
         public QuestionPopup()
         {
             InitializeComponent();
+
+            Loaded += OnLoaded;
         }
+
+        // set focus on first button
+        private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
+        {
+            var firstButton = VisualTreeHelpers.FindVisualChild<Button>(AnswerButtons.ItemContainerGenerator.ContainerFromIndex(0));
+            if (firstButton != null)
+                FocusManager.SetFocusedElement(AnswerButtons, firstButton);
+        }
+
     }
 }

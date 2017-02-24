@@ -10,6 +10,7 @@
     <BitmapImage UriSource="Images/close-round.png" x:Key="CloseImage"/>
     <BitmapImage UriSource="Images/discount.png" x:Key="DiscountImage"/>
     <BitmapImage UriSource="Images/edit.png" x:Key="EditImage"/>
+    <BitmapImage UriSource="Images/error.png" x:Key="ErrorImage"/>
     <BitmapImage UriSource="Images/game.png" x:Key="GameImage"/>
     <BitmapImage UriSource="Images/list.png" x:Key="ListImage"/>
     <BitmapImage UriSource="Images/locked.png" x:Key="LockedImage"/>

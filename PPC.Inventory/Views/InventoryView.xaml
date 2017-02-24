@@ -10,7 +10,15 @@
     <Grid Background="LightCoral">
         <StackPanel Orientation="Vertical">
             <TextBlock Foreground="White" FontWeight="Bold" Text="Under construction"/>
-            <TextBlock Text="Import from CSV"/>
+            <Button Command="{Binding LoadCommand}">
+                <TextBlock Text="Load"/>
+            </Button>
+            <Button Command="{Binding SaveCommand}">
+                <TextBlock Text="Save"/>
+            </Button>
+            <Button Command="{Binding ImportCommand}">
+                <TextBlock Text="Import"/>
+            </Button>
             <TextBlock Text="Add article"/>
             <TextBlock Text="Edit article"/>
         </StackPanel>

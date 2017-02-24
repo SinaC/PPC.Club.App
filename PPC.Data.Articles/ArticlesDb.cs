@@ -41,6 +41,66 @@ namespace PPC.Data.Articles
             //string filename = @"C:\temp\ppc\liste des produits.csv";
             if (File.Exists(filename))
             {
+                List<Article> articles = new List<Article>();
+
+                // Parse file and create new article list
+                string[] lines = File.ReadAllLines(filename, Encoding.GetEncoding("iso-8859-1"));
+                // column 2: id
+                // column 3: description
+                // column 6: category
+                // column 10: supplier price
+                // column 13: price
+                // column 16: price-vat -> can be used to compute vat
+                // if column 0 or 1 is non-empty or 3 is empty -> irrevelant line
+                foreach (string rawLine in lines)
+                {
+                    string[] tokens = SplitCsv(rawLine).ToArray();
+                    if (string.IsNullOrWhiteSpace(tokens[0]) && string.IsNullOrWhiteSpace(tokens[1]) && !string.IsNullOrWhiteSpace(tokens[3])) // don't consider invalid/header rows
+                    {
+                        Debug.Assert(tokens.Length == 17);
+                        string id = tokens[2];
+                        string description = tokens[3];
+
+                        string category = tokens[6].Trim();
+                        int stock;
+                        if (!int.TryParse(tokens[8], out stock))
+                            stock = 0;
+                        decimal supplierPrice;
+                        if (!decimal.TryParse(tokens[10], out supplierPrice))
+                            supplierPrice = 0;
+                        decimal price;
+                        if (!decimal.TryParse(tokens[13], out price))
+                            price = 0;
+                        decimal priceNoVat;
+                        if (!decimal.TryParse(tokens[16], out priceNoVat))
+                            priceNoVat = 0;
+                        decimal vat = Math.Round(100 * (price - priceNoVat) / priceNoVat, 0, MidpointRounding.AwayFromZero);
+
+                        VatRates vatRate = vat == 6 ? VatRates.FoodDrink : VatRates.Other;
+                        Article article = new Article
+                        {
+                            Guid = Guid.NewGuid(),
+                            Ean = id,
+                            Description = description,
+                            Category = category,
+                            Price = price,
+                            SupplierPrice = supplierPrice,
+                            Stock = stock,
+                            VatRate = vatRate,
+                        };
+                        articles.Add(article);
+                    }
+                }
+                // Assign new article list
+                _articles = articles;
+            }
+        }
+
+        public void ImportFromCsv2(string filename)
+        {
+            //string filename = @"C:\temp\ppc\liste des produits.csv";
+            if (File.Exists(filename))
+            {
                 int newArticlesCount = 0;
                 int categoryModifiedCount = 0;
                 int priceModifiedCount = 0;

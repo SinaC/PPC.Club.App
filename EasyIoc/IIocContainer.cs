@@ -33,7 +33,7 @@ namespace EasyIoc
         TInterface Resolve<TInterface>()
             where TInterface : class;
 
-        TInterface Resolve<TInterface>(IEnumerable<ParameterValue> parameters)
+        TInterface Resolve<TInterface>(IEnumerable<IParameterValue> parameters)
             where TInterface : class;
 
         void Reset();

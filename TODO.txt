@@ -1,5 +1,4 @@
 check each module (players, shop, inventory) before closing application
-in question popup set focus on first button
 form validation
 payback (client doesn't want anymore an already paid article !! only for cash payment)
 transaction edition
@@ -7,8 +6,10 @@ article DB (real DB instead of xml file)
 replace ArticlesDb/PlayersDb singleton with IOC RegisterInstance (IArticlesDb + IPlayersDb)
 PlayersDb: store the list of players (similar to ArticlesDb + call load from MainViewModel)
 Players -> remove save button, save automatically once a modification has been done
+add new method in IPopupService: DisplayError(string title, string message)
 
 new module: inventory
+!! after import -> every article guid are modified -> shopping carts and backup files are invalid
 
 known issues:
 after creating a new article, article cannot be added to shopping cart with enter

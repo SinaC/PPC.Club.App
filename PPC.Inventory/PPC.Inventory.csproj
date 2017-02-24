@@ -33,6 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -76,6 +77,10 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EasyIoc\EasyIoc.csproj">
+      <Project>{38d20e7f-9510-4b80-8755-1def2ef07bcf}</Project>
+      <Name>EasyIoc</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PPC.Data.Articles\PPC.Data.Articles.csproj">
       <Project>{99b36c5f-3b72-4e79-b34c-29f3a8a4cc99}</Project>
       <Name>PPC.Data.Articles</Name>
@@ -99,6 +104,10 @@
     <ProjectReference Include="..\PPC.Popup\PPC.Popup.csproj">
       <Project>{c06f804c-58a5-48ea-a3b4-935470804b05}</Project>
       <Name>PPC.Popup</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Services\PPC.Services.csproj">
+      <Project>{daab6105-1a4d-4af9-9cae-b76204b411d0}</Project>
+      <Name>PPC.Services</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Styles\PPC.Styles.csproj">
       <Project>{d75a55fb-738b-4771-be10-7db9008c412f}</Project>

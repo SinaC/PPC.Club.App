@@ -68,20 +68,20 @@ namespace PPC.Popup
         {
             Question = "How much wood could a woodchuck chuck if a woodchuck could chuck wood ?";
             AnswerItems = new List<QuestionPopupAnswerItem>
+            {
+                new QuestionPopupAnswerItem
                 {
-                    new QuestionPopupAnswerItem
-                        {
-                            Caption = "A lot"
-                        },
-                    new QuestionPopupAnswerItem
-                        {
-                            Caption = "42"
-                        },
-                    new QuestionPopupAnswerItem
-                        {
-                            Caption = "I don't care"
-                        },
-                };
+                    Caption = "A lot"
+                },
+                new QuestionPopupAnswerItem
+                {
+                    Caption = "42"
+                },
+                new QuestionPopupAnswerItem
+                {
+                    Caption = "I don't care"
+                },
+            };
         }
     }
 }

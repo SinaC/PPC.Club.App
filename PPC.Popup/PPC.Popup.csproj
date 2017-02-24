@@ -114,6 +114,10 @@
       <Project>{73F28B1D-02D3-4BDF-891A-DF4EE2248353}</Project>
       <Name>PPC.DataContracts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PPC.Helpers\PPC.Helpers.csproj">
+      <Project>{3523c53f-4317-4ac6-b077-76544bdd174a}</Project>
+      <Name>PPC.Helpers</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PPC.MVVM\PPC.MVVM.csproj">
       <Project>{10833c79-c3fb-4f70-ad1d-7f0173d01966}</Project>
       <Name>PPC.MVVM</Name>

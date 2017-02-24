@@ -2,8 +2,8 @@
 {
     public class ParameterValue : IParameterValue
     {
-        public string Name { get; private set; }
-        public object Value { get; private set; }
+        public string Name { get; }
+        public object Value { get; }
 
         public ParameterValue(string name, object value)
         {
