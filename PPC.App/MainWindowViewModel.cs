@@ -171,7 +171,11 @@ namespace PPC.App
         {
             try
             {
-                ArticlesDb.Instance.Load();
+                if (!DesignMode.IsInDesignModeStatic)
+                {
+                    //ArticlesDb.Instance.LoadOleDb();
+                    ArticlesDb.Instance.Load();
+                }
             }
             catch (Exception ex)
             {

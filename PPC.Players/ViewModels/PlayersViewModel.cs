@@ -171,7 +171,8 @@ namespace PPC.Players.ViewModels
 
         public PlayersViewModel()
         {
-            Load(true);
+            if (!DesignMode.IsInDesignModeStatic)
+                Load(true);
         }
     }
 

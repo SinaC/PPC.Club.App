@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
+using System.Data.Odbc;
+using System.Data.OleDb;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -231,6 +234,35 @@ namespace PPC.Data.Articles
             else
                 throw new InvalidOperationException("Article DB not found.");
         }
+
+        //public void LoadOleDb()
+        //{
+        //    //OleDbConnection yourConnectionHandler = new OleDbConnection(@"Provider=VFPOLEDB.1;Data Source=C:\Temp\ppc\data\ARTICLE.DBF");
+        //    //OleDbConnection yourConnectionHandler = new OleDbConnection(@"Provider=VFPOLEDB.1;Extended Properties=dBase III;Data Source=C:\Temp\ppc\data\CATEGORIE.DBF");
+        //    OleDbConnection yourConnectionHandler = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Temp\ppc\data\ARTICLE.DBF;Extended Properties=dBase 7");
+        //    yourConnectionHandler.Open();
+
+        //    DataTable tables = yourConnectionHandler.GetSchema(OdbcMetaDataCollectionNames.Tables);
+        //    DataTable columns = yourConnectionHandler.GetSchema(OdbcMetaDataCollectionNames.Columns);
+
+        //    OleDbCommand cmd = new OleDbCommand();
+        //    cmd.Connection = yourConnectionHandler;
+        //    cmd.CommandText = "SELECT * FROM ARTICLE";
+        //    var reader = cmd.ExecuteReader();
+        //    if (reader.HasRows)
+        //    {
+        //        while (reader.Read())
+        //        {
+        //            Console.WriteLine("{0}\t{1}", reader.GetInt32(0),
+        //                reader.GetString(1));
+        //        }
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("No rows found.");
+        //    }
+        //    reader.Close();
+        //}
 
         private static readonly Regex CsvSplitRegEx = new Regex("(?:^|,)(\"(?:[^\"]+|\"\")*\"|[^,]*)", RegexOptions.Compiled);
 

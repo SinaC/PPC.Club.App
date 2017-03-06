@@ -13,11 +13,25 @@ namespace PPC.Inventory.ViewModels
 {
     public class InventoryViewModel : ObservableObject
     {
-        // TODO: edit/new article
-
         private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
 
+        private static readonly string[] EmptyCategory = { string.Empty };
+
         public IEnumerable<Article> Articles => ArticlesDb.Instance.Articles;
+
+        private IEnumerable<string> Categories => EmptyCategory.Concat(ArticlesDb.Instance.Articles.GroupBy(x => x.Category, (category, articles) => category));
+        private IEnumerable<string> Producers => ArticlesDb.Instance.Articles.GroupBy(x => x.Producer, (producer, articles) => producer);
+
+        #region Selected article
+
+        private Article _selectedArticle;
+        public Article SelectedArticle
+        {
+            get { return _selectedArticle; }
+            set { Set(() => SelectedArticle, ref _selectedArticle, value); }
+        }
+
+        #endregion
 
         #region Load
 
@@ -107,9 +121,109 @@ namespace PPC.Inventory.ViewModels
         }
 
         #endregion
+
+        #region Article creation
+
+        private ICommand _createArticleCommand;
+        public ICommand CreateArticleCommand => _createArticleCommand = _createArticleCommand ?? new RelayCommand(DisplayCreateArticlePopup);
+
+        private void DisplayCreateArticlePopup()
+        {
+            CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(PopupService, Categories, Producers, CreateArticle)
+            {
+                IsEdition = false
+            };
+            PopupService.DisplayModal(vm, "New article");
+        }
+
+        private void CreateArticle(CreateEditArticlePopupViewModel vm)
+        {
+            Article article = new Article
+            {
+                Guid = Guid.NewGuid(),
+                Ean = vm.Ean,
+                Description = vm.Description,
+                Category = vm.Category,
+                Producer = vm.Producer,
+                SupplierPrice = vm.SupplierPrice,
+                Price = vm.Price,
+                Stock = vm.Stock,
+                VatRate = vm.VatRate,
+                IsNewArticle = true,
+            };
+
+            RaisePropertyChanged(() => Articles);
+
+            try
+            {
+                ArticlesDb.Instance.Add(article);
+            }
+            catch (Exception ex)
+            {
+                ErrorPopupViewModel errorVm = new ErrorPopupViewModel(PopupService, ex);
+                PopupService.DisplayModal(errorVm, "Error while saving articles DB");
+            }
+        }
+
+        #endregion
+
+        #region Article edition
+
+        private ICommand _editArticleCommand;
+        public ICommand EditArticleCommand => _editArticleCommand = _editArticleCommand ?? new RelayCommand(DisplayEditArticlePopup, () => SelectedArticle != null);
+
+        private void DisplayEditArticlePopup()
+        {
+            if (SelectedArticle != null)
+            {
+                CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(PopupService, Categories, Producers, SaveArticle)
+                {
+                    IsEdition = true,
+                    Ean = SelectedArticle.Ean,
+                    Description = SelectedArticle.Description,
+                    Category = SelectedArticle.Category,
+                    Producer = SelectedArticle.Producer,
+                    SupplierPrice = SelectedArticle.SupplierPrice,
+                    Price = SelectedArticle.Price,
+                    VatRate = SelectedArticle.VatRate,
+                    Stock = SelectedArticle.Stock
+                };
+                PopupService.DisplayModal(vm, "Edit article");
+            }
+        }
+
+        private void SaveArticle(CreateEditArticlePopupViewModel vm)
+        {
+            SelectedArticle.Ean = vm.Ean;
+            SelectedArticle.Description = vm.Description;
+            SelectedArticle.Category = vm.Category;
+            SelectedArticle.Producer = vm.Producer;
+            SelectedArticle.SupplierPrice = vm.SupplierPrice;
+            SelectedArticle.Price = vm.Price;
+            SelectedArticle.VatRate = vm.VatRate;
+            SelectedArticle.Stock = vm.Stock;
+
+            RaisePropertyChanged(() => Articles);
+            RaisePropertyChanged(() => Categories);
+
+            try
+            {
+                ArticlesDb.Instance.Save();
+            }
+            catch (Exception ex)
+            {
+                ErrorPopupViewModel errorVm = new ErrorPopupViewModel(PopupService, ex);
+                PopupService.DisplayModal(errorVm, "Error while saving articles DB");
+            }
+        }
+
+        #endregion
     }
 
     public class InventoryViewModelDesignData : InventoryViewModel
     {
+        public InventoryViewModelDesignData()
+        {
+        }
     }
 }

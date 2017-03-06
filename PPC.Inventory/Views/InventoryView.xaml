@@ -6,21 +6,90 @@
              xmlns:viewModels="clr-namespace:PPC.Inventory.ViewModels"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance viewModels:InventoryViewModelDesignData, IsDesignTimeCreatable=True}"
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Grid Background="LightCoral">
-        <StackPanel Orientation="Vertical">
-            <TextBlock Foreground="White" FontWeight="Bold" Text="Under construction"/>
-            <Button Command="{Binding LoadCommand}">
-                <TextBlock Text="Load"/>
-            </Button>
-            <Button Command="{Binding SaveCommand}">
-                <TextBlock Text="Save"/>
-            </Button>
-            <Button Command="{Binding ImportCommand}">
-                <TextBlock Text="Import"/>
-            </Button>
-            <TextBlock Text="Add article"/>
-            <TextBlock Text="Edit article"/>
-        </StackPanel>
+             d:DesignHeight="300" d:DesignWidth="800">
+    <Grid>
+        <!-- TODO: button image -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0"
+                        Margin="5,2"
+                        Command="{Binding LoadCommand}">
+                    <TextBlock Text="Load"/>
+                </Button>
+                <Button Grid.Column="1"
+                        Margin="5,2"
+                        Command="{Binding SaveCommand}">
+                    <TextBlock Text="Save"/>
+                </Button>
+                <Button Grid.Column="2"
+                        Margin="5,2"
+                        Command="{Binding ImportCommand}">
+                    <TextBlock Text="Import"/>
+                </Button>
+                <Button Grid.Column="3"
+                        Margin="5,2"
+                        Command="{Binding CreateArticleCommand}">
+                    <TextBlock Text="Add article"/>
+                </Button>
+                <Button Grid.Column="4"
+                        Margin="5,2"
+                        Command="{Binding EditArticleCommand}">
+                    <TextBlock Text="Edit article"/>
+                </Button>
+            </Grid>
+            <DataGrid Grid.Row="1"
+                      Margin="5,2"
+                      IsReadOnly="True"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      AutoGenerateColumns="False"
+                      EnableRowVirtualization="True"
+                      SelectedItem="{Binding SelectedArticle}"
+                      ItemsSource="{Binding Articles}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Ean"
+                                        Binding="{Binding Ean}"/>
+                    <DataGridTextColumn Header="Description"
+                                        Binding="{Binding Description}"/>
+                    <DataGridTextColumn Header="Category"
+                                        Binding="{Binding Category}"/>
+                    <!--<DataGridTextColumn Header="Producer"
+                                        Binding="{Binding Producer}"/>-->
+                    <DataGridTextColumn Header="Supplier price"
+                                        Binding="{Binding SupplierPrice, StringFormat=C}"/>
+                    <DataGridTextColumn Header="Price"
+                                        Binding="{Binding Price, StringFormat=C}"/>
+                    <DataGridTextColumn Header="Stock"
+                                        Binding="{Binding Stock}"/>
+                    <DataGridTextColumn Header="Vat"
+                                        Binding="{Binding VatRate}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+        <TextBlock VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   Opacity="0.5"
+                   IsHitTestVisible="False"
+                   FontSize="45"
+                   FontWeight="Bold"
+                   Text="Under Construction"
+                   RenderTransformOrigin="0.5,0.5">
+            <TextBlock.RenderTransform>
+                <RotateTransform>
+                    <RotateTransform.Angle>-45</RotateTransform.Angle>
+                </RotateTransform>
+            </TextBlock.RenderTransform>
+        </TextBlock>
     </Grid>
 </UserControl>

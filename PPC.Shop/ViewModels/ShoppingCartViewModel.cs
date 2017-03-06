@@ -14,6 +14,7 @@ namespace PPC.Shop.ViewModels
     public class ShoppingCartViewModel : ObservableObject
     {
         private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
+
         private static readonly string[] EmptyCategory = {string.Empty};
 
         private readonly Action<decimal, decimal> _paymentAction;
