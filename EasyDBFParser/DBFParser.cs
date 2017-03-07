@@ -197,8 +197,9 @@ namespace EasyDBFParser
                 Datas.Add(data);
             }
 
-            byte terminator = reader.ReadByte();
-            if (terminator != 0x1A)
+            int terminator = reader.PeekChar();
+            //byte terminator = reader.ReadByte();
+            if (terminator != 0x1A && terminator != -1)
                 throw new Exception("Invalid DBF terminator");
         }
     }
