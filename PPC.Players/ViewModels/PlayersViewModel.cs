@@ -7,12 +7,12 @@ using System.IO;
 using System.Linq;
 using System.Windows.Input;
 using EasyMVVM;
+using PPC.Data.Contracts;
 using PPC.Data.Players;
-using PPC.DataContracts;
 using PPC.Helpers;
 using PPC.Messages;
 using PPC.Players.Models;
-using PPC.Popup;
+using PPC.Popups;
 
 namespace PPC.Players.ViewModels
 {

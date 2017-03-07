@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 
-namespace PPC.Popup
+namespace PPC.Popups
 {
     public interface ISaveNavigationAndFocusPopup
     {

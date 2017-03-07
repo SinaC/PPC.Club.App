@@ -1,13 +1,5 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using System.Configuration;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Xml;
-using PPC.DataContracts;
-using PPC.Helpers;
-using PPC.Popup;
 
 namespace PPC.Shop.ViewModels
 {

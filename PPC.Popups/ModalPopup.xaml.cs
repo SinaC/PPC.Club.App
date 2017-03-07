@@ -6,7 +6,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace PPC.Popup
+namespace PPC.Popups
 {
     /// <summary>
     /// Interaction logic for ModalPopup.xaml

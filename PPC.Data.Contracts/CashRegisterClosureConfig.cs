@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace PPC.DataContracts
+namespace PPC.Data.Contracts
 {
     [DataContract]
     public class CashRegisterClosureConfig

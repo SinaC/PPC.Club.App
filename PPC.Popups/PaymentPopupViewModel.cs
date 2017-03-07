@@ -2,7 +2,7 @@
 using System.Windows.Input;
 using EasyMVVM;
 
-namespace PPC.Popup
+namespace PPC.Popups
 {
     public class PaymentPopupViewModel : ObservableObject
     {

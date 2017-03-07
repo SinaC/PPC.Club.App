@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:viewModels="clr-namespace:PPC.Shop.ViewModels"
-             xmlns:dataContracts="clr-namespace:PPC.DataContracts;assembly=PPC.Data.Contracts"
+             xmlns:contracts="clr-namespace:PPC.Data.Contracts;assembly=PPC.Data.Contracts"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance viewModels:ArticleSelectorViewModelDesignData, IsDesignTimeCreatable=True}"
              d:DesignHeight="500" d:DesignWidth="700">
@@ -14,17 +14,17 @@
                 <ItemsControl ItemsSource="{Binding Categories}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <WrapPanel Orientation="Horizontal"/>
+                            <!--<WrapPanel Orientation="Horizontal"/>-->
+                            <UniformGrid Columns="6"/>
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Button Width="96"
-                                    Height="64"
+                            <Button MinHeight="64"
                                     Margin="2"
                                     Command="{Binding DataContext.SelectCategoryCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                                     CommandParameter="{Binding}">
-                                <TextBlock TextWrapping="Wrap"
+                                <TextBlock TextWrapping="WrapWithOverflow"
                                            Text="{Binding}"/>
                             </Button>
                         </DataTemplate>
@@ -34,20 +34,21 @@
         </DataTemplate>
         <DataTemplate x:Key="SubCategorySelectionTemplate" DataType="{x:Type viewModels:ArticleSelectorViewModel}">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{Binding SubCategories}">
+                <ItemsControl VerticalAlignment="Top"
+                              ItemsSource="{Binding SubCategories}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <WrapPanel Orientation="Horizontal"/>
+                            <!--<WrapPanel Orientation="Horizontal"/>-->
+                            <UniformGrid Columns="6"/>
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Button Width="96"
-                                    Height="64"
+                            <Button MinHeight="64"
                                     Margin="2"
                                     Command="{Binding DataContext.SelectSubCategoryCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                                     CommandParameter="{Binding}">
-                                <TextBlock TextWrapping="Wrap"
+                                <TextBlock TextWrapping="WrapWithOverflow"
                                            Text="{Binding}"/>
                             </Button>
                         </DataTemplate>
@@ -57,32 +58,20 @@
         </DataTemplate>
         <DataTemplate x:Key="ArticleSelectionTemplate" DataType="{x:Type viewModels:ArticleSelectorViewModel}">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{Binding Articles}">
+                <ItemsControl VerticalAlignment="Top"
+                              ItemsSource="{Binding Articles}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <WrapPanel Orientation="Horizontal"/>
+                            <!--<WrapPanel Orientation="Horizontal"/>-->
+                            <UniformGrid Columns="6"/>
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="{x:Type dataContracts:Article}">
-                            <Button Width="96"
-                                    Height="96"
+                        <DataTemplate DataType="{x:Type contracts:Article}">
+                            <Button MinHeight="64"
                                     Margin="2"
                                     Command="{Binding DataContext.SelectArticleCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                                     CommandParameter="{Binding}">
-                                <!--<StackPanel Orientation="Vertical">
-                                <TextBlock TextWrapping="WrapWithOverflow"
-                                           Text="{Binding Description}"/>
-                                <TextBlock Text="{Binding Price, StringFormat=C}"/>
-                            </StackPanel>-->
-                                <!--<StackPanel Orientation="Vertical">
-                                <Viewbox StretchDirection="DownOnly" Stretch="Uniform">
-                                    <TextBlock TextWrapping="WrapWithOverflow"
-                                               MaxWidth="150"
-                                               Text="{Binding Description}"/>
-                                </Viewbox>
-                                <TextBlock Text="{Binding Price, StringFormat=C}"/>
-                            </StackPanel>-->
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="*"/>

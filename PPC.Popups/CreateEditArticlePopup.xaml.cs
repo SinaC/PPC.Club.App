@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using Xceed.Wpf.Toolkit;
 
-namespace PPC.Popup
+namespace PPC.Popups
 {
     /// <summary>
     /// Interaction logic for CreateEditArticlePopup.xaml

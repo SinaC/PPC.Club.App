@@ -169,7 +169,7 @@ namespace EasyDBFParser
                                 // otherwise, remove 1st bit (negate 1st bit is also correct)
                                 else
                                     valueRaw[0] &= 0x7F; // remove 1st bit
-                                                         // reverse byte array
+                                // reverse byte array
                                 for (int byteIndex = 0; byteIndex < 4; byteIndex++)
                                 {
                                     byte swap = valueRaw[byteIndex];
@@ -184,6 +184,7 @@ namespace EasyDBFParser
                                 bool isNegative = (valueRaw[0] & 0x80) == 0;
                                 valueRaw[0] &= 0x7F; // remove 1st bit
                                 data[fieldIndex] = (isNegative ? -1 : 1) * valueRaw[3] + valueRaw[2] * 0x100 + valueRaw[1] * 0x10000 + valueRaw[0] * 0x1000000;
+                                // BitConverter.ToIn32 can be used if valueRaw is reversed (see Double case)
                                 break;
                             }
                         default:

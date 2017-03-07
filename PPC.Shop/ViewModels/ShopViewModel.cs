@@ -14,10 +14,10 @@ using System.Windows.Input;
 using System.Xml;
 using EasyMVVM;
 using PPC.Data.Articles;
-using PPC.DataContracts;
+using PPC.Data.Contracts;
 using PPC.Helpers;
 using PPC.Messages;
-using PPC.Popup;
+using PPC.Popups;
 
 namespace PPC.Shop.ViewModels
 {
@@ -278,11 +278,11 @@ namespace PPC.Shop.ViewModels
                 string filename = $"{ConfigurationManager.AppSettings["BackupPath"]}{ShopFilename}";
                 if (File.Exists(filename))
                 {
-                    DataContracts.Shop shop;
+                    Data.Contracts.Shop shop;
                     using (XmlTextReader reader = new XmlTextReader(filename))
                     {
-                        DataContractSerializer serializer = new DataContractSerializer(typeof(DataContracts.Shop));
-                        shop = (DataContracts.Shop)serializer.ReadObject(reader);
+                        DataContractSerializer serializer = new DataContractSerializer(typeof(Data.Contracts.Shop));
+                        shop = (Data.Contracts.Shop)serializer.ReadObject(reader);
                     }
                     Transactions.Clear();
                     Transactions.AddRange(shop.Transactions.Select(t => new ShopTransactionItem
@@ -589,7 +589,7 @@ namespace PPC.Shop.ViewModels
             {
                 if (!Directory.Exists(ConfigurationManager.AppSettings["BackupPath"]))
                     Directory.CreateDirectory(ConfigurationManager.AppSettings["BackupPath"]);
-                DataContracts.Shop shop = new DataContracts.Shop
+                Data.Contracts.Shop shop = new Data.Contracts.Shop
                 {
                     Transactions = Transactions.Select(t => new ShopTransaction
                     {
@@ -607,7 +607,7 @@ namespace PPC.Shop.ViewModels
                 using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
                 {
                     writer.Formatting = Formatting.Indented;
-                    DataContractSerializer serializer = new DataContractSerializer(typeof(DataContracts.Shop));
+                    DataContractSerializer serializer = new DataContractSerializer(typeof(Data.Contracts.Shop));
                     serializer.WriteObject(writer, shop);
                 }
             }

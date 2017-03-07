@@ -8,7 +8,7 @@
         xmlns:playersViews="clr-namespace:PPC.Players.Views;assembly=PPC.Players"
         xmlns:shopViews="clr-namespace:PPC.Shop.Views;assembly=PPC.Shop"
         xmlns:inventoryViews="clr-namespace:PPC.Inventory.Views;assembly=PPC.Inventory"
-        xmlns:popups="clr-namespace:PPC.Popup;assembly=PPC.Popups"
+        xmlns:popups="clr-namespace:PPC.Popups;assembly=PPC.Popups"
         x:Name="AppMainWindow"
         mc:Ignorable="d"
         SnapsToDevicePixels="True"

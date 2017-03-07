@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Xml;
 using System.Xml.Serialization;
-using PPC.DataContracts;
+using PPC.Data.Contracts;
 
 namespace PPC.Data.Players
 {

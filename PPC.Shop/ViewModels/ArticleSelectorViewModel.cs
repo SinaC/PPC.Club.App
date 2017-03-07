@@ -4,7 +4,7 @@ using System.Linq;
 using System.Windows.Input;
 using EasyMVVM;
 using PPC.Data.Articles;
-using PPC.DataContracts;
+using PPC.Data.Contracts;
 
 namespace PPC.Shop.ViewModels
 {

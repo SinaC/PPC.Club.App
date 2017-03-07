@@ -7,9 +7,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using EasyMVVM;
 using PPC.Data.Articles;
-using PPC.DataContracts;
+using PPC.Data.Contracts;
 using PPC.Helpers;
-using PPC.Popup;
+using PPC.Popups;
 
 namespace PPC.Shop.ViewModels
 {

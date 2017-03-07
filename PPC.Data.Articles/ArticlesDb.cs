@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Data;
-using System.Data.Odbc;
-using System.Data.OleDb;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -13,7 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml;
 using EasyDBFParser;
-using PPC.DataContracts;
+using PPC.Data.Contracts;
 
 namespace PPC.Data.Articles
 {

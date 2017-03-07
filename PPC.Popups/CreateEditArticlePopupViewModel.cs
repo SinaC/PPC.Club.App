@@ -6,9 +6,9 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
 using EasyMVVM;
-using PPC.DataContracts;
+using PPC.Data.Contracts;
 
-namespace PPC.Popup
+namespace PPC.Popups
 {
     public class CreateEditArticlePopupViewModel : ObservableObject
     {

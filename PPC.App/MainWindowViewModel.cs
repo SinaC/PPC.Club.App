@@ -6,7 +6,7 @@ using PPC.Data.Articles;
 using PPC.Inventory.ViewModels;
 using PPC.Messages;
 using PPC.Players.ViewModels;
-using PPC.Popup;
+using PPC.Popups;
 using PPC.Shop.ViewModels;
 
 namespace PPC.App

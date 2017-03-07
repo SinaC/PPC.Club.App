@@ -1,7 +1,7 @@
 ﻿using System;
 using EasyMVVM;
 
-namespace PPC.Popup
+namespace PPC.Popups
 {
     public class QuestionPopupAnswerItem : ObservableObject
     {

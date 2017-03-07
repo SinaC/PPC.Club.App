@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Globalization;
-using System.Runtime.CompilerServices;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace PPC.Controls

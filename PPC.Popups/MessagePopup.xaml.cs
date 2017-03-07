@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace PPC.Popup
+namespace PPC.Popups
 {
     /// <summary>
     /// Interaction logic for MessagePopup.xaml

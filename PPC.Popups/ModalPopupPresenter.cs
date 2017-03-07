@@ -9,7 +9,7 @@ using System.Windows.Markup;
 using System.Windows.Media;
 using EasyMVVM;
 
-namespace PPC.Popup
+namespace PPC.Popups
 {
     // https://programmingwithpassion.wordpress.com/2012/07/01/displaying-modal-content-in-wpf/
 

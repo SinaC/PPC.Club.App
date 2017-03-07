@@ -1,11 +1,9 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using PPC.Helpers;
 
-namespace PPC.Popup
+namespace PPC.Popups
 {
     /// <summary>
     /// Interaction logic for QuestionPopup.xaml

@@ -5,8 +5,8 @@ using System.Linq;
 using System.Windows.Input;
 using EasyMVVM;
 using PPC.Data.Articles;
-using PPC.DataContracts;
-using PPC.Popup;
+using PPC.Data.Contracts;
+using PPC.Popups;
 using PPC.Services;
 
 namespace PPC.Inventory.ViewModels

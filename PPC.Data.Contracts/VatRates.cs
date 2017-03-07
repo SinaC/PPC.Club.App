@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.Serialization;
 
-namespace PPC.DataContracts
+namespace PPC.Data.Contracts
 {
     [DataContract]
     public enum VatRates

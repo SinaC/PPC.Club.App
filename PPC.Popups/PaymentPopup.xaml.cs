@@ -7,7 +7,7 @@ using System.Windows.Threading;
 using Xceed.Wpf.AvalonDock.Controls;
 using Xceed.Wpf.Toolkit;
 
-namespace PPC.Popup
+namespace PPC.Popups
 {
     /// <summary>
     /// Interaction logic for PaymentPopup.xaml

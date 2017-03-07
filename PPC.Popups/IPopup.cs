@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PPC.Popup
+namespace PPC.Popups
 {
     public interface IPopup
     {

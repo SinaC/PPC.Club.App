@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using EasyMVVM;
 
-namespace PPC.Popup
+namespace PPC.Popups
 {
     public class MessagePopupViewModel : ObservableObject
     {

@@ -25,5 +25,10 @@ after creating a new article, article cannot be added to shopping cart with ente
 workaround to fix:
 PlayerViewModel: Load must be called after Save to reset row.IsNewItem
 
+virtualization:
+https://blogs.msdn.microsoft.com/dancre/2006/02/06/implementing-a-virtualized-panel-in-wpf-avalon/  -> http://www.boingo.org/samples/VirtualizingTilePanelSample.zip
+https://www.codeproject.com/kb/wpf/virtualtilepanelfillmod.aspx
+http://stackoverflow.com/questions/2783845/virtualizing-an-itemscontrol
+
 icons:
 http://www.flaticon.com/packs/black-friday-5

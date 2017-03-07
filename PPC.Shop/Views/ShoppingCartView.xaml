@@ -6,7 +6,7 @@
              xmlns:controls="clr-namespace:PPC.Controls;assembly=PPC.Controls"
              xmlns:viewModels="clr-namespace:PPC.Shop.ViewModels"
              xmlns:helpers="clr-namespace:PPC.Helpers;assembly=PPC.Helpers"
-             xmlns:dataContracts="clr-namespace:PPC.DataContracts;assembly=PPC.Data.Contracts"
+             xmlns:contracts="clr-namespace:PPC.Data.Contracts;assembly=PPC.Data.Contracts"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance viewModels:ShoppingCartViewModelDesignData, IsDesignTimeCreatable=True}"
              d:DesignHeight="600" d:DesignWidth="800">
@@ -120,7 +120,7 @@
                     </ItemsPanelTemplate>
                 </ComboBox.ItemsPanel>
                 <ComboBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type dataContracts:Article}">
+                    <DataTemplate DataType="{x:Type contracts:Article}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding Description}"/>
                             <TextBlock Text="{Binding Price, StringFormat={} ({0:C})}"/>
@@ -142,7 +142,7 @@
                                                  ItemsSource="{Binding Articles}"
                                                  SelectedItem="{Binding SelectedArticle, Mode=TwoWay}">
                 <controls:KeyFriendlyAutoCompleteBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type dataContracts:Article}">
+                    <DataTemplate DataType="{x:Type contracts:Article}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding Description}"/>
                             <TextBlock Text="{Binding Price, StringFormat={} ({0:C})}"/>
