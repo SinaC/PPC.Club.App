@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Xml;
+using EasyMVVM;
 using PPC.Data.Articles;
 using PPC.DataContracts;
 using PPC.Helpers;
 using PPC.Messages;
-using PPC.MVVM;
 using PPC.Popup;
 
 namespace PPC.Shop.ViewModels
@@ -88,6 +88,8 @@ namespace PPC.Shop.ViewModels
                         ShopState = ShopStates.ShoppingCarts; // switch back to summary when no button are selected
                     else
                         ShopState = ShopStates.Detail;
+                    if (value == CashRegisterViewModel)
+                        CashRegisterViewModel.ShoppingCart.IsArticleNameFocused = true; // TODO: grrrrrrrrr f**king focus
                 }
             }
         }
@@ -363,6 +365,45 @@ namespace PPC.Shop.ViewModels
 
         private async Task CashRegisterClosureConfirmedAsync()
         {
+            CashRegisterClosure closure = BuildClosure();
+
+            // Display popup
+            CashRegisterClosurePopupViewModel vm = new CashRegisterClosurePopupViewModel(PopupService, closure, CloseApplicationAfterClosure, async c => await SendCashRegisterClosureMailAsync(closure));
+            PopupService.DisplayModal(vm, "Cash register closure"); // !! Shutdown application on close
+
+            // Dump cash register closure file
+            DateTime now = DateTime.Now;
+            //  txt
+            try
+            {
+                string filename = $"{ConfigurationManager.AppSettings["CashRegisterClosurePath"]}CashRegister_{now:yyyy-MM-dd_HH-mm-ss}.txt";
+                File.WriteAllText(filename, closure.ToString());
+            }
+            catch (Exception ex)
+            {
+                ErrorPopupViewModel vmError = new ErrorPopupViewModel(PopupService, ex);
+                PopupService.DisplayModal(vmError, "Error");
+            }
+            //  xml
+            try
+            {
+                string filename = $"{ConfigurationManager.AppSettings["CashRegisterClosurePath"]}CashRegister_{now:yyyy-MM-dd_HH-mm-ss}.xml";
+                using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
+                {
+                    writer.Formatting = Formatting.Indented;
+                    DataContractSerializer serializer = new DataContractSerializer(typeof(CashRegisterClosure));
+                    await serializer.WriteObjectAsync(writer, closure);
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorPopupViewModel vmError = new ErrorPopupViewModel(PopupService, ex);
+                PopupService.DisplayModal(vmError, "Error");
+            }
+        }
+
+        private CashRegisterClosure BuildClosure()
+        {
             // Compute shop closure
             //  transactions from cash register
             List<TransactionFullArticle> transactions = new List<TransactionFullArticle>(Transactions.Select(t => new TransactionFullArticle
@@ -412,40 +453,7 @@ namespace PPC.Shop.ViewModels
                 BankCard = SoldArticlesTotalBankCard,
                 Transactions = transactions
             };
-
-            // Display popup
-            CashRegisterClosurePopupViewModel vm = new CashRegisterClosurePopupViewModel(PopupService, closure, CloseApplicationAfterClosure, async c => await SendCashRegisterClosureMailAsync(closure));
-            PopupService.DisplayModal(vm, "Cash register closure"); // !! Shutdown application on close
-
-            // Dump cash register closure file
-            DateTime now = DateTime.Now;
-            //  txt
-            try
-            {
-                string filename = $"{ConfigurationManager.AppSettings["CashRegisterClosurePath"]}CashRegister_{now:yyyy-MM-dd_HH-mm-ss}.txt";
-                File.WriteAllText(filename, closure.ToString());
-            }
-            catch (Exception ex)
-            {
-                ErrorPopupViewModel vmError = new ErrorPopupViewModel(PopupService, ex);
-                PopupService.DisplayModal(vmError, "Error");
-            }
-            //  xml
-            try
-            {
-                string filename = $"{ConfigurationManager.AppSettings["CashRegisterClosurePath"]}CashRegister_{now:yyyy-MM-dd_HH-mm-ss}.xml";
-                using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
-                {
-                    writer.Formatting = Formatting.Indented;
-                    DataContractSerializer serializer = new DataContractSerializer(typeof(CashRegisterClosure));
-                    await serializer.WriteObjectAsync(writer, closure);
-                }
-            }
-            catch (Exception ex)
-            {
-                ErrorPopupViewModel vmError = new ErrorPopupViewModel(PopupService, ex);
-                PopupService.DisplayModal(vmError, "Error");
-            }
+            return closure;
         }
 
         private void CloseApplicationAfterClosure()
@@ -482,6 +490,7 @@ namespace PPC.Shop.ViewModels
                 }
                 else
                 {
+                    // Read closure config
                     CashRegisterClosureConfig closureConfig;
                     using (XmlTextReader reader = new XmlTextReader(closureConfigFilename))
                     {

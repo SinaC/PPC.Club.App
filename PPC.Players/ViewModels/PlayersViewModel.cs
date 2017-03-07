@@ -6,11 +6,11 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
+using EasyMVVM;
 using PPC.Data.Players;
 using PPC.DataContracts;
 using PPC.Helpers;
 using PPC.Messages;
-using PPC.MVVM;
 using PPC.Players.Models;
 using PPC.Popup;
 

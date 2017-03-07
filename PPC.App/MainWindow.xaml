@@ -4,11 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:app="clr-namespace:PPC.App"
-        xmlns:popup="clr-namespace:PPC.Popup;assembly=PPC.Popup" 
         xmlns:controls="clr-namespace:PPC.Controls;assembly=PPC.Controls"
         xmlns:playersViews="clr-namespace:PPC.Players.Views;assembly=PPC.Players"
         xmlns:shopViews="clr-namespace:PPC.Shop.Views;assembly=PPC.Shop"
         xmlns:inventoryViews="clr-namespace:PPC.Inventory.Views;assembly=PPC.Inventory"
+        xmlns:popups="clr-namespace:PPC.Popup;assembly=PPC.Popups"
         x:Name="AppMainWindow"
         mc:Ignorable="d"
         SnapsToDevicePixels="True"
@@ -37,9 +37,12 @@
             <DataTemplate DataType="{x:Type app:MainWindowViewModel}" x:Key="InventoryTemplate">
                 <inventoryViews:InventoryView DataContext="{Binding InventoryViewModel}"/>
             </DataTemplate>
+            <DataTemplate DataType="{x:Type app:MainWindowViewModel}" x:Key="TestTemplate">
+                <shopViews:ArticleSelectorView DataContext="{Binding TestViewModel}"/>
+            </DataTemplate>
         </ResourceDictionary>
     </Window.Resources>
-        <popup:ModalPopupPresenter x:Name="ModalPopupPresenter"
+        <popups:ModalPopupPresenter x:Name="ModalPopupPresenter"
                                    OverlayBrush="{StaticResource ModalPopupPresenterOverlayBrush}">
         <controls:AdornedControl IsAdornerVisible="{Binding IsWaiting}">
             <controls:AdornedControl.AdornerContent>
@@ -55,6 +58,7 @@
                 <!-- Header -->
                 <Grid Grid.Column="0">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -139,9 +143,18 @@
                         <Image Style="{StaticResource AutoDisableImageStyle}"
                                Source="{StaticResource ListImage}"/>
                     </Button>
-                    <!-- dummy row 5 -->
+                    <!-- Text -->
+                    <Button Grid.Row="5"
+                            Width="64"
+                            Height="32"
+                            Margin="5"
+                            ToolTip="Text"
+                            Command="{Binding SwitchToTestCommand}">
+                        <TextBlock Text="Test"/>
+                    </Button>
+                    <!-- dummy row 6 -->
                     <!-- Reload -->
-                    <Button Grid.Row="6"
+                    <Button Grid.Row="7"
                             Width="64"
                             Margin="5"
                             ToolTip="Load previous session"
@@ -150,7 +163,7 @@
                                Source="{StaticResource RefreshImage}"/>
                     </Button>
                     <!-- Shutdown -->
-                    <Button Grid.Row="7"
+                    <Button Grid.Row="8"
                             Width="64"
                             Margin="5"
                             ToolTip="Cash registry closure"
@@ -181,11 +194,14 @@
                                 <DataTrigger Binding="{Binding ApplicationMode}" Value="{x:Static app:ApplicationModes.Inventory}">
                                     <Setter Property="ContentTemplate" Value="{StaticResource InventoryTemplate}"/>
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding ApplicationMode}" Value="{x:Static app:ApplicationModes.Test}">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource TestTemplate}"/>
+                                </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </ContentControl.Style>
                 </ContentControl>
             </Grid>
         </controls:AdornedControl>
-    </popup:ModalPopupPresenter>
+    </popups:ModalPopupPresenter>
 </Window>

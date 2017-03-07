@@ -61,9 +61,12 @@
                     <DataGridTextColumn Header="Ean"
                                         Binding="{Binding Ean}"/>
                     <DataGridTextColumn Header="Description"
+                                        MaxWidth="250"
                                         Binding="{Binding Description}"/>
                     <DataGridTextColumn Header="Category"
                                         Binding="{Binding Category}"/>
+                    <DataGridTextColumn Header="SubCategory"
+                                        Binding="{Binding SubCategory}"/>
                     <!--<DataGridTextColumn Header="Producer"
                                         Binding="{Binding Producer}"/>-->
                     <DataGridTextColumn Header="Supplier price"

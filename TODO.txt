@@ -1,3 +1,5 @@
+store discount in transaction
+cash registry closure banknotes/coins amount (new file with starting values)
 check each module (players, shop, inventory) before closing application
 form validation
 payback (client doesn't want anymore an already paid article !! only for cash payment)
@@ -8,8 +10,14 @@ PlayersDb: store the list of players (similar to ArticlesDb + call load from Mai
 Players -> remove save button, save automatically once a modification has been done
 add new method in IPopupService: DisplayError(string title, string message)
 
+new mobile UI: 
+article selection using big button displaying categories -> subcategories -> articles + back button (->ArticleSelectorView/ViewModel)
+note more function buttons on left, unique button displaying panel with functions buttons
+
 new module: inventory
 !! after import -> every article guid are modified -> shopping carts and backup files are invalid
+
+ArticleSelectorView/ViewModel: buttons to scroll up/down -> paged collection
 
 known issues:
 after creating a new article, article cannot be added to shopping cart with enter

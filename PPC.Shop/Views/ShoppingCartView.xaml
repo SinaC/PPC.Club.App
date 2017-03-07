@@ -3,10 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:dataContracts="clr-namespace:PPC.DataContracts;assembly=PPC.DataContracts"
              xmlns:controls="clr-namespace:PPC.Controls;assembly=PPC.Controls"
              xmlns:viewModels="clr-namespace:PPC.Shop.ViewModels"
              xmlns:helpers="clr-namespace:PPC.Helpers;assembly=PPC.Helpers"
+             xmlns:dataContracts="clr-namespace:PPC.DataContracts;assembly=PPC.Data.Contracts"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance viewModels:ShoppingCartViewModelDesignData, IsDesignTimeCreatable=True}"
              d:DesignHeight="600" d:DesignWidth="800">
@@ -18,7 +18,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid FocusManager.FocusedElement="{Binding ElementName=EanTextBox}">
+    <Grid>
         <Grid.InputBindings>
             <KeyBinding Key="Return" 
                         Command="{Binding AddSelectedArticleCommand}"/>
@@ -56,20 +56,20 @@
 
             <!-- Ean -->
             <TextBlock Grid.Row="0" 
-                        Grid.Column="0"
-                        Grid.ColumnSpan="2"
-                        Margin="5,2"
-                        Style="{StaticResource HeaderTextBlockStyle}"
-                        Text="EAN"/>
+                       Grid.Column="0"
+                       Grid.ColumnSpan="2"
+                       Margin="5,2"
+                       Style="{StaticResource HeaderTextBlockStyle}"
+                       Text="EAN"/>
             <TextBox x:Name="EanTextBox"
-                        Grid.Row="1" 
-                        Grid.Column="0"
-                        Grid.ColumnSpan="2"
-                        VerticalAlignment="Top"
-                        HorizontalAlignment="Stretch"
-                        Margin="5,2"
-                        MaxLength="13"
-                        Text="{Binding Ean, UpdateSourceTrigger=PropertyChanged}"/>
+                     Grid.Row="1" 
+                     Grid.Column="0"
+                     Grid.ColumnSpan="2"
+                     VerticalAlignment="Top"
+                     HorizontalAlignment="Stretch"
+                     Margin="5,2"
+                     MaxLength="13"
+                     Text="{Binding Ean, UpdateSourceTrigger=PropertyChanged}"/>
 
             <!-- New article -->
             <Button Grid.Row="2" 
@@ -81,7 +81,7 @@
                     ToolTip="Add new article"
                     Command="{Binding CreateArticleCommand}">
                 <Image Source="{StaticResource PlusImage}"
-                        Style="{StaticResource AutoDisableImageStyle}"/>
+                       Style="{StaticResource AutoDisableImageStyle}"/>
             </Button>
 
             <!-- Edit article -->
@@ -99,21 +99,21 @@
 
             <!-- Article selection -->
             <TextBlock Grid.Row="0" 
-                        Grid.Column="2" 
-                        Margin="5,2"
-                        Style="{StaticResource HeaderTextBlockStyle}"
-                        Text="Article selection"/>
+                       Grid.Column="2" 
+                       Margin="5,2"
+                       Style="{StaticResource HeaderTextBlockStyle}"
+                       Text="Article selection"/>
             <ComboBox Grid.Row="1" 
-                        Grid.Column="2"
-                        Margin="5,2"
-                        ItemsSource="{Binding Categories}"
-                        SelectedItem="{Binding SelectedCategory}"/>
+                      Grid.Column="2"
+                      Margin="5,2"
+                      ItemsSource="{Binding Categories}"
+                      SelectedItem="{Binding SelectedCategory}"/>
             <ComboBox Grid.Row="2" 
-                        Grid.Column="2"
-                        Margin="5,2"
-                        ScrollViewer.VerticalScrollBarVisibility="Auto"
-                        ItemsSource="{Binding Articles}"
-                        SelectedItem="{Binding SelectedArticle}">
+                      Grid.Column="2"
+                      Margin="5,2"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      ItemsSource="{Binding Articles}"
+                      SelectedItem="{Binding SelectedArticle}">
                 <ComboBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel />
@@ -128,16 +128,19 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <controls:KeyFriendlyAutoCompleteBox Grid.Row="3" 
-                                                    Grid.Column="2"
-                                                    Margin="5,2"
-                                                    IsTextCompletionEnabled="False"
-                                                    FilterMode="ContainsOrdinal"
-                                                    MinimumPopulateDelay="0"
-                                                    MinimumPrefixLength="3"
-                                                    ValueMemberPath="Description"
-                                                    ItemsSource="{Binding Articles}"
-                                                    SelectedItem="{Binding SelectedArticle, Mode=TwoWay}">
+            <controls:KeyFriendlyAutoCompleteBox helpers:AttachedFocus.IsFocused="{Binding IsArticleNameFocused}"
+                                                 Focusable="True"
+                                                 Grid.Row="3" 
+                                                 Grid.Column="2"
+                                                 Margin="5,2"
+                                                 IsTextCompletionEnabled="False"
+                                                 FilterMode="Custom"
+                                                 ItemFilter="{Binding ArticleFilterPredicate}"
+                                                 MinimumPopulateDelay="0"
+                                                 MinimumPrefixLength="3"
+                                                 ValueMemberPath="Description"
+                                                 ItemsSource="{Binding Articles}"
+                                                 SelectedItem="{Binding SelectedArticle, Mode=TwoWay}">
                 <controls:KeyFriendlyAutoCompleteBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type dataContracts:Article}">
                         <StackPanel Orientation="Horizontal">
@@ -150,24 +153,24 @@
 
             <!-- Price & quantity -->
             <TextBlock Grid.Row="0" 
-                        Grid.Column="3" 
-                        Margin="5,2"
-                        Style="{StaticResource HeaderTextBlockStyle}"
-                        Text="Price"/>
+                       Grid.Column="3" 
+                       Margin="5,2"
+                       Style="{StaticResource HeaderTextBlockStyle}"
+                       Text="Price"/>
             <TextBlock Grid.Row="1" 
-                        Grid.Column="3" 
-                        MinWidth="48"
-                        VerticalAlignment="Center"
-                        Margin="5,2"
-                        Style="{StaticResource DataTextBlockStyle}"
-                        Text="{Binding SelectedArticle.Price, StringFormat=C}"/>
+                       Grid.Column="3" 
+                       MinWidth="48"
+                       VerticalAlignment="Center"
+                       Margin="5,2"
+                       Style="{StaticResource DataTextBlockStyle}"
+                       Text="{Binding SelectedArticle.Price, StringFormat=C}"/>
 
             <!-- Quantity + Modifiers -->
             <TextBlock Grid.Row="2" 
-                        Grid.Column="3" 
-                        Margin="5,2"
-                        Style="{StaticResource HeaderTextBlockStyle}"
-                        Text="Quantity"/>
+                       Grid.Column="3" 
+                       Margin="5,2"
+                       Style="{StaticResource HeaderTextBlockStyle}"
+                       Text="Quantity"/>
             <StackPanel Grid.Row="3"
                         Grid.Column="3"
                         HorizontalAlignment="Center"
@@ -182,8 +185,8 @@
 
                 <!-- Quantity -->
                 <TextBox Margin="2"
-                            MinWidth="30"
-                            Text="{Binding Quantity}"/>
+                         MinWidth="30"
+                         Text="{Binding Quantity}"/>
 
                 <!-- -Quantity -->
                 <Button Width="20"
@@ -208,14 +211,14 @@
             </Button>
         </Grid>
         <DataGrid Grid.Row="1"
-                    Margin="5,2"
-                    CanUserAddRows="False"
-                    CanUserDeleteRows="False"
-                    AutoGenerateColumns="False"
-                    VerticalScrollBarVisibility="Auto"
-                    ScrollViewer.CanContentScroll="True"
-                    helpers:DataGridHelpers.Autoscroll="True"
-                    ItemsSource="{Binding ShoppingCartArticles}">
+                  Margin="5,2"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  AutoGenerateColumns="False"
+                  VerticalScrollBarVisibility="Auto"
+                  ScrollViewer.CanContentScroll="True"
+                  helpers:DataGridHelpers.Autoscroll="True"
+                  ItemsSource="{Binding ShoppingCartArticles}">
             <DataGrid.Columns>
                 <DataGridTemplateColumn>
                     <DataGridTemplateColumn.CellTemplate>

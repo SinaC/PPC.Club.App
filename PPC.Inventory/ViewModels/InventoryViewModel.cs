@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Windows.Input;
+using EasyMVVM;
 using PPC.Data.Articles;
 using PPC.DataContracts;
-using PPC.MVVM;
 using PPC.Popup;
 using PPC.Services;
 
@@ -94,12 +94,12 @@ namespace PPC.Inventory.ViewModels
             string path = System.IO.Path.GetDirectoryName(ConfigurationManager.AppSettings["ArticlesPath"]);
 
             IIOService ioService = new IOService();
-            string filename = ioService.OpenFileDialog(path);
+            string filename = ioService.OpenFileDialog(path, ".dbf", "DBase VII documents (.dbf)|*.dbf");
             if (!string.IsNullOrWhiteSpace(filename))
             {
                 try
                 {
-                    ArticlesDb.Instance.ImportFromCsv(filename);
+                    ArticlesDb.Instance.ImportFromDbf(filename);
                     RaisePropertyChanged(() => Articles);
                     PopupService.DisplayQuestion("Import", $"{Articles.Count()} articles successfully imported. Don't forget to click on 'Save' button to save imported articles.",
                         new ActionButton
@@ -224,6 +224,41 @@ namespace PPC.Inventory.ViewModels
     {
         public InventoryViewModelDesignData()
         {
+            ArticlesDb.Instance.Inject(new List<Article>
+            {
+                new Article
+                {
+                    Ean = "1111111",
+                    Description = "Article1",
+                    Price = 10,
+                    Category = "Cat1",
+                    SubCategory = "SubCategory11"
+                },
+                new Article
+                {
+                    Ean = "2222222",
+                    Description = "AAAAAAAAAA AAAAA AAAAAA AAAAA Article2",
+                    Price = 10,
+                    Category = "Cat1",
+                    SubCategory = "SubCategory11"
+                },
+                new Article
+                {
+                    Ean = "3333333",
+                    Description = "Article3",
+                    Price = 10,
+                    Category = "Cat2",
+                    SubCategory = "Sub21"
+                },
+                new Article
+                {
+                    Ean = "4444444",
+                    Description = "Article4",
+                    Price = 10,
+                    Category = "Cat3",
+                    SubCategory = "Sub31"
+                },
+            });
         }
     }
 }

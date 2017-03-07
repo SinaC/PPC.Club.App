@@ -1,4 +1,4 @@
-﻿using PPC.MVVM;
+﻿using EasyMVVM;
 
 namespace PPC.Players.Models
 {

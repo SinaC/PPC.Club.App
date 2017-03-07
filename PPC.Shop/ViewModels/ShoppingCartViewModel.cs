@@ -1,18 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
+using System.Windows.Controls;
 using System.Windows.Input;
+using EasyMVVM;
 using PPC.Data.Articles;
 using PPC.DataContracts;
 using PPC.Helpers;
-using PPC.MVVM;
 using PPC.Popup;
 
 namespace PPC.Shop.ViewModels
 {
     public class ShoppingCartViewModel : ObservableObject
     {
+        private static readonly decimal MinBankCard = 5; // TODO: Config ?
+
         private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
 
         private static readonly string[] EmptyCategory = {string.Empty};
@@ -64,7 +68,9 @@ namespace PPC.Shop.ViewModels
 
         #endregion
 
-        #region Selected article
+        #region Article selection
+
+        #region Selected article/category
 
         private string _selectedCategory;
 
@@ -95,6 +101,33 @@ namespace PPC.Shop.ViewModels
                 }
             }
         }
+
+        #endregion
+
+        #region Article name filter
+
+        private bool _isArticleNameFocused;
+
+        public bool IsArticleNameFocused
+        {
+            get { return _isArticleNameFocused; }
+            set { Set(() => IsArticleNameFocused, ref _isArticleNameFocused, value); }
+        }
+
+        public AutoCompleteFilterPredicate<object> ArticleFilterPredicate => FilterArticle;
+
+        private bool FilterArticle(string search, object o)
+        {
+            if (string.IsNullOrWhiteSpace(search))
+                return true;
+            Article article = o as Article;
+            if (article == null)
+                return false;
+            //http://stackoverflow.com/questions/359827/ignoring-accented-letters-in-string-comparison/7720903#7720903
+            return CultureInfo.CurrentCulture.CompareInfo.IndexOf(article.Description, search, CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreCase) >= 0;
+        }
+
+        #endregion
 
         #endregion
 
@@ -234,7 +267,7 @@ namespace PPC.Shop.ViewModels
         #region Bank card payment
 
         private ICommand _bankCardCommand;
-        public ICommand BankCardCommand => _bankCardCommand = _bankCardCommand ?? new RelayCommand(() => DisplayPaymentPopup(false), () => ShoppingCartArticles.Any());
+        public ICommand BankCardCommand => _bankCardCommand = _bankCardCommand ?? new RelayCommand(() => DisplayPaymentPopup(false), () => ShoppingCartArticles.Any() && Total >= MinBankCard);
 
         #endregion
 

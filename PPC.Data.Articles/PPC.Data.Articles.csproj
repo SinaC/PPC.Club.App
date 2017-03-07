@@ -46,9 +46,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PPC.DataContracts\PPC.DataContracts.csproj">
+    <ProjectReference Include="..\EasyDBFParser\EasyDBFParser.csproj">
+      <Project>{e85892e8-7837-483d-b20d-dfe6a89d8330}</Project>
+      <Name>EasyDBFParser</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Data.Contracts\PPC.Data.Contracts.csproj">
       <Project>{73f28b1d-02d3-4bdf-891a-df4ee2248353}</Project>
-      <Name>PPC.DataContracts</Name>
+      <Name>PPC.Data.Contracts</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

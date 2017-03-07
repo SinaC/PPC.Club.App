@@ -162,9 +162,9 @@
       <Project>{99b36c5f-3b72-4e79-b34c-29f3a8a4cc99}</Project>
       <Name>PPC.Data.Articles</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PPC.DataContracts\PPC.DataContracts.csproj">
+    <ProjectReference Include="..\PPC.Data.Contracts\PPC.Data.Contracts.csproj">
       <Project>{73f28b1d-02d3-4bdf-891a-df4ee2248353}</Project>
-      <Name>PPC.DataContracts</Name>
+      <Name>PPC.Data.Contracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Inventory\PPC.Inventory.csproj">
       <Project>{e734f70a-12e8-46bb-857d-35d606169a11}</Project>
@@ -174,17 +174,17 @@
       <Project>{137EF3D3-E60D-45E9-8A3B-43042FC36105}</Project>
       <Name>PPC.Messages</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PPC.MVVM\PPC.MVVM.csproj">
+    <ProjectReference Include="..\EasyMVVM\EasyMVVM.csproj">
       <Project>{10833c79-c3fb-4f70-ad1d-7f0173d01966}</Project>
-      <Name>PPC.MVVM</Name>
+      <Name>EasyMVVM</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Players\PPC.Players.csproj">
       <Project>{e48a0ab3-a906-4909-b965-c6286b01d3e9}</Project>
       <Name>PPC.Players</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PPC.Popup\PPC.Popup.csproj">
+    <ProjectReference Include="..\PPC.Popups\PPC.Popups.csproj">
       <Project>{c06f804c-58a5-48ea-a3b4-935470804b05}</Project>
-      <Name>PPC.Popup</Name>
+      <Name>PPC.Popups</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Shop\PPC.Shop.csproj">
       <Project>{c55d71f3-09ab-4b1a-b76f-cfdf52a680f0}</Project>

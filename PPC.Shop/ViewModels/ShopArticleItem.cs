@@ -1,5 +1,5 @@
-﻿using PPC.DataContracts;
-using PPC.MVVM;
+﻿using EasyMVVM;
+using PPC.DataContracts;
 
 namespace PPC.Shop.ViewModels
 {

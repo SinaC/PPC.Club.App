@@ -6,10 +6,10 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Windows.Input;
 using System.Xml;
+using EasyMVVM;
 using PPC.Data.Articles;
 using PPC.DataContracts;
 using PPC.Helpers;
-using PPC.MVVM;
 using PPC.Popup;
 
 namespace PPC.Shop.ViewModels

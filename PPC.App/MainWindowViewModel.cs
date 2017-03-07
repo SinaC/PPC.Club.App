@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using EasyMVVM;
 using PPC.Data.Articles;
 using PPC.Inventory.ViewModels;
 using PPC.Messages;
-using PPC.MVVM;
 using PPC.Players.ViewModels;
 using PPC.Popup;
 using PPC.Shop.ViewModels;
@@ -15,7 +15,9 @@ namespace PPC.App
     {
         Shop,
         Players,
-        Inventory
+        Inventory,
+        //
+        Test
     }
 
     public class MainWindowViewModel : ObservableObject
@@ -48,6 +50,13 @@ namespace PPC.App
         {
             get { return _inventoryViewModel; }
             protected set { Set(() => InventoryViewModel, ref _inventoryViewModel, value); }
+        }
+
+        private ArticleSelectorViewModel _testViewModel;
+        public ArticleSelectorViewModel TestViewModel
+        {
+            get {  return _testViewModel;}
+            protected set { Set(() => TestViewModel, ref _testViewModel, value); }
         }
 
         #region Buttons + application mode
@@ -100,6 +109,14 @@ namespace PPC.App
         private void SwitchToInventory()
         {
             ApplicationMode = ApplicationModes.Inventory;
+        }
+
+        private ICommand _switchToTestCommand;
+        public ICommand SwitchToTestCommand => _switchToTestCommand = _switchToTestCommand ?? new RelayCommand(SwitchToTest);
+
+        private void SwitchToTest()
+        {
+            ApplicationMode = ApplicationModes.Test;
         }
 
         #endregion
@@ -173,8 +190,12 @@ namespace PPC.App
             {
                 if (!DesignMode.IsInDesignModeStatic)
                 {
-                    //ArticlesDb.Instance.LoadOleDb();
                     ArticlesDb.Instance.Load();
+                    //ArticlesDb.Instance.ImportFromDbf(@"c:\temp\ppc\data\article.dbf");
+                    //ArticlesDb.Instance.Save();
+
+                    //ArticleSelectorViewModel vm = new ArticleSelectorViewModel();
+                    //vm.Test();
                 }
             }
             catch (Exception ex)
@@ -186,6 +207,8 @@ namespace PPC.App
             PlayersViewModel = new PlayersViewModel();
             ShopViewModel = new ShopViewModel();
             InventoryViewModel = new InventoryViewModel();
+
+            TestViewModel = new ArticleSelectorViewModel();
 
             ApplicationMode = ApplicationModes.Shop;
 
@@ -211,6 +234,9 @@ namespace PPC.App
         {
             PlayersViewModel = new PlayersViewModelDesignData();
             ShopViewModel = new ShopViewModelDesignData();
+            InventoryViewModel = new InventoryViewModelDesignData();
+
+            TestViewModel = new ArticleSelectorViewModelDesignData();
 
             ApplicationMode = ApplicationModes.Shop;
 

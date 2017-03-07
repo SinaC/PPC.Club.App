@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using PPC.MVVM;
+using EasyMVVM;
 
 namespace PPC.Shop.ViewModels
 {

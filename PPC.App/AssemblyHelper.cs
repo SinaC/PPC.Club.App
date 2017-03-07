@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Windows;
-using PPC.MVVM;
+using EasyMVVM;
 
 namespace PPC.App
 {

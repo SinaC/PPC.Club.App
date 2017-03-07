@@ -1,5 +1,10 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Globalization;
+using System.Runtime.CompilerServices;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace PPC.Controls
 {
@@ -20,6 +25,20 @@ namespace PPC.Controls
         {
             TextBox textBox = e.OriginalSource as TextBox;
             textBox?.SelectAll();
+
+            KeyFriendlyAutoCompleteBox autoCompleteBox = e.OriginalSource as KeyFriendlyAutoCompleteBox;
+            if (autoCompleteBox != null)
+            {
+                TextBox innerTextBox = Helpers.VisualTreeHelpers.FindVisualChild<TextBox>(autoCompleteBox);
+                if (innerTextBox != null)
+                {
+                    Dispatcher.BeginInvoke((Action) delegate
+                    {
+                        innerTextBox.Focus();
+                        Keyboard.Focus(innerTextBox);
+                    }, DispatcherPriority.Input);
+                }
+            }
         }
     }
 }

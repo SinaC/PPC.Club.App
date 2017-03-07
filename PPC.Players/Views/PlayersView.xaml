@@ -40,8 +40,12 @@
                      PreviewKeyDown="FilterTextBox_OnPreviewKeyDown"
                      Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}">
                 <TextBox.InputBindings>
-                    <KeyBinding Key="Enter" Command="{Binding SelectPlayerCommand}" CommandParameter="{Binding SelectedPlayer}"/>
-                    <KeyBinding Key="Return" Command="{Binding SelectPlayerCommand}" CommandParameter="{Binding SelectedPlayer}"/>
+                    <KeyBinding Key="Enter" 
+                                Command="{Binding SelectPlayerCommand}" 
+                                CommandParameter="{Binding SelectedPlayer}"/>
+                    <KeyBinding Key="Return" 
+                                Command="{Binding SelectPlayerCommand}" 
+                                CommandParameter="{Binding SelectedPlayer}"/>
                 </TextBox.InputBindings>
                 <TextBox.Style>
                     <Style TargetType="{x:Type TextBox}">

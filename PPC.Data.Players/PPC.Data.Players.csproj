@@ -65,9 +65,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PPC.DataContracts\PPC.DataContracts.csproj">
+    <ProjectReference Include="..\PPC.Data.Contracts\PPC.Data.Contracts.csproj">
       <Project>{73f28b1d-02d3-4bdf-891a-df4ee2248353}</Project>
-      <Name>PPC.DataContracts</Name>
+      <Name>PPC.Data.Contracts</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
