@@ -19,7 +19,7 @@ namespace PPC.Shop.ViewModels
 
         private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
 
-        private static readonly string[] EmptyCategory = {string.Empty};
+        private static readonly string[] EmptyList = {string.Empty};
 
         private readonly Action<decimal, decimal> _paymentAction;
         private readonly Action _cartModifiedAction;
@@ -28,8 +28,9 @@ namespace PPC.Shop.ViewModels
             ? ArticlesDb.Instance.Articles
             : ArticlesDb.Instance.Articles.Where(x => x.Category == SelectedCategory)).OrderBy(x => x.Description);
 
-        public IEnumerable<string> Categories => EmptyCategory.Concat(ArticlesDb.Instance.Articles.GroupBy(x => x.Category, (category, articles) => category));
-        public IEnumerable<string> Producers => ArticlesDb.Instance.Articles.GroupBy(x => x.Producer, (producer, articles) => producer);
+        public IEnumerable<string> Categories => EmptyList.Concat(ArticlesDb.Instance.Articles.Where(x => !string.IsNullOrWhiteSpace(x.Category)).Select(x => x.Category).Distinct());
+        public IEnumerable<string> Producers => EmptyList.Concat(ArticlesDb.Instance.Articles.Where(x => !string.IsNullOrWhiteSpace(x.Producer)).Select(x => x.Producer).Distinct());
+        private Func<string, IEnumerable<string>> BuildSubCategories => category => EmptyList.Concat(ArticlesDb.Instance.Articles.Where(x => x.Category == category && !string.IsNullOrWhiteSpace(x.SubCategory)).Select(x => x.SubCategory).Distinct());
 
         #region Cart articles
 
@@ -111,7 +112,12 @@ namespace PPC.Shop.ViewModels
         public bool IsArticleNameFocused
         {
             get { return _isArticleNameFocused; }
-            set { Set(() => IsArticleNameFocused, ref _isArticleNameFocused, value); }
+            set
+            {
+                // Force RaisePropertyChanged
+                _isArticleNameFocused = value;
+                RaisePropertyChanged(() => IsArticleNameFocused);
+            }
         }
 
         public AutoCompleteFilterPredicate<object> ArticleFilterPredicate => FilterArticle;
@@ -273,7 +279,7 @@ namespace PPC.Shop.ViewModels
 
         private void DisplayPaymentPopup(bool isCashFirst)
         {
-            PaymentPopupViewModel vm = new PaymentPopupViewModel(PopupService, Total, isCashFirst, (cash, bankCard) => _paymentAction(cash, bankCard));
+            PaymentPopupViewModel vm = new PaymentPopupViewModel(PopupService, Total, isCashFirst, _paymentAction);
             PopupService.DisplayModal(vm, "Payment");
         }
 
@@ -287,7 +293,7 @@ namespace PPC.Shop.ViewModels
         private void DisplayCreateArticlePopup()
         {
             SelectedArticle = null;
-            CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(PopupService, Categories, Producers, CreateArticle)
+            CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(PopupService, Categories, Producers, BuildSubCategories, CreateArticle)
             {
                 IsEdition = false
             };
@@ -302,6 +308,7 @@ namespace PPC.Shop.ViewModels
                 Ean = vm.Ean,
                 Description = vm.Description,
                 Category = vm.Category,
+                SubCategory = vm.SubCategory,
                 Producer = vm.Producer,
                 SupplierPrice = vm.SupplierPrice,
                 Price = vm.Price,
@@ -310,20 +317,23 @@ namespace PPC.Shop.ViewModels
                 IsNewArticle = true,
             };
 
-            RaisePropertyChanged(() => Articles);
-            RaisePropertyChanged(() => Categories);
-
             try
             {
                 ArticlesDb.Instance.Add(article);
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel errorVm = new ErrorPopupViewModel(PopupService, ex);
-                PopupService.DisplayModal(errorVm, "Error while saving articles DB");
+                PopupService.DisplayError("Error while saving articles DB", ex);
             }
 
-            SelectedArticle = article;
+            SelectedCategory = null;
+
+            RaisePropertyChanged(() => Categories);
+            RaisePropertyChanged(() => Producers);
+            RaisePropertyChanged(() => Articles);
+
+            SelectedArticle = Articles.FirstOrDefault(x => x.Guid == article.Guid);
+            IsArticleNameFocused = true;
         }
 
         #endregion
@@ -337,12 +347,13 @@ namespace PPC.Shop.ViewModels
         {
             if (SelectedArticle != null)
             {
-                CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(PopupService, Categories, Producers, SaveArticle)
+                CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(PopupService, Categories, Producers, BuildSubCategories, SaveArticle)
                 {
                     IsEdition = true,
                     Ean = SelectedArticle.Ean,
                     Description = SelectedArticle.Description,
                     Category = SelectedArticle.Category,
+                    SubCategory = SelectedArticle.SubCategory,
                     Producer = SelectedArticle.Producer,
                     SupplierPrice = SelectedArticle.SupplierPrice,
                     Price = SelectedArticle.Price,
@@ -358,6 +369,7 @@ namespace PPC.Shop.ViewModels
             SelectedArticle.Ean = vm.Ean;
             SelectedArticle.Description = vm.Description;
             SelectedArticle.Category = vm.Category;
+            SelectedArticle.SubCategory = vm.SubCategory;
             SelectedArticle.Producer = vm.Producer;
             SelectedArticle.SupplierPrice = vm.SupplierPrice;
             SelectedArticle.Price = vm.Price;
@@ -373,8 +385,7 @@ namespace PPC.Shop.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel errorVm = new ErrorPopupViewModel(PopupService, ex);
-                PopupService.DisplayModal(errorVm, "Error while saving articles DB");
+                PopupService.DisplayError("Error while saving articles DB", ex);
             }
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -29,7 +30,7 @@ namespace PPC.Data.Articles
         #endregion
 
         private List<Article> _articles;
-        public IEnumerable<Article> Articles => _articles;
+        public IEnumerable<Article> Articles => _articles ?? Enumerable.Empty<Article>();
 
         public void Add(Article article)
         {
@@ -99,9 +100,31 @@ namespace PPC.Data.Articles
 
         public void ImportFromDbf(string filename)
         {
+            // Extract articles from DBF
             DBFParser parser = new DBFParser();
             parser.Parse(filename);
-            
+
+            _articles = parser.DataTable.AsEnumerable().Select(row => new Article
+            {
+                Guid = Guid.NewGuid(),
+                Ean = row.Field<string>("CODE_ART"),
+                Description = row.Field<string>("NOM_ART"),
+                Category = row.Field<string>("CATEGORIE"),
+                SubCategory = row.Field<string>("CATEGORIE2"),
+                Stock = ConvertFromDoubleToInt(row.Field<double>("QTE_STOCK")),
+                SupplierPrice = ConvertFromDoubleToDecimal(row.Field<double>("PRIX_ACHAT")),
+                Price = ConvertFromDoubleToDecimal(row.Field<double>("PX_VTE_TC")),
+                Producer = row.Field<string>("NOM_FOU"),
+                VatRate = row.Field<int>("CODE_TVA") == 2 ? VatRates.FoodDrink : VatRates.Other
+            }).ToList();
+        }
+
+        public void ImportFromDbf2(string filename)
+        {
+            // Extract articles from DBF
+            DBFParser parser = new DBFParser();
+            parser.Parse(filename);
+
             // Get column index
             int eanIndex = parser.Fields.FindIndex(x => x.Name == "CODE_ART");
             int descriptionIndex = parser.Fields.FindIndex(x => x.Name == "NOM_ART");
@@ -113,33 +136,59 @@ namespace PPC.Data.Articles
             int supplierIndex = parser.Fields.FindIndex(x => x.Name == "NOM_FOU");
             int vatIndex = parser.Fields.FindIndex(x => x.Name == "CODE_TVA");
 
+            if (eanIndex == -1 || descriptionIndex == -1 || categoryIndex == -1 || subCategoryIndex == -1 || stockIndex == -1 || supplierPriceIndex == -1 || priceIndex == -1 ||supplierIndex == -1 || vatIndex == -1)
+                throw new InvalidOperationException("Imported DBF file is not an article DB");
+
             // Build articles DB
             List<Article> articles = new List<Article>();
             foreach (object[] data in parser.Datas)
             {
                 try
                 {
+                    string ean = (string) data[eanIndex];
+                    string description = (string) data[descriptionIndex];
+                    string category = (string) data[categoryIndex];
+                    string subCategory = (string) data[subCategoryIndex];
+                    int stock = ConvertFromDoubleToInt(data[stockIndex]);
+                    decimal supplierPrice = ConvertFromDoubleToDecimal(data[supplierPriceIndex]);
+                    decimal price = ConvertFromDoubleToDecimal(data[priceIndex]);
+                    string producer = (string) data[supplierIndex];
+                    VatRates vatRate = (int)data[vatIndex] == 2 ? VatRates.FoodDrink : VatRates.Other;
+
                     Article article = new Article
                     {
                         Guid = Guid.NewGuid(),
-                        Ean = (string)data[eanIndex],
-                        Description = (string)data[descriptionIndex],
-                        Category = (string)data[categoryIndex],
-                        SubCategory = (string)data[subCategoryIndex],
-                        Stock = ConvertFromDoubleToInt(data[stockIndex]),
-                        SupplierPrice = ConvertFromDoubleToDecimal(data[supplierPriceIndex]),
-                        Price = ConvertFromDoubleToDecimal(data[priceIndex]),
-                        Producer = (string)data[supplierIndex],
-                        VatRate = (int)data[vatIndex] == 2 ? VatRates.FoodDrink : VatRates.Other
+                        Ean = ean,
+                        Description = description,
+                        Category = category,
+                        SubCategory = subCategory,
+                        Stock = stock,
+                        SupplierPrice = supplierPrice,
+                        Price = price,
+                        Producer = producer,
+                        VatRate = vatRate
                     };
                     articles.Add(article);
                 }
                 catch (Exception ex)
                 {
-                    
                 }
             }
             _articles = articles;
+        }
+
+        private static decimal ConvertFromDoubleToDecimal(double d)
+        {
+            if (double.IsInfinity(d) || double.IsNaN(d) || double.IsNegativeInfinity(d) || double.IsPositiveInfinity(d))
+                return 0;
+            return (decimal)d;
+        }
+
+        private static int ConvertFromDoubleToInt(double d)
+        {
+            if (double.IsInfinity(d) || double.IsNaN(d) || double.IsNegativeInfinity(d) || double.IsPositiveInfinity(d))
+                return 0;
+            return (int)d;
         }
 
         private static decimal ConvertFromDoubleToDecimal(object value)

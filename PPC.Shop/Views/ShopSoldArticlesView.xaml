@@ -132,7 +132,7 @@
                        Text="Cash:"/>
             <TextBlock Margin="0,2"
                        Style="{StaticResource DataTextBlockStyle}"
-                       Text="{Binding SoldArticlesTotalCash}"/>
+                       Text="{Binding SoldArticlesTotalCash, StringFormat=C}"/>
             <TextBlock Margin="5,2"
                        Style="{StaticResource HeaderTextBlockStyle}"
                        Text="Bank card:"/>

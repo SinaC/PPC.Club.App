@@ -2,13 +2,16 @@ store discount in transaction
 cash registry closure banknotes/coins amount (new file with starting values)
 check each module (players, shop, inventory) before closing application
 form validation
-payback (client doesn't want anymore an already paid article !! only for cash payment)
+article refund (client doesn't want anymore an already paid article !! only for cash payment)
 transaction edition
 article DB (real DB instead of xml file)
 replace ArticlesDb/PlayersDb singleton with IOC RegisterInstance (IArticlesDb + IPlayersDb)
 PlayersDb: store the list of players (similar to ArticlesDb + call load from MainViewModel)
 Players -> remove save button, save automatically once a modification has been done
-add new method in IPopupService: DisplayError(string title, string message)
+
+move popup logic in a new project depending on EasyMVVM (EasyPopup)
+
+Discount: % or free article (not fixed amount anymore)
 
 new mobile UI: 
 article selection using big button displaying categories -> subcategories -> articles + back button (->ArticleSelectorView/ViewModel)
@@ -21,6 +24,7 @@ ArticleSelectorView/ViewModel: buttons to scroll up/down -> paged collection
 
 known issues:
 after creating a new article, article cannot be added to shopping cart with enter
+ ==> it seems KeyFriendlyAutoCompleteBox lose SelectedItem once entered is pressed
 
 workaround to fix:
 PlayerViewModel: Load must be called after Save to reset row.IsNewItem

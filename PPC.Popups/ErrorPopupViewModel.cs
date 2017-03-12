@@ -4,7 +4,7 @@ using EasyMVVM;
 
 namespace PPC.Popups
 {
-    public class ErrorPopupViewModel : ObservableObject
+    internal class ErrorPopupViewModel : ObservableObject
     {
         public IPopupService PopupService { get; }
 
@@ -60,7 +60,7 @@ namespace PPC.Popups
         }
     }
 
-    public class ErrorPopupViewModelDesignData : ErrorPopupViewModel
+    internal class ErrorPopupViewModelDesignData : ErrorPopupViewModel
     {
         public ErrorPopupViewModelDesignData() : base(null, new Exception())
         {

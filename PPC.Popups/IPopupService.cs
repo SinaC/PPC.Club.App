@@ -25,10 +25,14 @@ namespace PPC.Popups
             where T : ObservableObject;
 
         // Messages popup (shouldn't be moved)
-        IPopup DisplayMessages(List<string> messages);
+        IPopup DisplayMessages(params string[] messages);
 
         // Question popup (displayed in a Modal)
         IPopup DisplayQuestion(string title, string question, params ActionButton[] actionButtons);
+
+        // Error popup
+        IPopup DisplayError(string title, string error);
+        IPopup DisplayError(string title, Exception ex);
 
         // Move
         void Move(IPopup popup, double horizontalOffset, double verticalOffset);

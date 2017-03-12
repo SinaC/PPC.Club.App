@@ -40,7 +40,7 @@ namespace PPC.Shop.ViewModels
         public ShopStates ShopState
         {
             get { return _shopState; }
-            set { Set(() => ShopState, ref _shopState, value); }
+            protected set { Set(() => ShopState, ref _shopState, value); }
         }
 
         private ICommand _viewShoppingCartsCommand;
@@ -69,7 +69,7 @@ namespace PPC.Shop.ViewModels
         public CashRegisterViewModel CashRegisterViewModel
         {
             get { return _cashRegisterViewModel; }
-            set { Set(() => CashRegisterViewModel, ref _cashRegisterViewModel, value); }
+            protected set { Set(() => CashRegisterViewModel, ref _cashRegisterViewModel, value); }
         }
 
         #endregion
@@ -88,8 +88,8 @@ namespace PPC.Shop.ViewModels
                         ShopState = ShopStates.ShoppingCarts; // switch back to summary when no button are selected
                     else
                         ShopState = ShopStates.Detail;
-                    if (value == CashRegisterViewModel)
-                        CashRegisterViewModel.ShoppingCart.IsArticleNameFocused = true; // TODO: grrrrrrrrr f**king focus
+                    if (value != null)
+                        value.ShoppingCart.IsArticleNameFocused = true; // grrrrrrrrr f**king focus
                 }
             }
         }
@@ -117,12 +117,11 @@ namespace PPC.Shop.ViewModels
         {
             if (Buttons.OfType<ClientViewModel>().Any(x => x.ClientName == name))
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, "A shopping cart with that client name has already been opened!");
-                PopupService.DisplayModal(vm, "Error");
+                PopupService.DisplayError("Error", "A shopping cart with that client name has already been opened!");
             }
             else
             {
-                ClientViewModel newClient = new ClientViewModel(RefreshSoldArticles, RefreshSoldArticles)
+                ClientViewModel newClient = new ClientViewModel(ClientPaid, RefreshSoldArticles)
                 {
                     HasFullPlayerInfos = false,
                     ClientName = name,
@@ -194,8 +193,7 @@ namespace PPC.Shop.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, ex);
-                PopupService.DisplayModal(vm, "Error while deleting backup file");
+                PopupService.DisplayError("Error while deleting backup file", ex);
             }
             //
             RaisePropertyChanged(() => ClientShoppingCartsCount);
@@ -217,7 +215,7 @@ namespace PPC.Shop.ViewModels
         public List<ShopArticleItem> SoldArticles
         {
             get { return _soldArticles; }
-            private set { Set(() => SoldArticles, ref _soldArticles, value); }
+            protected set { Set(() => SoldArticles, ref _soldArticles, value); }
         }
 
         #endregion
@@ -256,33 +254,53 @@ namespace PPC.Shop.ViewModels
                     //  remove existing clients
                     Buttons.RemoveOfType<ShoppingCartBasedViewModelBase, ClientViewModel>();
                     LoadClients();
+
+                    // If transactions/clients contains unknown article -> remove them and display a warning
+                    bool unknownArticleFound = false;
+                    foreach (ShopTransactionItem transaction in Transactions.Where(t => t.Articles.Any(a => a.Article == null)))
+                    {
+                        transaction.Articles.RemoveAll(x => x.Article == null);
+                        unknownArticleFound = true;
+                    }
+                    foreach(ClientViewModel client in Buttons.OfType<ClientViewModel>().Where(c => c.ShoppingCart.ShoppingCartArticles.Any(a => a.Article == null)))
+                    {
+                        client.ShoppingCart.ShoppingCartArticles.RemoveAll(x => x.Article == null);
+                        unknownArticleFound = true;
+                    }
+
+                    if (unknownArticleFound)
+                    {
+                        PopupService.DisplayError("Warning", "Unknown articles have been found and removed!");
+                        // TODO: 
+                        // recompute transaction cash/bank if possible
+                        // recompute client cash/bank if possible
+                    }
+
+                    RefreshSoldArticles();
                 }
                 catch (Exception ex)
                 {
-                    ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, ex);
-                    PopupService.DisplayModal(vm, "Error while loading shop");
+                    PopupService.DisplayError("Error while loading shop", ex);
                 }
-                RefreshSoldArticles();
             }
             else
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, "Backup path not found");
-                PopupService.DisplayModal(vm, "Error while loading shop");
+                PopupService.DisplayError("Error while loading shop", "Backup path not found");
             }
         }
 
         private void LoadTransactions()
         {
-            try
+            string filename = $"{ConfigurationManager.AppSettings["BackupPath"]}{ShopFilename}";
+            if (File.Exists(filename))
             {
-                string filename = $"{ConfigurationManager.AppSettings["BackupPath"]}{ShopFilename}";
-                if (File.Exists(filename))
+                try
                 {
                     Data.Contracts.Shop shop;
                     using (XmlTextReader reader = new XmlTextReader(filename))
                     {
                         DataContractSerializer serializer = new DataContractSerializer(typeof(Data.Contracts.Shop));
-                        shop = (Data.Contracts.Shop)serializer.ReadObject(reader);
+                        shop = (Data.Contracts.Shop) serializer.ReadObject(reader);
                     }
                     Transactions.Clear();
                     Transactions.AddRange(shop.Transactions.Select(t => new ShopTransactionItem
@@ -294,21 +312,19 @@ namespace PPC.Shop.ViewModels
                             Quantity = a.Quantity
                         }).ToList(),
                         Cash = t.Cash,
-                        BankCard = t.BankCard
+                        BankCard = t.BankCard,
                     }));
                     CashRegisterViewModel.Cash = Transactions.Sum(x => x.Cash);
                     CashRegisterViewModel.BankCard = Transactions.Sum(x => x.BankCard);
                 }
-                else
+                catch (Exception ex)
                 {
-                    ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, "Shop file not found");
-                    PopupService.DisplayModal(vm, "Error while loading shop");
+                    PopupService.DisplayError("Error while loading shop", ex);
                 }
             }
-            catch (Exception ex)
+            else
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, ex);
-                PopupService.DisplayModal(vm, "Error while loading shop");
+                PopupService.DisplayError("Error while loading shop", "Shop file not found");
             }
         }
 
@@ -319,13 +335,12 @@ namespace PPC.Shop.ViewModels
             {
                 try
                 {
-                    ClientViewModel client = new ClientViewModel(RefreshSoldArticles, RefreshSoldArticles, filename);
+                    ClientViewModel client = new ClientViewModel(ClientPaid, RefreshSoldArticles, filename);
                     Buttons.Add(client);
                 }
                 catch (Exception ex)
                 {
-                    ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, ex);
-                    PopupService.DisplayModal(vm, $"Error while loading {filename} cart");
+                    PopupService.DisplayError($"Error while loading {filename} cart", ex);
                 }
             }
         }
@@ -376,17 +391,20 @@ namespace PPC.Shop.ViewModels
             //  txt
             try
             {
+                if (!Directory.Exists(ConfigurationManager.AppSettings["CashRegisterClosurePath"]))
+                    Directory.CreateDirectory(ConfigurationManager.AppSettings["CashRegisterClosurePath"]);
                 string filename = $"{ConfigurationManager.AppSettings["CashRegisterClosurePath"]}CashRegister_{now:yyyy-MM-dd_HH-mm-ss}.txt";
                 File.WriteAllText(filename, closure.ToString());
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vmError = new ErrorPopupViewModel(PopupService, ex);
-                PopupService.DisplayModal(vmError, "Error");
+                PopupService.DisplayError("Error", ex);
             }
             //  xml
             try
             {
+                if (!Directory.Exists(ConfigurationManager.AppSettings["CashRegisterClosurePath"]))
+                    Directory.CreateDirectory(ConfigurationManager.AppSettings["CashRegisterClosurePath"]);
                 string filename = $"{ConfigurationManager.AppSettings["CashRegisterClosurePath"]}CashRegister_{now:yyyy-MM-dd_HH-mm-ss}.xml";
                 using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
                 {
@@ -397,8 +415,7 @@ namespace PPC.Shop.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vmError = new ErrorPopupViewModel(PopupService, ex);
-                PopupService.DisplayModal(vmError, "Error");
+                PopupService.DisplayError("Error", ex);
             }
         }
 
@@ -469,8 +486,7 @@ namespace PPC.Shop.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vmError = new ErrorPopupViewModel(PopupService, ex);
-                PopupService.DisplayModal(vmError, "Error");
+                PopupService.DisplayError("Error", ex);
             }
 
             Application.Current.Shutdown();
@@ -483,12 +499,7 @@ namespace PPC.Shop.ViewModels
             try
             {
                 string closureConfigFilename = ConfigurationManager.AppSettings["CashRegisterClosureConfigPath"];
-                if (!File.Exists(closureConfigFilename))
-                {
-                    ErrorPopupViewModel vmError = new ErrorPopupViewModel(PopupService, "Cash register closure config file not found -> Cannot send automatically cash register closure mail.");
-                    PopupService.DisplayModal(vmError, "Warning");
-                }
-                else
+                if (File.Exists(closureConfigFilename))
                 {
                     // Read closure config
                     CashRegisterClosureConfig closureConfig;
@@ -522,11 +533,12 @@ namespace PPC.Shop.ViewModels
                         }
                     }
                 }
+                else
+                    PopupService.DisplayError("Warning", "Cash register closure config file not found -> Cannot send automatically cash register closure mail.");
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vmError = new ErrorPopupViewModel(PopupService, ex);
-                PopupService.DisplayModal(vmError, "Error");
+                PopupService.DisplayError("Error", ex);
             }
             finally
             {
@@ -543,7 +555,7 @@ namespace PPC.Shop.ViewModels
         public int SoldArticlesCount
         {
             get { return _soldArticlesCount; }
-            set { Set(() => SoldArticlesCount, ref _soldArticlesCount, value); }
+            protected set { Set(() => SoldArticlesCount, ref _soldArticlesCount, value); }
         }
 
         private decimal _soldArticlesTotal;
@@ -551,7 +563,7 @@ namespace PPC.Shop.ViewModels
         public decimal SoldArticlesTotal
         {
             get { return _soldArticlesTotal; }
-            set { Set(() => SoldArticlesTotal, ref _soldArticlesTotal, value); }
+            protected set { Set(() => SoldArticlesTotal, ref _soldArticlesTotal, value); }
         }
 
         private decimal _soldArticlesTotalCash;
@@ -559,7 +571,7 @@ namespace PPC.Shop.ViewModels
         public decimal SoldArticlesTotalCash
         {
             get { return _soldArticlesTotalCash; }
-            set { Set(() => SoldArticlesTotalCash, ref _soldArticlesTotalCash, value); }
+            protected set { Set(() => SoldArticlesTotalCash, ref _soldArticlesTotalCash, value); }
         }
 
         private decimal _soldArticlesTotalBankCard;
@@ -567,7 +579,7 @@ namespace PPC.Shop.ViewModels
         public decimal SoldArticlesTotalBankCard
         {
             get { return _soldArticlesTotalBankCard; }
-            set { Set(() => SoldArticlesTotalBankCard, ref _soldArticlesTotalBankCard, value); }
+            protected set { Set(() => SoldArticlesTotalBankCard, ref _soldArticlesTotalBankCard, value); }
         }
 
         #endregion
@@ -613,8 +625,7 @@ namespace PPC.Shop.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, ex);
-                PopupService.DisplayModal(vm, "Error while saving shop");
+                PopupService.DisplayError("Error while saving shop", ex);
             }
         }
 
@@ -633,6 +644,12 @@ namespace PPC.Shop.ViewModels
             };
 
             Mediator.Default.Register<PlayerSelectedMessage>(this, PlayerSelected);
+        }
+
+        private void ClientPaid()
+        {
+            ShopState = ShopStates.ShoppingCarts;
+            RefreshSoldArticles();
         }
 
         private void RefreshSoldArticles()
@@ -695,7 +712,7 @@ namespace PPC.Shop.ViewModels
             ClientViewModel client = Buttons.OfType<ClientViewModel>().FirstOrDefault(x => x.DciNumber == msg.DciNumber && x.ClientFirstName == msg.FirstName && x.ClientLastName == msg.LastName);
             if (client == null)
             {
-                ClientViewModel newClient = new ClientViewModel(RefreshSoldArticles, RefreshSoldArticles)
+                ClientViewModel newClient = new ClientViewModel(ClientPaid, RefreshSoldArticles)
                 {
                     HasFullPlayerInfos = true,
                     ClientName = msg.FirstName,

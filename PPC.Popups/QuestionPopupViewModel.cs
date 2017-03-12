@@ -5,7 +5,7 @@ using EasyMVVM;
 
 namespace PPC.Popups
 {
-    public class QuestionPopupViewModel : ObservableObject
+    internal class QuestionPopupViewModel : ObservableObject
     {
         public IPopupService PopupService { get; }
 
@@ -62,7 +62,7 @@ namespace PPC.Popups
         }
     }
 
-    public class QuestionPopupViewModelDesignData : QuestionPopupViewModel
+    internal class QuestionPopupViewModelDesignData : QuestionPopupViewModel
     {
         public QuestionPopupViewModelDesignData() : base(null)
         {

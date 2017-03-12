@@ -199,7 +199,8 @@
 
                 <!-- Discount -->
                 <Grid Grid.Row="0"
-                      Grid.Column="4">
+                      Grid.Column="4"
+					  IsEnabled="False">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition MinWidth="80"/>

@@ -19,7 +19,7 @@ namespace PPC.Popups
         public bool HasBeenInitializedFromCash
         {
             get { return _hasBeenInitializedFromCash; }
-            set { Set(() => HasBeenInitializedFromCash, ref _hasBeenInitializedFromCash, value); }
+            protected set { Set(() => HasBeenInitializedFromCash, ref _hasBeenInitializedFromCash, value); }
         }
 
         private decimal _cash;

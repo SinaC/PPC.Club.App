@@ -169,8 +169,7 @@ namespace PPC.Shop.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, ex);
-                PopupService.DisplayModal(vm, "Error while saving client cart");
+                PopupService.DisplayError("Error while saving client cart", ex);
             }
         }
 

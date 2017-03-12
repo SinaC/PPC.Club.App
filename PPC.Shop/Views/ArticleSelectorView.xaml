@@ -5,89 +5,39 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:viewModels="clr-namespace:PPC.Shop.ViewModels"
              xmlns:contracts="clr-namespace:PPC.Data.Contracts;assembly=PPC.Data.Contracts"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance viewModels:ArticleSelectorViewModelDesignData, IsDesignTimeCreatable=True}"
              d:DesignHeight="500" d:DesignWidth="700">
     <UserControl.Resources>
-        <DataTemplate x:Key="CategorySelectionTemplate" DataType="{x:Type viewModels:ArticleSelectorViewModel}">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{Binding Categories}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <!--<WrapPanel Orientation="Horizontal"/>-->
-                            <UniformGrid Columns="6"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Button MinHeight="64"
-                                    Margin="2"
-                                    Command="{Binding DataContext.SelectCategoryCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
-                                    CommandParameter="{Binding}">
-                                <TextBlock TextWrapping="WrapWithOverflow"
-                                           Text="{Binding}"/>
-                            </Button>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+        <!-- Article template -->
+        <DataTemplate x:Key="ArticleTemplate" DataType="{x:Type contracts:Article}">
+            <Button MinHeight="64"
+                    Margin="2"
+                    Command="{Binding DataContext.SelectArticleCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                    CommandParameter="{Binding}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0"
+                               TextWrapping="WrapWithOverflow"
+                               Text="{Binding Description}"/>
+                    <TextBlock Grid.Row="1"
+                               Text="{Binding Price, StringFormat=C}"/>
+                </Grid>
+            </Button>
         </DataTemplate>
-        <DataTemplate x:Key="SubCategorySelectionTemplate" DataType="{x:Type viewModels:ArticleSelectorViewModel}">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <ItemsControl VerticalAlignment="Top"
-                              ItemsSource="{Binding SubCategories}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <!--<WrapPanel Orientation="Horizontal"/>-->
-                            <UniformGrid Columns="6"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Button MinHeight="64"
-                                    Margin="2"
-                                    Command="{Binding DataContext.SelectSubCategoryCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
-                                    CommandParameter="{Binding}">
-                                <TextBlock TextWrapping="WrapWithOverflow"
-                                           Text="{Binding}"/>
-                            </Button>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
-        </DataTemplate>
-        <DataTemplate x:Key="ArticleSelectionTemplate" DataType="{x:Type viewModels:ArticleSelectorViewModel}">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <ItemsControl VerticalAlignment="Top"
-                              ItemsSource="{Binding Articles}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <!--<WrapPanel Orientation="Horizontal"/>-->
-                            <UniformGrid Columns="6"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="{x:Type contracts:Article}">
-                            <Button MinHeight="64"
-                                    Margin="2"
-                                    Command="{Binding DataContext.SelectArticleCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
-                                    CommandParameter="{Binding}">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="*"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
-                                    <TextBlock Grid.Row="0"
-                                               TextWrapping="WrapWithOverflow"
-                                               Text="{Binding Description}"/>
-                                    <TextBlock Grid.Row="1"
-                                               Text="{Binding Price, StringFormat=C}"/>
-                                </Grid>
-                            </Button>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+        <!-- Category or SubCategory template -->
+        <DataTemplate x:Key="CategorySubCategoryTemplate" DataType="{x:Type system:String}">
+            <Button MinHeight="64"
+                    Margin="2"
+                    Command="{Binding DataContext.SelectCategoryOrSubCategoryCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                    CommandParameter="{Binding}">
+                <TextBlock TextWrapping="WrapWithOverflow"
+                           Text="{Binding}"/>
+            </Button>
         </DataTemplate>
     </UserControl.Resources>
     <Grid>
@@ -96,26 +46,50 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <ContentControl Grid.Column="0"
-                            Content="{Binding}">
-                <ContentControl.Style>
-                    <Style TargetType="{x:Type ContentControl}">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Mode}" Value="{x:Static viewModels:ArticleSelectorModes.CategorySelection}">
-                                <Setter Property="ContentTemplate" Value="{StaticResource CategorySelectionTemplate}"/>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Mode}" Value="{x:Static viewModels:ArticleSelectorModes.SubCategorySelection}">
-                                <Setter Property="ContentTemplate" Value="{StaticResource SubCategorySelectionTemplate}"/>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Mode}" Value="{x:Static viewModels:ArticleSelectorModes.ArticleSelection}">
-                                <Setter Property="ContentTemplate" Value="{StaticResource ArticleSelectionTemplate}"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ContentControl.Style>
-            </ContentControl>
+
+            <!-- Categories/SubCategories/Articles -->
+            <ScrollViewer x:Name="ScrollViewerActive"
+                          Grid.Column="0"
+                          HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollBarVisibility="Auto">
+                <ItemsControl VerticalAlignment="Top"
+                              ItemsSource="{Binding CurrentlyDisplayedCollection}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <!--<WrapPanel Orientation="Horizontal"/>-->
+                            <UniformGrid Columns="6"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <ContentControl Content="{Binding}">
+                                <ContentControl.Style>
+                                    <Style TargetType="{x:Type ContentControl}">
+                                        <!-- ContentTemplate is not set at design time -->
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding DataContext.Mode, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" Value="{x:Static viewModels:ArticleSelectorModes.ArticleSelection}">
+                                                <Setter Property="ContentTemplate" Value="{StaticResource ArticleTemplate}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding DataContext.Mode, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" Value="{x:Static viewModels:ArticleSelectorModes.SubCategorySelection}">
+                                                <Setter Property="ContentTemplate" Value="{StaticResource CategorySubCategoryTemplate}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding DataContext.Mode, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" Value="{x:Static viewModels:ArticleSelectorModes.CategorySelection}">
+                                                <Setter Property="ContentTemplate" Value="{StaticResource CategorySubCategoryTemplate}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ContentControl.Style>
+                            </ContentControl>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- Function buttons -->
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -155,6 +129,18 @@
                         Command="{Binding AddArticleCommand}">
                     <TextBlock Text="Add"/>
                 </Button>
+
+                <!--<RepeatButton Grid.Row="5"
+                    Command="{x:Static ScrollBar.LineLeftCommand}"
+                    CommandTarget="{Binding ElementName=ScrollViewerActive}">
+                    <TextBlock Text="&lt;"/>
+                </RepeatButton>
+                <RepeatButton Grid.Row="6"
+                    Command="{x:Static ScrollBar.PageRightCommand}"
+                    CommandTarget="{Binding ElementName=ScrollViewerActive}">
+                    <TextBlock Text="&gt;"/>
+                </RepeatButton>-->
+
             </Grid>
         </Grid>
         <TextBlock VerticalAlignment="Center"

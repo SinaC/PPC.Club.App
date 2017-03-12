@@ -14,6 +14,7 @@ namespace PPC.Popups
     {
         private readonly IPopupService _popupService;
         private readonly Action<CreateEditArticlePopupViewModel> _saveArticleAction;
+        private readonly Func<string, IEnumerable<string>> _buildSubCategoriesFunc;
 
         // true: edition  false: creation
         private bool _isEdition;
@@ -46,13 +47,32 @@ namespace PPC.Popups
             {
                 if (Set(() => Category, ref _category, value))
                 {
-                    if (string.Compare(Category, "food", StringComparison.InvariantCultureIgnoreCase) == 0
-                        || string.Compare(Category, "drink", StringComparison.InvariantCultureIgnoreCase) == 0) 
+                    if (string.Compare(Category, "BOISSONS", StringComparison.InvariantCultureIgnoreCase) == 0) 
                         VatRate = VatRates.FoodDrink;
                     else
                         VatRate = VatRates.Other;
+                    if (Category == null)
+                    {
+                        SubCategory = null;
+                        SubCategories = null;
+                    }
+                    else
+                    {
+                        SubCategory = null;
+                        SubCategories = new ObservableCollection<string>(_buildSubCategoriesFunc(Category));
+                        RaisePropertyChanged(() => SubCategories);
+                    }
                 }
             }
+        }
+
+        public ObservableCollection<string> SubCategories { get; private set; }
+
+        private string _subCategory;
+        public string SubCategory
+        {
+            get { return _subCategory; }
+            set { Set(() => SubCategory, ref _subCategory, value); }
         }
 
         public ObservableCollection<string> Producers { get; private set; }
@@ -103,10 +123,11 @@ namespace PPC.Popups
             _saveArticleAction(this);
         }
 
-        public CreateEditArticlePopupViewModel(IPopupService popupService, IEnumerable<string> categories, IEnumerable<string> producers, Action<CreateEditArticlePopupViewModel> saveArticleAction)
+        public CreateEditArticlePopupViewModel(IPopupService popupService, IEnumerable<string> categories, IEnumerable<string> producers, Func<string, IEnumerable<string>> buildSubCategoriesFunc, Action<CreateEditArticlePopupViewModel> saveArticleAction)
         {
             _popupService = popupService;
             _saveArticleAction = saveArticleAction;
+            _buildSubCategoriesFunc = buildSubCategoriesFunc;
             Categories = new ObservableCollection<string>(categories);
             Producers = new ObservableCollection<string>(producers);
             VatRateList = Enum.GetValues(typeof(VatRates)).Cast<VatRates>().ToDictionary(x => x, x => GetEnumDescription(x));
@@ -125,7 +146,7 @@ namespace PPC.Popups
 
     public class CreateEditArticlePopupViewModelDesignData : CreateEditArticlePopupViewModel
     {
-        public CreateEditArticlePopupViewModelDesignData() : base(null, new [] {""}, new[] { "" }, _ => { })
+        public CreateEditArticlePopupViewModelDesignData() : base(null, new[] {""}, new[] {""}, _ => new[] {""}, _ => { })
         {
             Ean = "1111111111111";
             Description = "Article1";

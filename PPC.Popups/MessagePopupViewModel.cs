@@ -3,7 +3,7 @@ using EasyMVVM;
 
 namespace PPC.Popups
 {
-    public class MessagePopupViewModel : ObservableObject
+    internal class MessagePopupViewModel : ObservableObject
     {
         private List<string> _messages;
         public List<string> Messages
@@ -13,7 +13,7 @@ namespace PPC.Popups
         }
     }
 
-    public class MessagePopupViewModelDesignData : MessagePopupViewModel
+    internal class MessagePopupViewModelDesignData : MessagePopupViewModel
     {
         public MessagePopupViewModelDesignData()
         {

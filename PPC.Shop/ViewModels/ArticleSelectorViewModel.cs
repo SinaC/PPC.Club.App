@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Input;
 using EasyMVVM;
@@ -17,11 +18,11 @@ namespace PPC.Shop.ViewModels
 
     public class ArticleSelectorViewModel : ObservableObject
     {
-        public IEnumerable<string> Categories => ArticlesDb.Instance.Articles.Select(x => x.Category).Distinct();
+        public IEnumerable<string> Categories => ArticlesDb.Instance.Articles.Where(x => !string.IsNullOrWhiteSpace(x.Category)).Select(x => x.Category).Distinct();
 
-        public IEnumerable<string> SubCategories => ArticlesDb.Instance.Articles.Where(x => x.Category == SelectedCategory && !String.IsNullOrWhiteSpace(x.SubCategory)).Select(x => x.SubCategory).Distinct();
+        public IEnumerable<string> SubCategories => ArticlesDb.Instance.Articles.Where(x => x.Category == SelectedCategory && !string.IsNullOrWhiteSpace(x.SubCategory)).Select(x => x.SubCategory).Distinct();
 
-        public IEnumerable<string> Producers => ArticlesDb.Instance.Articles.Select(x => x.Producer).Distinct();
+        public IEnumerable<string> Producers => ArticlesDb.Instance.Articles.Where(x => !string.IsNullOrWhiteSpace(x.Producer)).Select(x => x.Producer).Distinct();
 
         public IEnumerable<Article> Articles
         {
@@ -38,6 +39,17 @@ namespace PPC.Shop.ViewModels
             }
         }
 
+        private IEnumerable<object> _currentlyDisplayedCollection;
+        public IEnumerable<object> CurrentlyDisplayedCollection
+        {
+            get { return _currentlyDisplayedCollection;}
+            protected set
+            {
+                if (Set(() => CurrentlyDisplayedCollection, ref _currentlyDisplayedCollection, value))
+                    Debug.WriteLine($"Collection: {value?.Count()}");
+            }
+        }
+
         private ICommand _backCommand;
         public ICommand BackCommand => _backCommand = _backCommand ?? new RelayCommand(Back, () => Mode == ArticleSelectorModes.ArticleSelection || Mode == ArticleSelectorModes.SubCategorySelection);
 
@@ -48,23 +60,55 @@ namespace PPC.Shop.ViewModels
                 case ArticleSelectorModes.ArticleSelection:
                     // if no subcategories, back to category selection
                     SelectedArticle = null;
+                    Quantity = 1;
                     if (SubCategories.Any())
                     {
                         SelectedSubCategory = null;
                         Mode = ArticleSelectorModes.SubCategorySelection;
+                        CurrentlyDisplayedCollection = SubCategories;
                     }
                     else
                     {
                         SelectedCategory = null;
                         Mode = ArticleSelectorModes.CategorySelection;
+                        CurrentlyDisplayedCollection = Categories;
                     }
                     break;
                 case ArticleSelectorModes.SubCategorySelection:
                     SelectedCategory = null;
                     Mode = ArticleSelectorModes.CategorySelection;
+                    CurrentlyDisplayedCollection = Categories;
                     break;
                 default:
                     throw new InvalidOperationException($"Cannot use back button in mode {Mode}");
+            }
+        }
+
+        private ICommand _selectCategoryOrSubCategoryCommand;
+        public ICommand SelectCategoryOrSubCategoryCommand => _selectCategoryOrSubCategoryCommand = _selectCategoryOrSubCategoryCommand ?? new RelayCommand<string>(SelectCategoryOrSubCategory);
+
+        private void SelectCategoryOrSubCategory(string categoryOrSubCategory)
+        {
+            if (Mode == ArticleSelectorModes.CategorySelection)
+            {
+                SelectedCategory = categoryOrSubCategory;
+                // if no subcategories, direct article selection
+                if (SubCategories.Any())
+                {
+                    Mode = ArticleSelectorModes.SubCategorySelection;
+                    CurrentlyDisplayedCollection = SubCategories;
+                }
+                else
+                {
+                    Mode = ArticleSelectorModes.ArticleSelection;
+                    CurrentlyDisplayedCollection = Articles;
+                }
+            }
+            else if (Mode == ArticleSelectorModes.SubCategorySelection)
+            {
+                Mode = ArticleSelectorModes.ArticleSelection;
+                SelectedSubCategory = categoryOrSubCategory;
+                CurrentlyDisplayedCollection = Articles;
             }
         }
 
@@ -73,7 +117,7 @@ namespace PPC.Shop.ViewModels
         public string SelectedCategory
         {
             get { return _selectedCategory; }
-            set
+            protected set
             {
                 if (Set(() => SelectedCategory, ref _selectedCategory, value))
                 {
@@ -91,11 +135,14 @@ namespace PPC.Shop.ViewModels
             SelectedCategory = category;
             // if no subcategories, direct article selection
             if (SubCategories.Any())
+            {
                 Mode = ArticleSelectorModes.SubCategorySelection;
+                CurrentlyDisplayedCollection = SubCategories;
+            }
             else
             {
                 Mode = ArticleSelectorModes.ArticleSelection;
-                RaisePropertyChanged(() => Articles);
+                CurrentlyDisplayedCollection = Articles;
             }
         }
 
@@ -104,7 +151,7 @@ namespace PPC.Shop.ViewModels
         public string SelectedSubCategory
         {
             get { return _selectedSubCategory; }
-            set
+            protected set
             {
                 if (Set(() => SelectedSubCategory, ref _selectedSubCategory, value))
                     RaisePropertyChanged(() => Articles);
@@ -118,6 +165,7 @@ namespace PPC.Shop.ViewModels
         {
             Mode = ArticleSelectorModes.ArticleSelection;
             SelectedSubCategory = subCategory;
+            CurrentlyDisplayedCollection = Articles;
         }
 
         private Article _selectedArticle;
@@ -125,7 +173,7 @@ namespace PPC.Shop.ViewModels
         public Article SelectedArticle
         {
             get { return _selectedArticle; }
-            set { Set(() => SelectedArticle, ref _selectedArticle, value); }
+            protected set { Set(() => SelectedArticle, ref _selectedArticle, value); }
         }
 
         private ICommand _selectArticleCommand;
@@ -169,10 +217,14 @@ namespace PPC.Shop.ViewModels
 
         private void AddArticle()
         {
-            // TODO: inform about article selection and quantity
+            // TODO: inform about article selection
+
+            SelectedArticle = null;
             SelectedSubCategory = null;
             SelectedCategory = null;
+            Quantity = 1;
             Mode = ArticleSelectorModes.CategorySelection;
+            CurrentlyDisplayedCollection = Categories;
         }
 
         private ArticleSelectorModes _mode;
@@ -180,12 +232,13 @@ namespace PPC.Shop.ViewModels
         public ArticleSelectorModes Mode
         {
             get { return _mode; }
-            set { Set(() => Mode, ref _mode, value); }
+            protected set { Set(() => Mode, ref _mode, value); }
         }
 
         public ArticleSelectorViewModel()
         {
             Mode = ArticleSelectorModes.CategorySelection;
+            CurrentlyDisplayedCollection = Categories;
         }
 
         //public void Test()
@@ -245,12 +298,11 @@ namespace PPC.Shop.ViewModels
                     SubCategory = "Sub31"
                 },
             });
-            RaisePropertyChanged(() => Categories);
-            RaisePropertyChanged(() => SubCategories);
-            RaisePropertyChanged(() => Articles);
 
             SelectCategoryCommand.Execute("Cat1");
             SelectSubCategoryCommand.Execute("SubCategory11");
+
+            Mode = ArticleSelectorModes.ArticleSelection;
         }
     }
 }

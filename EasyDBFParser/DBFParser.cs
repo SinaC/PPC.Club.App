@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -40,6 +41,8 @@ namespace EasyDBFParser
 
         public List<Field> Fields { get; private set; }
         public List<object[]> Datas { get; private set; }
+
+        public DataTable DataTable { get; private set; }
 
         public void Parse(string filename)
         {
@@ -93,8 +96,10 @@ namespace EasyDBFParser
             RecordCount = recordCount;
             RecordSize = recordSize;
 
-            // field descriptor array (48 bytes each)
-            Fields = new List<Field>();
+            DataTable = new DataTable();
+
+                // field descriptor array (48 bytes each)
+                Fields = new List<Field>();
             while (true)
             {
                 int firstChar = reader.PeekChar();
@@ -133,6 +138,28 @@ namespace EasyDBFParser
                     Length = fieldLength,
                     DecimalCount = fieldDecimalCount
                 });
+
+                // Create DataColumn
+                Type dataColumnType;
+                switch ((NativeDbType) fieldType)
+                {
+                    case NativeDbType.Char:
+                        dataColumnType = typeof(string);
+                        break;
+                    case NativeDbType.Logical:
+                        dataColumnType = typeof(bool);
+                        break;
+                    case NativeDbType.Double:
+                        dataColumnType = typeof(double);
+                        break;
+                    case NativeDbType.Long:
+                        dataColumnType = typeof(int);
+                        break;
+                    default:
+                        dataColumnType = typeof(object);
+                        break;
+                }
+                DataTable.Columns.Add(fieldName, dataColumnType);
             }
 
             int computedFieldLength = Fields.Sum(x => x.Length);
@@ -146,6 +173,9 @@ namespace EasyDBFParser
                 if (dataHeader != 0x20 && dataHeader != 0x2A) // 0x2A for deleted record
                     throw new Exception("Invalid data separator");
                 object[] data = new object[Fields.Count];
+
+                DataRow row = DataTable.NewRow();
+
                 int fieldIndex = 0;
                 foreach (Field field in Fields)
                 {
@@ -154,18 +184,28 @@ namespace EasyDBFParser
                     switch (field.Type)
                     {
                         case NativeDbType.Char:
-                            data[fieldIndex] = Encoding.Default.GetString(valueRaw).TrimEnd();
+                        {
+                            string value = Encoding.Default.GetString(valueRaw).TrimEnd();
+                            data [fieldIndex] = value;
+                            row[fieldIndex] = value;
                             break;
+                        }
                         case NativeDbType.Logical:
-                            data[fieldIndex] = valueRaw[0] == 'T' || valueRaw[0] == 't' || valueRaw[0] == 'Y' || valueRaw[0] == 'y';
+                        {
+                            bool value = valueRaw[0] == 'T' || valueRaw[0] == 't' || valueRaw[0] == 'Y' || valueRaw[0] == 'y';
+                            data[fieldIndex] = value;
+                            row[fieldIndex] = value;
                             break;
+                        }
                         case NativeDbType.Double: // even if field length is not fixed, we suppose double as 8 bytes field
                             {
                                 bool isNegative = (valueRaw[0] & 0x80) == 0;
                                 // if negative, inverse every bit
                                 if (isNegative)
+                                {
                                     for (int byteIndex = 0; byteIndex < 8; byteIndex++)
-                                        valueRaw[byteIndex] = (byte)~valueRaw[byteIndex];
+                                        valueRaw[byteIndex] = (byte) ~valueRaw[byteIndex];
+                                }
                                 // otherwise, remove 1st bit (negate 1st bit is also correct)
                                 else
                                     valueRaw[0] &= 0x7F; // remove 1st bit
@@ -176,26 +216,32 @@ namespace EasyDBFParser
                                     valueRaw[byteIndex] = valueRaw[7 - byteIndex];
                                     valueRaw[7 - byteIndex] = swap;
                                 }
-                                data[fieldIndex] = BitConverter.ToDouble(valueRaw, 0);
+                                double value = BitConverter.ToDouble(valueRaw, 0);
+                                data[fieldIndex] = value;
+                                row[fieldIndex] = value;
                                 break;
                             }
                         case NativeDbType.Long:
                             {
                                 bool isNegative = (valueRaw[0] & 0x80) == 0;
                                 valueRaw[0] &= 0x7F; // remove 1st bit
-                                data[fieldIndex] = (isNegative ? -1 : 1) * valueRaw[3] + valueRaw[2] * 0x100 + valueRaw[1] * 0x10000 + valueRaw[0] * 0x1000000;
-                                // BitConverter.ToIn32 can be used if valueRaw is reversed (see Double case)
+                                int value = (isNegative ? -1 : 1)*valueRaw[3] + valueRaw[2]*0x100 + valueRaw[1]*0x10000 + valueRaw[0]*0x1000000;
+                                data[fieldIndex] = value;
+                                row[fieldIndex] = value;
+                                // BitConverter.ToIn32 could also be used (simply reverse byte array, similarly to double case)
                                 break;
                             }
                         default:
                             // TODO: other types
                             //throw new Exception($"Unhandled DbType {field.Type}");
                             data[fieldIndex] = valueRaw; // store without conversion
+                            row[fieldIndex] = valueRaw;
                             break;
                     }
                     fieldIndex++;
                 }
                 Datas.Add(data);
+                DataTable.Rows.Add(row);
             }
 
             int terminator = reader.PeekChar();

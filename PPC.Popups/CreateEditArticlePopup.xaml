@@ -40,6 +40,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <!-- Ean -->
                 <TextBlock Grid.Row="0"
@@ -80,13 +81,28 @@
                           ItemsSource="{Binding Categories}"
                           Text="{Binding Category}"/>
 
-                <!-- Producer -->
+                <!-- SubCategory -->
                 <TextBlock Grid.Row="3"
                            Grid.Column="0"
                            Margin="5,2"
                            Style="{StaticResource HeaderTextBlockStyle}"
-                           Text="Producer/seller:"/>
+                           Text="Sub category:"/>
                 <ComboBox Grid.Row="3"
+                          Grid.Column="1"
+                          Margin="5,2"
+                          IsEditable="True"
+                          IsTextSearchEnabled="True" 
+                          IsTextSearchCaseSensitive="False"
+                          ItemsSource="{Binding SubCategories}"
+                          Text="{Binding SubCategory}"/>
+
+                <!-- Producer -->
+                <TextBlock Grid.Row="4"
+                           Grid.Column="0"
+                           Margin="5,2"
+                           Style="{StaticResource HeaderTextBlockStyle}"
+                           Text="Producer/seller:"/>
+                <ComboBox Grid.Row="4"
                           Grid.Column="1"
                           Margin="5,2"
                           IsEditable="True"
@@ -96,12 +112,12 @@
                           Text="{Binding Producer}"/>
 
                 <!-- Supplier price -->
-                <TextBlock Grid.Row="4"
+                <TextBlock Grid.Row="5"
                            Grid.Column="0"
                            Margin="5,2"
                            Style="{StaticResource HeaderTextBlockStyle}"
                            Text="Supplier price:"/>
-                <xctk:DecimalUpDown Grid.Row="4"
+                <xctk:DecimalUpDown Grid.Row="5"
                                     Grid.Column="1"
                                     Margin="5,2"
                                     Minimum="0"
@@ -111,12 +127,12 @@
                                     Value="{Binding SupplierPrice}"/>
 
                 <!-- Vat rate -->
-                <TextBlock Grid.Row="5"
+                <TextBlock Grid.Row="6"
                            Grid.Column="0"
                            Margin="5,2"
                            Style="{StaticResource HeaderTextBlockStyle}"
                            Text="Vat:"/>
-                <ComboBox Grid.Row="5"
+                <ComboBox Grid.Row="6"
                           Grid.Column="1"
                           Margin="5,2"
                           ItemsSource="{Binding VatRateList}"
@@ -125,12 +141,12 @@
                           SelectedValue="{Binding VatRate}"/>
 
                 <!-- Price -->
-                <TextBlock Grid.Row="6"
+                <TextBlock Grid.Row="7"
                            Grid.Column="0"
                            Margin="5,2"
                            Style="{StaticResource HeaderTextBlockStyle}"
                            Text="Price:"/>
-                <xctk:DecimalUpDown Grid.Row="6"
+                <xctk:DecimalUpDown Grid.Row="7"
                                     Grid.Column="1"
                                     Margin="5,2"
                                     Minimum="0"
@@ -140,12 +156,12 @@
                                     Value="{Binding Price}"/>
 
                 <!-- Stock price -->
-                <TextBlock Grid.Row="7"
+                <TextBlock Grid.Row="8"
                            Grid.Column="0"
                            Margin="5,2"
                            Style="{StaticResource HeaderTextBlockStyle}"
                            Text="Stock:"/>
-                <xctk:IntegerUpDown Grid.Row="7"
+                <xctk:IntegerUpDown Grid.Row="8"
                                     Grid.Column="1"
                                     Margin="5,2"
                                     Minimum="0"

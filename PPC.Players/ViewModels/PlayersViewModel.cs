@@ -106,8 +106,7 @@ namespace PPC.Players.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, ex);
-                PopupService.DisplayModal(vm, "Error while loading player file");
+                PopupService.DisplayError("Error while loading player file", ex);
             }
         }
 
@@ -137,8 +136,7 @@ namespace PPC.Players.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, ex);
-                PopupService.DisplayModal(vm, "Error while saving player file");
+                PopupService.DisplayError("Error while saving player file", ex);
             }
         }
 

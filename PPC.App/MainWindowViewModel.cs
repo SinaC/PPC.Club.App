@@ -200,8 +200,7 @@ namespace PPC.App
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, ex);
-                PopupService.DisplayModal(vm, "Error while loading articles DB");
+                PopupService.DisplayError("Error while loading articles DB", ex);
             }
 
             PlayersViewModel = new PlayersViewModel();

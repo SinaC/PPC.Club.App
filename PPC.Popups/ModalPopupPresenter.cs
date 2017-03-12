@@ -162,14 +162,14 @@ namespace PPC.Popups
             return popup;
         }
 
-        public IPopup DisplayMessages(List<string> messages)
+        public IPopup DisplayMessages(params string[] messages)
         {
             // Create popup + view model
             MessagePopup popup = new MessagePopup
             {
                 DataContext = new MessagePopupViewModel
                 {
-                    Messages = messages,
+                    Messages = (messages ?? Enumerable.Empty<string>()).ToList(),
                 }
             };
             // Display popup
@@ -184,6 +184,24 @@ namespace PPC.Popups
             // Create QuestionPopupViewModel
             QuestionPopupViewModel vm = new QuestionPopupViewModel(this);
             vm.Initialize(question, actionButtons);
+
+            // Display as modal
+            return DisplayModal(vm, title);
+        }
+
+        public IPopup DisplayError(string title, string error)
+        {
+            // Create ErrorPopupViewModel
+            ErrorPopupViewModel vm = new ErrorPopupViewModel(this, error);
+
+            // Display as modal
+            return DisplayModal(vm, title);
+        }
+
+        public IPopup DisplayError(string title, Exception ex)
+        {
+            // Create ErrorPopupViewModel
+            ErrorPopupViewModel vm = new ErrorPopupViewModel(this, ex);
 
             // Display as modal
             return DisplayModal(vm, title);
@@ -223,7 +241,8 @@ namespace PPC.Popups
             //FrameworkElement frameworkElement = _logicalChildren.OfType<IPopup>().Cast<FrameworkElement>().FirstOrDefault(x => x.DataContext == viewModel);
             FrameworkElement frameworkElement = _logicalChildren.OfType<ModalPopup>().FirstOrDefault(x => x.DataContext == viewModel);
             // Close popup
-            ClosePopup(frameworkElement);
+            if (frameworkElement != null)
+                ClosePopup(frameworkElement);
         }
 
         #endregion

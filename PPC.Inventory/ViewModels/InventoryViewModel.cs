@@ -15,12 +15,13 @@ namespace PPC.Inventory.ViewModels
     {
         private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
 
-        private static readonly string[] EmptyCategory = { string.Empty };
+        private static readonly string[] EmptyList = { string.Empty };
 
         public IEnumerable<Article> Articles => ArticlesDb.Instance.Articles;
 
-        private IEnumerable<string> Categories => EmptyCategory.Concat(ArticlesDb.Instance.Articles.GroupBy(x => x.Category, (category, articles) => category));
-        private IEnumerable<string> Producers => ArticlesDb.Instance.Articles.GroupBy(x => x.Producer, (producer, articles) => producer);
+        private IEnumerable<string> Categories => EmptyList.Concat(ArticlesDb.Instance.Articles.Where(x => !string.IsNullOrWhiteSpace(x.Category)).Select(x => x.Category).Distinct());
+        private IEnumerable<string> Producers => EmptyList.Concat(ArticlesDb.Instance.Articles.Where(x => !string.IsNullOrWhiteSpace(x.Producer)).Select(x => x.Producer).Distinct());
+        private Func<string,IEnumerable<string>> BuildSubCategories => category => EmptyList.Concat(ArticlesDb.Instance.Articles.Where(x => x.Category == category && !string.IsNullOrWhiteSpace(x.SubCategory)).Select(x => x.SubCategory).Distinct());
 
         #region Selected article
 
@@ -52,8 +53,7 @@ namespace PPC.Inventory.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, ex);
-                PopupService.DisplayModal(vm, "Load error");
+                PopupService.DisplayError("Load error", ex);
             }
         }
 
@@ -77,8 +77,7 @@ namespace PPC.Inventory.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, ex);
-                PopupService.DisplayModal(vm, "Save error");
+                PopupService.DisplayError("Save error", ex);
             }
         }
 
@@ -114,8 +113,7 @@ namespace PPC.Inventory.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    ErrorPopupViewModel vm = new ErrorPopupViewModel(PopupService, ex);
-                    PopupService.DisplayModal(vm, "Import error");
+                    PopupService.DisplayError("Import error", ex);
                 }
             }
         }
@@ -129,7 +127,7 @@ namespace PPC.Inventory.ViewModels
 
         private void DisplayCreateArticlePopup()
         {
-            CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(PopupService, Categories, Producers, CreateArticle)
+            CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(PopupService, Categories, Producers, BuildSubCategories, CreateArticle)
             {
                 IsEdition = false
             };
@@ -144,6 +142,7 @@ namespace PPC.Inventory.ViewModels
                 Ean = vm.Ean,
                 Description = vm.Description,
                 Category = vm.Category,
+                SubCategory = vm.SubCategory,
                 Producer = vm.Producer,
                 SupplierPrice = vm.SupplierPrice,
                 Price = vm.Price,
@@ -160,8 +159,7 @@ namespace PPC.Inventory.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel errorVm = new ErrorPopupViewModel(PopupService, ex);
-                PopupService.DisplayModal(errorVm, "Error while saving articles DB");
+                PopupService.DisplayError("Error while saving articles DB", ex);
             }
         }
 
@@ -176,12 +174,13 @@ namespace PPC.Inventory.ViewModels
         {
             if (SelectedArticle != null)
             {
-                CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(PopupService, Categories, Producers, SaveArticle)
+                CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(PopupService, Categories, Producers, BuildSubCategories, SaveArticle)
                 {
                     IsEdition = true,
                     Ean = SelectedArticle.Ean,
                     Description = SelectedArticle.Description,
                     Category = SelectedArticle.Category,
+                    SubCategory = SelectedArticle.SubCategory,
                     Producer = SelectedArticle.Producer,
                     SupplierPrice = SelectedArticle.SupplierPrice,
                     Price = SelectedArticle.Price,
@@ -197,6 +196,7 @@ namespace PPC.Inventory.ViewModels
             SelectedArticle.Ean = vm.Ean;
             SelectedArticle.Description = vm.Description;
             SelectedArticle.Category = vm.Category;
+            SelectedArticle.SubCategory = vm.SubCategory;
             SelectedArticle.Producer = vm.Producer;
             SelectedArticle.SupplierPrice = vm.SupplierPrice;
             SelectedArticle.Price = vm.Price;
@@ -212,8 +212,7 @@ namespace PPC.Inventory.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorPopupViewModel errorVm = new ErrorPopupViewModel(PopupService, ex);
-                PopupService.DisplayModal(errorVm, "Error while saving articles DB");
+                PopupService.DisplayError("Error while saving articles DB", ex);
             }
         }
 
