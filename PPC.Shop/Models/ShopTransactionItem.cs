@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using EasyMVVM;
 
-namespace PPC.Shop.ViewModels
+namespace PPC.Shop.Models
 {
     public class ShopTransactionItem : ObservableObject
     {

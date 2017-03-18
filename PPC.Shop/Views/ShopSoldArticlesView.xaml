@@ -3,8 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:converters="clr-namespace:PPC.Shop.Converters" 
+             xmlns:models="clr-namespace:PPC.Shop.Models"
              xmlns:viewModels="clr-namespace:PPC.Shop.ViewModels" 
-             xmlns:converters="clr-namespace:PPC.Shop.Converters"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance viewModels:ShopViewModelDesignData, IsDesignTimeCreatable=True}"
              d:DesignHeight="300" d:DesignWidth="500">
@@ -60,7 +61,7 @@
                       RowHeaderStyle="{StaticResource TransactionRowHeaderStyle}"
                       ItemsSource="{Binding Transactions}">
                 <DataGrid.RowDetailsTemplate>
-                    <DataTemplate DataType="{x:Type viewModels:ShopTransactionItem}">
+                    <DataTemplate DataType="{x:Type models:ShopTransactionItem}">
                         <DataGrid IsReadOnly="True"
                                   CanUserAddRows="False"
                                   CanUserDeleteRows="False"

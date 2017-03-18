@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Linq;
-using System.Windows.Controls;
 using System.Windows.Input;
 using EasyMVVM;
-using PPC.Data.Articles;
 using PPC.Data.Contracts;
 using PPC.Helpers;
 using PPC.Popups;
+using PPC.Shop.Models;
+using PPC.Shop.ViewModels.ArticleSelector;
 
 namespace PPC.Shop.ViewModels
 {
@@ -19,198 +17,15 @@ namespace PPC.Shop.ViewModels
 
         private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
 
-        private static readonly string[] EmptyList = {string.Empty};
+        private Action<decimal, decimal> _paymentAction;
+        private Action _cartModifiedAction;
 
-        private readonly Action<decimal, decimal> _paymentAction;
-        private readonly Action _cartModifiedAction;
-
-        public IEnumerable<Article> Articles => (string.IsNullOrWhiteSpace(SelectedCategory)
-            ? ArticlesDb.Instance.Articles
-            : ArticlesDb.Instance.Articles.Where(x => x.Category == SelectedCategory)).OrderBy(x => x.Description);
-
-        public IEnumerable<string> Categories => EmptyList.Concat(ArticlesDb.Instance.Articles.Where(x => !string.IsNullOrWhiteSpace(x.Category)).Select(x => x.Category).Distinct());
-        public IEnumerable<string> Producers => EmptyList.Concat(ArticlesDb.Instance.Articles.Where(x => !string.IsNullOrWhiteSpace(x.Producer)).Select(x => x.Producer).Distinct());
-        private Func<string, IEnumerable<string>> BuildSubCategories => category => EmptyList.Concat(ArticlesDb.Instance.Articles.Where(x => x.Category == category && !string.IsNullOrWhiteSpace(x.SubCategory)).Select(x => x.SubCategory).Distinct());
+        public IArticleSelector ArticleSelectorViewModel { get; protected set; }
 
         #region Cart articles
 
         public ObservableCollection<ShopArticleItem> ShoppingCartArticles { get; }
         public decimal Total => ShoppingCartArticles.Sum(x => x.Total);
-
-        #endregion
-
-        #region Ean
-
-        private string _ean;
-
-        public string Ean
-        {
-            get { return _ean; }
-            set
-            {
-                if (Set(() => Ean, ref _ean, value))
-                {
-                    if (_ean != null)
-                    {
-                        if (_ean.Length == 13)
-                        {
-                            Article article = ArticlesDb.Instance.Articles.FirstOrDefault(x => x.Ean == _ean);
-                            if (article != null)
-                                SelectedArticle = article;
-                            else
-                                DisplayCreateArticlePopup();
-                        }
-                        else
-                            SelectedArticle = null;
-                    }
-                }
-            }
-        }
-
-        #endregion
-
-        #region Article selection
-
-        #region Selected article/category
-
-        private string _selectedCategory;
-
-        public string SelectedCategory
-        {
-            get { return _selectedCategory; }
-            set
-            {
-                if (Set(() => SelectedCategory, ref _selectedCategory, value))
-                    RaisePropertyChanged(() => Articles);
-            }
-        }
-
-        private Article _selectedArticle;
-
-        public Article SelectedArticle
-        {
-            get { return _selectedArticle; }
-            set
-            {
-                if (Set(() => SelectedArticle, ref _selectedArticle, value))
-                {
-                    Quantity = _selectedArticle == null
-                        ? (int?) null
-                        : 1;
-                    _ean = _selectedArticle?.Ean; // set value without retriggering article search
-                    RaisePropertyChanged(() => Ean);
-                }
-            }
-        }
-
-        #endregion
-
-        #region Article name filter
-
-        private bool _isArticleNameFocused;
-
-        public bool IsArticleNameFocused
-        {
-            get { return _isArticleNameFocused; }
-            set
-            {
-                // Force RaisePropertyChanged
-                _isArticleNameFocused = value;
-                RaisePropertyChanged(() => IsArticleNameFocused);
-            }
-        }
-
-        public AutoCompleteFilterPredicate<object> ArticleFilterPredicate => FilterArticle;
-
-        private bool FilterArticle(string search, object o)
-        {
-            if (string.IsNullOrWhiteSpace(search))
-                return true;
-            Article article = o as Article;
-            if (article == null)
-                return false;
-            //http://stackoverflow.com/questions/359827/ignoring-accented-letters-in-string-comparison/7720903#7720903
-            return CultureInfo.CurrentCulture.CompareInfo.IndexOf(article.Description, search, CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreCase) >= 0;
-        }
-
-        #endregion
-
-        #endregion
-
-        #region Quantity
-
-        private int? _quantity;
-
-        public int? Quantity
-        {
-            get { return _quantity; }
-            set { Set(() => Quantity, ref _quantity, value); }
-        }
-
-        #endregion
-
-        #region Increment selected article
-
-        private ICommand _incrementSelectedArticleCommand;
-        public ICommand IncrementSelectedArticleCommand => _incrementSelectedArticleCommand = _incrementSelectedArticleCommand ?? new RelayCommand(IncrementSelectedArticle, () => SelectedArticle != null);
-
-        private void IncrementSelectedArticle()
-        {
-            if (SelectedArticle == null)
-                return;
-            if (!Quantity.HasValue)
-                Quantity = 1;
-            else
-                Quantity++;
-        }
-
-        #endregion
-
-        #region Decrement selected article
-
-        private ICommand _decrementSelectedArticleCommand;
-        public ICommand DecrementSelectedArticleCommand => _decrementSelectedArticleCommand = _decrementSelectedArticleCommand ?? new RelayCommand(DecrementSelectedArticle, () => SelectedArticle != null);
-
-        private void DecrementSelectedArticle()
-        {
-            if (SelectedArticle == null)
-                return;
-            if (Quantity.HasValue)
-            {
-                if (Quantity.Value == 1)
-                    Quantity = null;
-                else
-                    Quantity--;
-            }
-        }
-
-        #endregion
-
-        #region Add selected article in cart
-
-        private ICommand _addSelectedArticleCommand;
-        public ICommand AddSelectedArticleCommand => _addSelectedArticleCommand = _addSelectedArticleCommand ?? new RelayCommand(AddSelectedArticle, () => SelectedArticle != null);
-
-        private void AddSelectedArticle()
-        {
-            if (SelectedArticle == null)
-                return;
-            if (!Quantity.HasValue || Quantity.Value == 0)
-                return;
-            ShopArticleItem article = ShoppingCartArticles.FirstOrDefault(x => x.Article.Guid == SelectedArticle.Guid);
-            if (article == null)
-            {
-                article = new ShopArticleItem
-                {
-                    Article = SelectedArticle,
-                    Quantity = 0
-                };
-                ShoppingCartArticles.Add(article);
-            }
-            article.Quantity += Quantity.Value;
-            RaisePropertyChanged(() => Total);
-            _cartModifiedAction?.Invoke();
-        }
 
         #endregion
 
@@ -261,6 +76,8 @@ namespace PPC.Shop.ViewModels
 
         #endregion
 
+        // TODO: mark article as free (discount)
+
         #region Payment
 
         #region Cash payment
@@ -285,111 +102,10 @@ namespace PPC.Shop.ViewModels
 
         #endregion
 
-        #region Article creation
-
-        private ICommand _createArticleCommand;
-        public ICommand CreateArticleCommand => _createArticleCommand = _createArticleCommand ?? new RelayCommand(DisplayCreateArticlePopup);
-
-        private void DisplayCreateArticlePopup()
+        public void GotFocus()
         {
-            SelectedArticle = null;
-            CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(PopupService, Categories, Producers, BuildSubCategories, CreateArticle)
-            {
-                IsEdition = false
-            };
-            PopupService.DisplayModal(vm, "New article");
+            ArticleSelectorViewModel.GotFocus();
         }
-
-        private void CreateArticle(CreateEditArticlePopupViewModel vm)
-        {
-            Article article = new Article
-            {
-                Guid = Guid.NewGuid(),
-                Ean = vm.Ean,
-                Description = vm.Description,
-                Category = vm.Category,
-                SubCategory = vm.SubCategory,
-                Producer = vm.Producer,
-                SupplierPrice = vm.SupplierPrice,
-                Price = vm.Price,
-                Stock = vm.Stock,
-                VatRate = vm.VatRate,
-                IsNewArticle = true,
-            };
-
-            try
-            {
-                ArticlesDb.Instance.Add(article);
-            }
-            catch (Exception ex)
-            {
-                PopupService.DisplayError("Error while saving articles DB", ex);
-            }
-
-            SelectedCategory = null;
-
-            RaisePropertyChanged(() => Categories);
-            RaisePropertyChanged(() => Producers);
-            RaisePropertyChanged(() => Articles);
-
-            SelectedArticle = Articles.FirstOrDefault(x => x.Guid == article.Guid);
-            IsArticleNameFocused = true;
-        }
-
-        #endregion
-
-        #region Article edition
-
-        private ICommand _editArticleCommand;
-        public ICommand EditArticleCommand => _editArticleCommand = _editArticleCommand ?? new RelayCommand(DisplayEditArticlePopup, () => SelectedArticle != null);
-
-        private void DisplayEditArticlePopup()
-        {
-            if (SelectedArticle != null)
-            {
-                CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(PopupService, Categories, Producers, BuildSubCategories, SaveArticle)
-                {
-                    IsEdition = true,
-                    Ean = SelectedArticle.Ean,
-                    Description = SelectedArticle.Description,
-                    Category = SelectedArticle.Category,
-                    SubCategory = SelectedArticle.SubCategory,
-                    Producer = SelectedArticle.Producer,
-                    SupplierPrice = SelectedArticle.SupplierPrice,
-                    Price = SelectedArticle.Price,
-                    VatRate = SelectedArticle.VatRate,
-                    Stock = SelectedArticle.Stock
-                };
-                PopupService.DisplayModal(vm, "Edit article");
-            }
-        }
-
-        private void SaveArticle(CreateEditArticlePopupViewModel vm)
-        {
-            SelectedArticle.Ean = vm.Ean;
-            SelectedArticle.Description = vm.Description;
-            SelectedArticle.Category = vm.Category;
-            SelectedArticle.SubCategory = vm.SubCategory;
-            SelectedArticle.Producer = vm.Producer;
-            SelectedArticle.SupplierPrice = vm.SupplierPrice;
-            SelectedArticle.Price = vm.Price;
-            SelectedArticle.VatRate = vm.VatRate;
-            SelectedArticle.Stock = vm.Stock;
-
-            RaisePropertyChanged(() => Articles);
-            RaisePropertyChanged(() => Categories);
-
-            try
-            {
-                ArticlesDb.Instance.Save();
-            }
-            catch (Exception ex)
-            {
-                PopupService.DisplayError("Error while saving articles DB", ex);
-            }
-        }
-
-        #endregion
 
         public void Clear()
         {
@@ -398,12 +114,40 @@ namespace PPC.Shop.ViewModels
             _cartModifiedAction?.Invoke();
         }
 
+        public void RemoveHandlers()
+        {
+            ArticleSelectorViewModel.ArticleSelected -= AddArticle;
+            _paymentAction = null;
+            _cartModifiedAction = null;
+        }
+
         public ShoppingCartViewModel(Action<decimal, decimal> paymentAction, Action cartModifiedAction = null)
         {
+            ArticleSelectorViewModel = new DesktopArticleSelectorViewModel();
+            //ArticleSelectorViewModel = new MobileArticleSelectorViewModel();
+            ArticleSelectorViewModel.ArticleSelected += AddArticle;
+
             _paymentAction = paymentAction;
             _cartModifiedAction = cartModifiedAction;
 
             ShoppingCartArticles = new ObservableCollection<ShopArticleItem>();
+        }
+
+        private void AddArticle(object sender, ArticleSelectedEventArgs args)
+        {
+            ShopArticleItem article = ShoppingCartArticles.FirstOrDefault(x => x.Article.Guid == args.Article.Guid);
+            if (article == null)
+            {
+                article = new ShopArticleItem
+                {
+                    Article = args.Article,
+                    Quantity = 0
+                };
+                ShoppingCartArticles.Add(article);
+            }
+            article.Quantity += args.Quantity;
+            RaisePropertyChanged(() => Total);
+            _cartModifiedAction?.Invoke();
         }
     }
 
@@ -411,6 +155,9 @@ namespace PPC.Shop.ViewModels
     {
         public ShoppingCartViewModelDesignData() : base((d, d1) => { }, () => { })
         {
+            ArticleSelectorViewModel = new DesktopArticleSelectorViewModelDesignData();
+            //ArticleSelectorViewModel = new MobileArticleSelectorViewModelDesignData();
+
             ShoppingCartArticles.Clear();
             ShoppingCartArticles.AddRange(new[]
             {
@@ -445,7 +192,16 @@ namespace PPC.Shop.ViewModels
                     Quantity = 1,
                 }
             });
-            SelectedArticle = ShoppingCartArticles[0].Article;
+            ShoppingCartArticles.AddRange(Enumerable.Range(0, 100).Select(x => new ShopArticleItem
+            {
+                Article = new Article
+                {
+                    Ean = "1111111",
+                    Description = "Article1",
+                    Price = 10+x
+                },
+                Quantity = x+1,
+            }));
         }
     }
 }

@@ -8,26 +8,15 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Xml;
 using EasyDBFParser;
 using PPC.Data.Contracts;
 
 namespace PPC.Data.Articles
 {
-    public class ArticlesDb
+    public class ArticlesDb : IArticleDb
     {
-        #region Singleton
-
-        private static readonly Lazy<ArticlesDb> Lazy = new Lazy<ArticlesDb>(() => new ArticlesDb(), LazyThreadSafetyMode.ExecutionAndPublication);
-        public static ArticlesDb Instance => Lazy.Value;
-
-        private ArticlesDb()
-        {
-            // TODO: ideally Load should be called here but if an exception occurs in Load, it will not bubble
-        }
-
-        #endregion
+        private static readonly string[] EmptyList = { string.Empty };
 
         private List<Article> _articles;
         public IEnumerable<Article> Articles => _articles ?? Enumerable.Empty<Article>();
@@ -36,6 +25,41 @@ namespace PPC.Data.Articles
         {
             _articles.Add(article);
             Save();
+        }
+
+        public Article GetByEan(string ean)
+        {
+            return _articles.FirstOrDefault(x => x.Ean == ean);
+        }
+
+        public Article GetById(Guid guid)
+        {
+            return _articles.FirstOrDefault(x => x.Guid == guid);
+        }
+
+        public IEnumerable<string> Categories => EmptyList.Concat(Articles.Where(x => !string.IsNullOrWhiteSpace(x.Category)).Select(x => x.Category).Distinct());
+        public IEnumerable<string> Producers => EmptyList.Concat(Articles.Where(x => !string.IsNullOrWhiteSpace(x.Producer)).Select(x => x.Producer).Distinct());
+        public IEnumerable<string> SubCategories(string category)
+        {
+            return EmptyList.Concat(Articles.Where(x => x.Category == category && !string.IsNullOrWhiteSpace(x.SubCategory)).Select(x => x.SubCategory).Distinct());
+        }
+        public IEnumerable<Article> GetArticles(string category)
+        {
+            IQueryable<Article> query = Articles.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(category))
+                query = query.Where(x => x.Category == category);
+            return query;
+        }
+        public IEnumerable<Article> GetArticles(string category, string subCategory)
+        {
+            IQueryable<Article> query = Articles.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(category))
+            {
+                query = query.Where(x => x.Category == category);
+                if (!string.IsNullOrWhiteSpace(subCategory))
+                    query = query.Where(x => x.SubCategory == subCategory);
+            }
+            return query;
         }
 
         public void ImportFromCsv(string filename)
@@ -119,64 +143,6 @@ namespace PPC.Data.Articles
             }).ToList();
         }
 
-        public void ImportFromDbf2(string filename)
-        {
-            // Extract articles from DBF
-            DBFParser parser = new DBFParser();
-            parser.Parse(filename);
-
-            // Get column index
-            int eanIndex = parser.Fields.FindIndex(x => x.Name == "CODE_ART");
-            int descriptionIndex = parser.Fields.FindIndex(x => x.Name == "NOM_ART");
-            int categoryIndex = parser.Fields.FindIndex(x => x.Name == "CATEGORIE");
-            int subCategoryIndex = parser.Fields.FindIndex(x => x.Name == "CATEGORIE2");
-            int stockIndex = parser.Fields.FindIndex(x => x.Name == "QTE_STOCK");
-            int supplierPriceIndex = parser.Fields.FindIndex(x => x.Name == "PRIX_ACHAT");
-            int priceIndex  = parser.Fields.FindIndex(x => x.Name == "PX_VTE_TC");
-            int supplierIndex = parser.Fields.FindIndex(x => x.Name == "NOM_FOU");
-            int vatIndex = parser.Fields.FindIndex(x => x.Name == "CODE_TVA");
-
-            if (eanIndex == -1 || descriptionIndex == -1 || categoryIndex == -1 || subCategoryIndex == -1 || stockIndex == -1 || supplierPriceIndex == -1 || priceIndex == -1 ||supplierIndex == -1 || vatIndex == -1)
-                throw new InvalidOperationException("Imported DBF file is not an article DB");
-
-            // Build articles DB
-            List<Article> articles = new List<Article>();
-            foreach (object[] data in parser.Datas)
-            {
-                try
-                {
-                    string ean = (string) data[eanIndex];
-                    string description = (string) data[descriptionIndex];
-                    string category = (string) data[categoryIndex];
-                    string subCategory = (string) data[subCategoryIndex];
-                    int stock = ConvertFromDoubleToInt(data[stockIndex]);
-                    decimal supplierPrice = ConvertFromDoubleToDecimal(data[supplierPriceIndex]);
-                    decimal price = ConvertFromDoubleToDecimal(data[priceIndex]);
-                    string producer = (string) data[supplierIndex];
-                    VatRates vatRate = (int)data[vatIndex] == 2 ? VatRates.FoodDrink : VatRates.Other;
-
-                    Article article = new Article
-                    {
-                        Guid = Guid.NewGuid(),
-                        Ean = ean,
-                        Description = description,
-                        Category = category,
-                        SubCategory = subCategory,
-                        Stock = stock,
-                        SupplierPrice = supplierPrice,
-                        Price = price,
-                        Producer = producer,
-                        VatRate = vatRate
-                    };
-                    articles.Add(article);
-                }
-                catch (Exception ex)
-                {
-                }
-            }
-            _articles = articles;
-        }
-
         private static decimal ConvertFromDoubleToDecimal(double d)
         {
             if (double.IsInfinity(d) || double.IsNaN(d) || double.IsNegativeInfinity(d) || double.IsPositiveInfinity(d))
@@ -186,22 +152,6 @@ namespace PPC.Data.Articles
 
         private static int ConvertFromDoubleToInt(double d)
         {
-            if (double.IsInfinity(d) || double.IsNaN(d) || double.IsNegativeInfinity(d) || double.IsPositiveInfinity(d))
-                return 0;
-            return (int)d;
-        }
-
-        private static decimal ConvertFromDoubleToDecimal(object value)
-        {
-            double d = (double) value;
-            if (double.IsInfinity(d) || double.IsNaN(d) || double.IsNegativeInfinity(d) || double.IsPositiveInfinity(d))
-                return 0;
-            return (decimal) d;
-        }
-
-        private static int ConvertFromDoubleToInt(object value)
-        {
-            double d = (double)value;
             if (double.IsInfinity(d) || double.IsNaN(d) || double.IsNegativeInfinity(d) || double.IsPositiveInfinity(d))
                 return 0;
             return (int)d;
@@ -234,11 +184,6 @@ namespace PPC.Data.Articles
             }
             else
                 throw new InvalidOperationException("Article DB not found.");
-        }
-
-        public void Inject(List<Article> articles) // useful while designing views
-        {
-            _articles = articles;
         }
 
         private static readonly Regex CsvSplitRegEx = new Regex("(?:^|,)(\"(?:[^\"]+|\"\")*\"|[^,]*)", RegexOptions.Compiled);

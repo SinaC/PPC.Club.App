@@ -121,7 +121,7 @@
                 <DataGridCheckBoxColumn Header="Judge?" Binding="{Binding IsJudge}"/>
                 <DataGridTemplateColumn>
                     <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type models:PlayerModel}">
+                        <DataTemplate DataType="{x:Type models:PlayerItem}">
                             <Button Width="24"
                                     Height="24"
                                     Visibility="{Binding Converter={StaticResource IsNamedObjectVisibilityConverter}}"

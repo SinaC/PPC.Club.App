@@ -9,29 +9,29 @@
              d:DataContext="{d:DesignInstance viewModels:ShopViewModelDesignData, IsDesignTimeCreatable=True}"
              d:DesignHeight="600" d:DesignWidth="800">
     <UserControl.Resources>
-        <DataTemplate DataType="{x:Type viewModels:ShopViewModel}" x:Key="ShoppingCartsTemplate">
-            <views:ShopShoppingCartsView DataContext="{Binding}"/>
+        <DataTemplate DataType="{x:Type viewModels:ShopViewModel}" x:Key="CashRegisterTemplate">
+            <views:CashRegisterView DataContext="{Binding CashRegisterViewModel}"/>
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type viewModels:ShopViewModel}" x:Key="DetailTemplate">
-            <views:ShopDetailView DataContext="{Binding}"/>
+        <DataTemplate DataType="{x:Type viewModels:ShopViewModel}" x:Key="ClientShoppingCartsTemplate">
+            <views:ClientShoppingCartsView DataContext="{Binding ClientShoppingCartsViewModel}"/>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type viewModels:ShopViewModel}" x:Key="SoldArticles">
-            <views:ShopSoldArticlesView DataContext="{Binding }"/>
+            <views:ShopSoldArticlesView DataContext="{Binding}"/>
         </DataTemplate>
     </UserControl.Resources>
     <ContentControl Content="{Binding}">
         <ContentControl.Style>
             <Style TargetType="{x:Type ContentControl}">
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding ShopState}" Value="{x:Static viewModels:ShopStates.ShoppingCarts}">
-                        <Setter Property="ContentTemplate" Value="{StaticResource ShoppingCartsTemplate}"/>
+                    <DataTrigger Binding="{Binding Mode}" Value="{x:Static viewModels:ShopModes.CashRegister}">
+                        <Setter Property="ContentTemplate" Value="{StaticResource CashRegisterTemplate}"/>
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding ShopState}" Value="{x:Static viewModels:ShopStates.Detail}">
-                        <Setter Property="ContentTemplate" Value="{StaticResource DetailTemplate}"/>
+                    <DataTrigger Binding="{Binding Mode}" Value="{x:Static viewModels:ShopModes.ClientShoppingCarts}">
+                        <Setter Property="ContentTemplate" Value="{StaticResource ClientShoppingCartsTemplate}"/>
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding ShopState}" Value="{x:Static viewModels:ShopStates.SoldArticles}">
+                    <DataTrigger Binding="{Binding Mode}" Value="{x:Static viewModels:ShopModes.SoldArticles}">
                         <Setter Property="ContentTemplate" Value="{StaticResource SoldArticles}"/>
                     </DataTrigger>
                 </Style.Triggers>

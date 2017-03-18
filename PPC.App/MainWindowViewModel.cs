@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using EasyIoc;
 using EasyMVVM;
 using PPC.Data.Articles;
 using PPC.Inventory.ViewModels;
@@ -8,6 +9,7 @@ using PPC.Messages;
 using PPC.Players.ViewModels;
 using PPC.Popups;
 using PPC.Shop.ViewModels;
+using PPC.Shop.ViewModels.ArticleSelector;
 
 namespace PPC.App
 {
@@ -52,8 +54,8 @@ namespace PPC.App
             protected set { Set(() => InventoryViewModel, ref _inventoryViewModel, value); }
         }
 
-        private ArticleSelectorViewModel _testViewModel;
-        public ArticleSelectorViewModel TestViewModel
+        private MobileArticleSelectorViewModel _testViewModel;
+        public MobileArticleSelectorViewModel TestViewModel
         {
             get {  return _testViewModel;}
             protected set { Set(() => TestViewModel, ref _testViewModel, value); }
@@ -66,6 +68,15 @@ namespace PPC.App
         {
             get { return _applicationMode; }
             set { Set(() => ApplicationMode, ref _applicationMode, value); }
+        }
+
+        private ICommand _switchToCashRegisterCommand;
+        public ICommand SwitchToCashRegisterCommand => _switchToCashRegisterCommand = _switchToCashRegisterCommand ?? new RelayCommand(SwitchToCashRegister);
+
+        private void SwitchToCashRegister()
+        {
+            ApplicationMode = ApplicationModes.Shop;
+            ShopViewModel.ViewCashRegisterCommand.Execute(null);
         }
 
         private ICommand _switchToShoppingCartsCommand;
@@ -92,7 +103,8 @@ namespace PPC.App
         private void AddNewClient()
         {
             ApplicationMode = ApplicationModes.Shop;
-            ShopViewModel.AddNewClientCommand.Execute(null);
+            ShopViewModel.ViewShoppingCartsCommand.Execute(null);
+            ShopViewModel.ClientShoppingCartsViewModel.AddNewClientCommand.Execute(null);
         }
 
         private ICommand _switchToPlayersCommand;
@@ -188,15 +200,7 @@ namespace PPC.App
         {
             try
             {
-                if (!DesignMode.IsInDesignModeStatic)
-                {
-                    ArticlesDb.Instance.Load();
-                    //ArticlesDb.Instance.ImportFromDbf(@"c:\temp\ppc\data\article.dbf");
-                    //ArticlesDb.Instance.Save();
-
-                    //ArticleSelectorViewModel vm = new ArticleSelectorViewModel();
-                    //vm.Test();
-                }
+                IocContainer.Default.Resolve<IArticleDb>().Load();
             }
             catch (Exception ex)
             {
@@ -207,7 +211,7 @@ namespace PPC.App
             ShopViewModel = new ShopViewModel();
             InventoryViewModel = new InventoryViewModel();
 
-            TestViewModel = new ArticleSelectorViewModel();
+            TestViewModel = new MobileArticleSelectorViewModel();
 
             ApplicationMode = ApplicationModes.Shop;
 
@@ -235,7 +239,7 @@ namespace PPC.App
             ShopViewModel = new ShopViewModelDesignData();
             InventoryViewModel = new InventoryViewModelDesignData();
 
-            TestViewModel = new ArticleSelectorViewModelDesignData();
+            TestViewModel = new MobileArticleSelectorViewModelDesignData();
 
             ApplicationMode = ApplicationModes.Shop;
 

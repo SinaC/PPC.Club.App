@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Input;
+using EasyIoc;
 using EasyMVVM;
 using PPC.Data.Articles;
 using PPC.Data.Contracts;
+using PPC.Helpers;
+using PPC.Popups;
 
-namespace PPC.Shop.ViewModels
+namespace PPC.Shop.ViewModels.ArticleSelector
 {
     public enum ArticleSelectorModes
     {
@@ -16,28 +19,20 @@ namespace PPC.Shop.ViewModels
         ArticleSelection
     }
 
-    public class ArticleSelectorViewModel : ObservableObject
+    public class MobileArticleSelectorViewModel : ObservableObject, IArticleSelector
     {
-        public IEnumerable<string> Categories => ArticlesDb.Instance.Articles.Where(x => !string.IsNullOrWhiteSpace(x.Category)).Select(x => x.Category).Distinct();
+        private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
 
-        public IEnumerable<string> SubCategories => ArticlesDb.Instance.Articles.Where(x => x.Category == SelectedCategory && !string.IsNullOrWhiteSpace(x.SubCategory)).Select(x => x.SubCategory).Distinct();
+        private Func<string, IEnumerable<string>> BuildSubCategories => IocContainer.Default.Resolve<IArticleDb>().SubCategories;
 
-        public IEnumerable<string> Producers => ArticlesDb.Instance.Articles.Where(x => !string.IsNullOrWhiteSpace(x.Producer)).Select(x => x.Producer).Distinct();
+        public IEnumerable<string> Categories => IocContainer.Default.Resolve<IArticleDb>().Categories;
+        public IEnumerable<string> Producers => IocContainer.Default.Resolve<IArticleDb>().Producers;
 
-        public IEnumerable<Article> Articles
-        {
-            get
-            {
-                IQueryable<Article> query = ArticlesDb.Instance.Articles.AsQueryable();
-                if (!string.IsNullOrWhiteSpace(SelectedCategory))
-                {
-                    query = query.Where(x => x.Category == SelectedCategory);
-                    if (!string.IsNullOrWhiteSpace(SelectedSubCategory))
-                        query = query.Where(x => x.SubCategory == SelectedSubCategory);
-                }
-                return query.OrderBy(x => x.Description);
-            }
-        }
+        public IEnumerable<string> SubCategories => BuildSubCategories(SelectedSubCategory);
+
+        public IEnumerable<Article> Articles => IocContainer.Default.Resolve<IArticleDb>().GetArticles(SelectedCategory, SelectedSubCategory);
+
+        public string CurrentSelectionPath => SelectedCategory.AppendIfNotEmpty(">").AppendIfNotEmpty(SelectedSubCategory.AppendIfNotEmpty(">")).AppendIfNotEmpty((SelectedArticle?.Description).AppendIfNotEmpty("(").AppendIfNotEmpty(SelectedArticle?.Price.ToString("C")).AppendIfNotEmpty(")"));
 
         private IEnumerable<object> _currentlyDisplayedCollection;
         public IEnumerable<object> CurrentlyDisplayedCollection
@@ -49,6 +44,8 @@ namespace PPC.Shop.ViewModels
                     Debug.WriteLine($"Collection: {value?.Count()}");
             }
         }
+
+        #region Back
 
         private ICommand _backCommand;
         public ICommand BackCommand => _backCommand = _backCommand ?? new RelayCommand(Back, () => Mode == ArticleSelectorModes.ArticleSelection || Mode == ArticleSelectorModes.SubCategorySelection);
@@ -84,6 +81,10 @@ namespace PPC.Shop.ViewModels
             }
         }
 
+        #endregion
+
+        #region Category/SubCategory/Article selection
+
         private ICommand _selectCategoryOrSubCategoryCommand;
         public ICommand SelectCategoryOrSubCategoryCommand => _selectCategoryOrSubCategoryCommand = _selectCategoryOrSubCategoryCommand ?? new RelayCommand<string>(SelectCategoryOrSubCategory);
 
@@ -110,6 +111,7 @@ namespace PPC.Shop.ViewModels
                 SelectedSubCategory = categoryOrSubCategory;
                 CurrentlyDisplayedCollection = Articles;
             }
+            RaisePropertyChanged(() => CurrentSelectionPath);
         }
 
         private string _selectedCategory;
@@ -123,6 +125,7 @@ namespace PPC.Shop.ViewModels
                 {
                     SelectedSubCategory = null;
                     RaisePropertyChanged(() => SubCategories);
+                    RaisePropertyChanged(() => CurrentSelectionPath);
                 }
             }
         }
@@ -154,7 +157,10 @@ namespace PPC.Shop.ViewModels
             protected set
             {
                 if (Set(() => SelectedSubCategory, ref _selectedSubCategory, value))
+                {
                     RaisePropertyChanged(() => Articles);
+                    RaisePropertyChanged(() => CurrentSelectionPath);
+                }
             }
         }
 
@@ -183,7 +189,10 @@ namespace PPC.Shop.ViewModels
         {
             SelectedArticle = article;
             Quantity = 1;
+            RaisePropertyChanged(() => CurrentSelectionPath);
         }
+
+        #endregion
 
         #region Quantity
 
@@ -212,12 +221,19 @@ namespace PPC.Shop.ViewModels
 
         #endregion
 
+        #region Add article to shopping cart
+
         private ICommand _addArticleCommand;
         public ICommand AddArticleCommand => _addArticleCommand = _addArticleCommand ?? new RelayCommand(AddArticle, () => SelectedArticle != null);
 
         private void AddArticle()
         {
-            // TODO: inform about article selection
+            if (SelectedArticle == null)
+                return;
+            if (Quantity <= 0)
+                return;
+
+            ArticleSelected?.Invoke(this, new ArticleSelectedEventArgs(SelectedArticle, Quantity));
 
             SelectedArticle = null;
             SelectedSubCategory = null;
@@ -227,43 +243,165 @@ namespace PPC.Shop.ViewModels
             CurrentlyDisplayedCollection = Categories;
         }
 
-        private ArticleSelectorModes _mode;
+        #endregion
 
+        #region Edit article
+
+        private ICommand _editArticleCommand;
+        public ICommand EditArticleCommand => _editArticleCommand = _editArticleCommand ?? new RelayCommand(DisplayEditArticlePopup, () => SelectedArticle != null);
+
+        private void DisplayEditArticlePopup()
+        {
+            if (SelectedArticle != null)
+            {
+                CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(PopupService, Categories, Producers, BuildSubCategories, SaveArticle)
+                {
+                    IsEdition = true,
+                    Ean = SelectedArticle.Ean,
+                    Description = SelectedArticle.Description,
+                    Category = SelectedArticle.Category,
+                    SubCategory = SelectedArticle.SubCategory,
+                    Producer = SelectedArticle.Producer,
+                    SupplierPrice = SelectedArticle.SupplierPrice,
+                    Price = SelectedArticle.Price,
+                    VatRate = SelectedArticle.VatRate,
+                    Stock = SelectedArticle.Stock
+                };
+                PopupService.DisplayModal(vm, "Edit article");
+            }
+        }
+
+        private void SaveArticle(CreateEditArticlePopupViewModel vm)
+        {
+            Article article = SelectedArticle;
+            article.Ean = vm.Ean;
+            article.Description = vm.Description;
+            article.Category = vm.Category;
+            article.SubCategory = vm.SubCategory;
+            article.Producer = vm.Producer;
+            article.SupplierPrice = vm.SupplierPrice;
+            article.Price = vm.Price;
+            article.VatRate = vm.VatRate;
+            article.Stock = vm.Stock;
+
+            SelectedArticle = null;
+            SelectedSubCategory = null;
+            SelectedCategory = null;
+
+            try
+            {
+                IocContainer.Default.Resolve<IArticleDb>().Save();
+            }
+            catch (Exception ex)
+            {
+                PopupService.DisplayError("Error while saving articles DB", ex);
+            }
+
+            SelectedCategory = Categories.FirstOrDefault(x => x == article.Category);
+            SelectedSubCategory = SubCategories.FirstOrDefault(x => x == article.SubCategory);
+            SelectedArticle = Articles.FirstOrDefault(x => x.Guid == article.Guid);
+
+            CurrentlyDisplayedCollection = Articles;
+            Mode = ArticleSelectorModes.ArticleSelection;
+        }
+
+        #endregion
+
+        #region Create article
+
+        private ICommand _createArticleCommand;
+        public ICommand CreateArticleCommand => _createArticleCommand = _createArticleCommand ?? new RelayCommand(DisplayCreateArticlePopup);
+
+        private void DisplayCreateArticlePopup()
+        {
+            SelectedArticle = null;
+            CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(PopupService, Categories, Producers, BuildSubCategories, CreateArticle)
+            {
+                IsEdition = false
+            };
+            PopupService.DisplayModal(vm, "New article");
+        }
+
+        private void CreateArticle(CreateEditArticlePopupViewModel vm)
+        {
+            Article article = new Article
+            {
+                Guid = Guid.NewGuid(),
+                Ean = vm.Ean,
+                Description = vm.Description,
+                Category = vm.Category,
+                SubCategory = vm.SubCategory,
+                Producer = vm.Producer,
+                SupplierPrice = vm.SupplierPrice,
+                Price = vm.Price,
+                Stock = vm.Stock,
+                VatRate = vm.VatRate,
+                IsNewArticle = true,
+            };
+
+            SelectedArticle = null;
+            SelectedSubCategory = null;
+            SelectedCategory = null;
+
+            try
+            {
+                IocContainer.Default.Resolve<IArticleDb>().Add(article);
+            }
+            catch (Exception ex)
+            {
+                PopupService.DisplayError("Error while saving articles DB", ex);
+            }
+
+            SelectedCategory = Categories.FirstOrDefault(x => x == article.Category);
+            SelectedSubCategory = SubCategories.FirstOrDefault(x => x == article.SubCategory);
+            SelectedArticle = Articles.FirstOrDefault(x => x.Guid == article.Guid);
+
+            CurrentlyDisplayedCollection = Articles;
+            Mode = ArticleSelectorModes.ArticleSelection;
+        }
+
+        #endregion
+
+        #region Mode
+
+        private ArticleSelectorModes _mode;
         public ArticleSelectorModes Mode
         {
             get { return _mode; }
             protected set { Set(() => Mode, ref _mode, value); }
         }
 
-        public ArticleSelectorViewModel()
+        #endregion
+
+        #region IArticleSelector
+
+        public event EventHandler<ArticleSelectedEventArgs> ArticleSelected;
+
+        #endregion
+
+        public void GotFocus()
         {
+            SelectedArticle = null;
+            SelectedSubCategory = null;
+            SelectedCategory = null;
+            Quantity = 1;
             Mode = ArticleSelectorModes.CategorySelection;
             CurrentlyDisplayedCollection = Categories;
         }
 
-        //public void Test()
-        //{
-        //    int noCategoryCount = ArticlesDb.Instance.Articles.Count(x => string.IsNullOrWhiteSpace(x.Category));
-        //    int noSubCategoryCount = ArticlesDb.Instance.Articles.Count(x => string.IsNullOrWhiteSpace(x.SubCategory));
-
-        //    foreach (string category in Categories)
-        //    {
-        //        SelectedCategory = category;
-        //        foreach (string subCategory in SubCategories)
-        //        {
-        //            SelectedSubCategory = subCategory;
-        //            int articleCount = Articles.Count();
-        //            Debug.WriteLine($"{category}|{subCategory}:{articleCount}");
-        //        }
-        //    }
-        //}
+        public MobileArticleSelectorViewModel()
+        {
+            Mode = ArticleSelectorModes.CategorySelection;
+            CurrentlyDisplayedCollection = Categories;
+        }
     }
 
-    public class ArticleSelectorViewModelDesignData : ArticleSelectorViewModel
+    public class MobileArticleSelectorViewModelDesignData : MobileArticleSelectorViewModel
     {
-        public ArticleSelectorViewModelDesignData()
+        public MobileArticleSelectorViewModelDesignData()
         {
-            ArticlesDb.Instance.Inject(new List<Article>
+            IocContainer.Default.Unregister<IArticleDb>();
+            IocContainer.Default.RegisterInstance<IArticleDb>(new ArticlesDesignData(new List<Article>
             {
                 new Article
                 {
@@ -297,7 +435,7 @@ namespace PPC.Shop.ViewModels
                     Category = "Cat3",
                     SubCategory = "Sub31"
                 },
-            });
+            }));
 
             SelectCategoryCommand.Execute("Cat1");
             SelectSubCategoryCommand.Execute("SubCategory11");

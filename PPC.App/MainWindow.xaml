@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:app="clr-namespace:PPC.App"
         xmlns:controls="clr-namespace:PPC.Controls;assembly=PPC.Controls"
+        xmlns:popups="clr-namespace:PPC.Popups;assembly=PPC.Popups"
         xmlns:playersViews="clr-namespace:PPC.Players.Views;assembly=PPC.Players"
         xmlns:shopViews="clr-namespace:PPC.Shop.Views;assembly=PPC.Shop"
         xmlns:inventoryViews="clr-namespace:PPC.Inventory.Views;assembly=PPC.Inventory"
-        xmlns:popups="clr-namespace:PPC.Popups;assembly=PPC.Popups"
+        xmlns:articleSelectorViews="clr-namespace:PPC.Shop.Views.ArticleSelector;assembly=PPC.Shop"
         x:Name="AppMainWindow"
         mc:Ignorable="d"
         SnapsToDevicePixels="True"
@@ -38,7 +39,7 @@
                 <inventoryViews:InventoryView DataContext="{Binding InventoryViewModel}"/>
             </DataTemplate>
             <DataTemplate DataType="{x:Type app:MainWindowViewModel}" x:Key="TestTemplate">
-                <shopViews:ArticleSelectorView DataContext="{Binding TestViewModel}"/>
+                <articleSelectorViews:MobileArticleSelectorView DataContext="{Binding TestViewModel}"/>
             </DataTemplate>
         </ResourceDictionary>
     </Window.Resources>
@@ -64,38 +65,50 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <!-- Go to shopping carts -->
+                    <!-- Go to cash register -->
                     <Button Grid.Row="0"
                             Width="64"
-                            Margin="5"
+                            Margin="2"
+                            Command="{Binding SwitchToCashRegisterCommand}"
+                            ToolTip="Cash register">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="{StaticResource CashRegisterImage}"/>
+                    </Button>
+                    <!-- Go to shopping carts -->
+                    <Button Grid.Row="1"
+                            Width="64"
+                            Margin="2"
+                            IsEnabled="{Binding ShopViewModel.ClientShoppingCartsViewModel.HasClientShoppingCartsOpened}"
                             Command="{Binding SwitchToShoppingCartsCommand}">
                         <Button.ToolTip>
                             <StackPanel Orientation="Vertical">
-                                <TextBlock Text="{Binding ShopViewModel.ClientShoppingCartsCount, StringFormat={}Shopping carts: {0}}"/>
-                                <TextBlock Text="{Binding ShopViewModel.UnpaidClientShoppingCartsCount, StringFormat={}Unpaid shopping carts: {0}}"/>
-                                <TextBlock Text="{Binding ShopViewModel.PaidClientShoppingCartsCount, StringFormat={}Paid shopping carts: {0}}"/>
+                                <TextBlock Text="Shopping carts"/>
+                                <TextBlock Text="{Binding ShopViewModel.ClientShoppingCartsViewModel.ClientShoppingCartsCount, StringFormat={}Shopping carts: {0}}"/>
+                                <TextBlock Text="{Binding ShopViewModel.ClientShoppingCartsViewModel.UnpaidClientShoppingCartsCount, StringFormat={}Unpaid shopping carts: {0}}"/>
+                                <TextBlock Text="{Binding ShopViewModel.ClientShoppingCartsViewModel.PaidClientShoppingCartsCount, StringFormat={}Paid shopping carts: {0}}"/>
                             </StackPanel>
                         </Button.ToolTip>
                         <Image Style="{StaticResource AutoDisableImageStyle}"
                                Source="{StaticResource ShopImage}"/>
                     </Button>
                     <!-- Create new client -->
-                    <Button Grid.Row="1"
+                    <Button Grid.Row="2"
                             Width="64"
-                            Margin="5"
+                            Margin="2"
                             ToolTip="Add new client shopping cart"
                             Command="{Binding AddNewClientCommand}">
                         <Image Style="{StaticResource AutoDisableImageStyle}"
                                Source="{StaticResource PlusImage}"/>
                     </Button>
                     <!-- Go to sold articles -->
-                    <Button Grid.Row="2"
+                    <Button Grid.Row="3"
                             Width="64"
-                            Margin="5"
+                            Margin="2"
                             Command="{Binding SwitchToSoldArticlesCommand}">
                         <Button.ToolTip>
                             <StackPanel Orientation="Vertical">
@@ -108,7 +121,6 @@
                         <Grid>
                             <Image Style="{StaticResource AutoDisableImageStyle}"
                                    Source="{StaticResource TransactionsImage}"/>
-                            
                             <!--<StackPanel Orientation="Vertical"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center">
@@ -126,46 +138,46 @@
                         </Grid>
                     </Button>
                     <!-- Players -->
-                    <Button Grid.Row="3"
+                    <Button Grid.Row="4"
                             Width="64"
-                            Margin="5"
+                            Margin="2"
                             ToolTip="Players"
                             Command="{Binding SwitchToPlayersCommand}">
                         <Image Style="{StaticResource AutoDisableImageStyle}"
                                Source="{StaticResource PlayersImage}"/>
                     </Button>
                     <!-- Inventory -->
-                    <Button Grid.Row="4"
+                    <Button Grid.Row="5"
                             Width="64"
-                            Margin="5"
+                            Margin="2"
                             ToolTip="Inventory/Stock"
                             Command="{Binding SwitchToInventoryCommand}">
                         <Image Style="{StaticResource AutoDisableImageStyle}"
                                Source="{StaticResource ListImage}"/>
                     </Button>
-                    <!-- Text -->
-                    <Button Grid.Row="5"
+                    <!-- Test -->
+                    <Button Grid.Row="6"
                             Width="64"
                             Height="32"
-                            Margin="5"
+                            Margin="2"
                             ToolTip="Text"
                             Command="{Binding SwitchToTestCommand}">
                         <TextBlock Text="Test"/>
                     </Button>
-                    <!-- dummy row 6 -->
+                    <!-- dummy row 7 -->
                     <!-- Reload -->
-                    <Button Grid.Row="7"
+                    <Button Grid.Row="8"
                             Width="64"
-                            Margin="5"
+                            Margin="2"
                             ToolTip="Load previous session"
                             Command="{Binding ReloadCommand}">
                         <Image Style="{StaticResource AutoDisableImageStyle}"
                                Source="{StaticResource RefreshImage}"/>
                     </Button>
                     <!-- Shutdown -->
-                    <Button Grid.Row="8"
+                    <Button Grid.Row="9"
                             Width="64"
-                            Margin="5"
+                            Margin="2"
                             ToolTip="Cash registry closure"
                             Command="{Binding CloseCommand}">
                         <Image Style="{StaticResource AutoDisableImageStyle}"

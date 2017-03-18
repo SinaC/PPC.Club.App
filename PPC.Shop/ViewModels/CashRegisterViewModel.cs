@@ -1,18 +1,25 @@
 ﻿using System;
 using System.Linq;
+using EasyMVVM;
+using PPC.Shop.Models;
 
 namespace PPC.Shop.ViewModels
 {
-    public class CashRegisterViewModel : ShoppingCartBasedViewModelBase
+    public class CashRegisterViewModel : ObservableObject
     {
         private readonly Action<ShopTransactionItem> _addTransactionAction;
 
+        private ShoppingCartViewModel _shoppingCart;
+        public ShoppingCartViewModel ShoppingCart
+        {
+            get { return _shoppingCart; }
+            protected set { Set(() => ShoppingCart, ref _shoppingCart, value); }
+        }
+
         public CashRegisterViewModel(Action<ShopTransactionItem> addTransactionAction)
         {
-            PaymentState = PaymentStates.Irrelevant;
-
             _addTransactionAction = addTransactionAction;
-            
+
             ShoppingCart = new ShoppingCartViewModel(Payment);
         }
 
@@ -30,10 +37,6 @@ namespace PPC.Shop.ViewModels
                 Cash = cash,
                 BankCard = bankCard
             };
-
-            // Add cash/bank card
-            Cash += cash;
-            BankCard += bankCard;
 
             // Clear shopping cart
             ShoppingCart.Clear();

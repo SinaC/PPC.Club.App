@@ -12,54 +12,57 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Xml;
+using EasyIoc;
 using EasyMVVM;
 using PPC.Data.Articles;
 using PPC.Data.Contracts;
 using PPC.Helpers;
 using PPC.Messages;
 using PPC.Popups;
+using PPC.Shop.Models;
 
 namespace PPC.Shop.ViewModels
 {
-    public enum ShopStates
+    public enum ShopModes
     {
-        ShoppingCarts,
-        Detail,
+        CashRegister,
+        ClientShoppingCarts,
         SoldArticles
     }
 
     public class ShopViewModel : ObservableObject
     {
-        private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
+        private const string ShopFilename = "_shop.xml";
 
-        public const string ShopFilename = "_shop.xml";
+        private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
 
-        #region Shop state
+        public decimal Cash => Transactions?.Sum(x => x.Cash) ?? 0;
 
-        private ShopStates _shopState;
-        public ShopStates ShopState
+        public decimal BankCard => Transactions?.Sum(x => x.BankCard) ?? 0;
+
+        #region Shop mode
+
+        private ShopModes _mode;
+        public ShopModes Mode
         {
-            get { return _shopState; }
-            protected set { Set(() => ShopState, ref _shopState, value); }
+            get { return _mode; }
+            protected set { Set(() => Mode, ref _mode, value); }
         }
+
+        private ICommand _viewCashRegisterCommand;
+        public ICommand ViewCashRegisterCommand => _viewCashRegisterCommand = _viewCashRegisterCommand ?? new RelayCommand(() => Mode = ShopModes.CashRegister);
 
         private ICommand _viewShoppingCartsCommand;
         public ICommand ViewShoppingCartsCommand => _viewShoppingCartsCommand = _viewShoppingCartsCommand ?? new RelayCommand(ViewShoppingCarts);
 
         private void ViewShoppingCarts()
         {
-            SelectedButton = null;
-            ShopState = ShopStates.ShoppingCarts;
+            ClientShoppingCartsViewModel.SelectClientCommand.Execute(null); // unselect client
+            Mode = ShopModes.ClientShoppingCarts;
         }
 
         private ICommand _viewSoldArticlesCommand;
-        public ICommand ViewSoldArticlesCommand => _viewSoldArticlesCommand = _viewSoldArticlesCommand ?? new RelayCommand(ViewSoldArticle);
-
-        private void ViewSoldArticle()
-        {
-            SelectedButton = null;
-            ShopState = ShopStates.SoldArticles;
-        }
+        public ICommand ViewSoldArticlesCommand => _viewSoldArticlesCommand = _viewSoldArticlesCommand ?? new RelayCommand(() => Mode = ShopModes.SoldArticles);
 
         #endregion
 
@@ -74,138 +77,14 @@ namespace PPC.Shop.ViewModels
 
         #endregion
 
-        #region Cash register/client shopping carts buttons
+        #region Clients shopping cart
 
-        private ShoppingCartBasedViewModelBase _selectedButton;
-        public ShoppingCartBasedViewModelBase SelectedButton
+        private ClientShoppingCartsViewModel _clientShoppingCartsViewModel;
+        public ClientShoppingCartsViewModel ClientShoppingCartsViewModel
         {
-            get { return _selectedButton;}
-            set
-            {
-                if (Set(() => SelectedButton, ref _selectedButton, value))
-                {
-                    if (value == null)
-                        ShopState = ShopStates.ShoppingCarts; // switch back to summary when no button are selected
-                    else
-                        ShopState = ShopStates.Detail;
-                    if (value != null)
-                        value.ShoppingCart.IsArticleNameFocused = true; // grrrrrrrrr f**king focus
-                }
-            }
+            get { return _clientShoppingCartsViewModel; }
+            protected set { Set(() => ClientShoppingCartsViewModel, ref _clientShoppingCartsViewModel, value); }
         }
-
-        private ObservableCollection<ShoppingCartBasedViewModelBase> _buttons;
-        public ObservableCollection<ShoppingCartBasedViewModelBase> Buttons
-        {
-            get { return _buttons; }
-            protected set { Set(() => Buttons, ref _buttons, value); }
-        }
-
-        private ICommand _selectButtonCommand;
-        public ICommand SelectButtonCommand => _selectButtonCommand = _selectButtonCommand ?? new RelayCommand<ShoppingCartBasedViewModelBase>(button => SelectedButton = button);
-
-        private ICommand _addNewClientCommand;
-        public ICommand AddNewClientCommand => _addNewClientCommand = _addNewClientCommand ?? new RelayCommand(AddNewClient);
-
-        private void AddNewClient()
-        {
-            AskNamePopupViewModel vm = new AskNamePopupViewModel(PopupService, AddNewClientNameSelected);
-            PopupService.DisplayModal(vm, "Client name?");
-        }
-
-        private void AddNewClientNameSelected(string name)
-        {
-            if (Buttons.OfType<ClientViewModel>().Any(x => x.ClientName == name))
-            {
-                PopupService.DisplayError("Error", "A shopping cart with that client name has already been opened!");
-            }
-            else
-            {
-                ClientViewModel newClient = new ClientViewModel(ClientPaid, RefreshSoldArticles)
-                {
-                    HasFullPlayerInfos = false,
-                    ClientName = name,
-                };
-                Buttons.Add(newClient);
-                SelectedButton = newClient;
-                //
-                RaisePropertyChanged(() => ClientShoppingCartsCount);
-                RaisePropertyChanged(() => PaidClientShoppingCartsCount);
-                RaisePropertyChanged(() => UnpaidClientShoppingCartsCount);
-            }
-        }
-
-        private ICommand _closeClientCommand;
-        public ICommand CloseClientCommand => _closeClientCommand = _closeClientCommand ?? new RelayCommand<ClientViewModel>(CloseClient);
-
-        private void CloseClient(ClientViewModel client)
-        {
-            if (client.PaymentState == PaymentStates.Unpaid && client.ShoppingCart.ShoppingCartArticles.Any())
-                PopupService.DisplayQuestion($"Close {client.ClientName} shopping cart", $"Client {client.ClientName} has not paid yet. shopping cart cannot be closed.",
-                    new ActionButton
-                    {
-                        Caption = "Ok",
-                        Order = 2,
-                        ClickCallback = () => { }
-                    });
-            else
-                PopupService.DisplayQuestion($"Close {client.ClientName} shopping cart", "Are you sure ?",
-                    new ActionButton
-                    {
-                        Caption = "Yes",
-                        Order = 1,
-                        ClickCallback = () => CloseClientConfirmed(client)
-                    },
-                    new ActionButton
-                    {
-                        Caption = "No",
-                        Order = 2,
-                        ClickCallback = () => { }
-                    });
-        }
-
-        private void CloseClientConfirmed(ClientViewModel client)
-        {
-            if (SelectedButton == client)
-                SelectedButton = CashRegisterViewModel;
-            Buttons.Remove(client);
-            if (client.ShoppingCart.ShoppingCartArticles.Any())
-            {
-                // Create a transaction and add it to transactions
-                ShopTransactionItem transaction = new ShopTransactionItem
-                {
-                    Timestamp = DateTime.Now,
-                    Articles = client.ShoppingCart.ShoppingCartArticles.Select(x => new ShopArticleItem
-                    {
-                        Article = x.Article,
-                        Quantity = x.Quantity
-                    }).ToList(),
-                    Cash = client.Cash,
-                    BankCard = client.BankCard
-                };
-                AddTransaction(transaction);
-            }
-            // Delete backup file
-            try
-            {
-                string filename = client.Filename;
-                File.Delete(filename);
-            }
-            catch (Exception ex)
-            {
-                PopupService.DisplayError("Error while deleting backup file", ex);
-            }
-            //
-            RaisePropertyChanged(() => ClientShoppingCartsCount);
-            RaisePropertyChanged(() => PaidClientShoppingCartsCount);
-            RaisePropertyChanged(() => UnpaidClientShoppingCartsCount);
-        }
-
-        public int ClientShoppingCartsCount => Buttons.OfType<ClientViewModel>().Count();
-
-        public int PaidClientShoppingCartsCount => Buttons.OfType<ClientViewModel>().Count(x => x.PaymentState == PaymentStates.Paid);
-
-        public int UnpaidClientShoppingCartsCount => Buttons.OfType<ClientViewModel>().Count(x => x.PaymentState == PaymentStates.Unpaid);
 
         #endregion
 
@@ -247,13 +126,10 @@ namespace PPC.Shop.ViewModels
             {
                 try
                 {
-                    SelectedButton = CashRegisterViewModel; // View cash register
                     // Reload transactions
                     LoadTransactions();
                     // Reload clients
-                    //  remove existing clients
-                    Buttons.RemoveOfType<ShoppingCartBasedViewModelBase, ClientViewModel>();
-                    LoadClients();
+                    ClientShoppingCartsViewModel.LoadClients(ShopFilename);
 
                     // If transactions/clients contains unknown article -> remove them and display a warning
                     bool unknownArticleFound = false;
@@ -262,11 +138,9 @@ namespace PPC.Shop.ViewModels
                         transaction.Articles.RemoveAll(x => x.Article == null);
                         unknownArticleFound = true;
                     }
-                    foreach(ClientViewModel client in Buttons.OfType<ClientViewModel>().Where(c => c.ShoppingCart.ShoppingCartArticles.Any(a => a.Article == null)))
-                    {
-                        client.ShoppingCart.ShoppingCartArticles.RemoveAll(x => x.Article == null);
+
+                    if (ClientShoppingCartsViewModel.FindAndRemoveInvalidArticles())
                         unknownArticleFound = true;
-                    }
 
                     if (unknownArticleFound)
                     {
@@ -277,6 +151,11 @@ namespace PPC.Shop.ViewModels
                     }
 
                     RefreshSoldArticles();
+
+                    PopupService.DisplayQuestion("Reload", "Reload done", new ActionButton
+                    {
+                        Caption = "Ok"
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -302,20 +181,17 @@ namespace PPC.Shop.ViewModels
                         DataContractSerializer serializer = new DataContractSerializer(typeof(Data.Contracts.Shop));
                         shop = (Data.Contracts.Shop) serializer.ReadObject(reader);
                     }
-                    Transactions.Clear();
-                    Transactions.AddRange(shop.Transactions.Select(t => new ShopTransactionItem
+                    Transactions = new ObservableCollection<ShopTransactionItem>(shop.Transactions.Select(t => new ShopTransactionItem
                     {
                         Timestamp = t.Timestamp,
                         Articles = t.Articles.Select(a => new ShopArticleItem
                         {
-                            Article = ArticlesDb.Instance.Articles.FirstOrDefault(x => x.Guid == a.Guid),
+                            Article = IocContainer.Default.Resolve<IArticleDb>().GetById(a.Guid),
                             Quantity = a.Quantity
                         }).ToList(),
                         Cash = t.Cash,
                         BankCard = t.BankCard,
                     }));
-                    CashRegisterViewModel.Cash = Transactions.Sum(x => x.Cash);
-                    CashRegisterViewModel.BankCard = Transactions.Sum(x => x.BankCard);
                 }
                 catch (Exception ex)
                 {
@@ -328,23 +204,6 @@ namespace PPC.Shop.ViewModels
             }
         }
 
-        private void LoadClients()
-        {
-            //  add backup clients
-            foreach (string filename in Directory.EnumerateFiles(ConfigurationManager.AppSettings["BackupPath"], "*.xml", SearchOption.TopDirectoryOnly).Where(x => !x.Contains(ShopFilename)))
-            {
-                try
-                {
-                    ClientViewModel client = new ClientViewModel(ClientPaid, RefreshSoldArticles, filename);
-                    Buttons.Add(client);
-                }
-                catch (Exception ex)
-                {
-                    PopupService.DisplayError($"Error while loading {filename} cart", ex);
-                }
-            }
-        }
-
         #endregion
 
         #region Cash register closure
@@ -354,7 +213,7 @@ namespace PPC.Shop.ViewModels
 
         private void CashRegisterClosure()
         {
-            if (Buttons.OfType<ClientViewModel>().Any(x => x.PaymentState == PaymentStates.Unpaid))
+            if (ClientShoppingCartsViewModel.UnpaidClientShoppingCartsCount > 0)
                 PopupService.DisplayQuestion("Warning", "There is 1 or more client shopping cart opened.",
                     new ActionButton
                     {
@@ -423,7 +282,7 @@ namespace PPC.Shop.ViewModels
         {
             // Compute shop closure
             //  transactions from cash register
-            List<TransactionFullArticle> transactions = new List<TransactionFullArticle>(Transactions.Select(t => new TransactionFullArticle
+            List<TransactionFullArticle> transactions = Transactions.Select(t => new TransactionFullArticle
             {
                 Timestamp = t.Timestamp,
                 Articles = t.Articles.Select(x => new FullArticle
@@ -436,25 +295,10 @@ namespace PPC.Shop.ViewModels
                 }).ToList(),
                 Cash = t.Cash,
                 BankCard = t.BankCard
-            }));
-            //  transactions from shopping client carts
-            foreach (ClientViewModel client in Buttons.OfType<ClientViewModel>())
-            {
-                transactions.Add(new TransactionFullArticle
-                {
-                    Timestamp = client.PaymentTimestamp,
-                    Articles = client.ShoppingCart.ShoppingCartArticles.Select(x => new FullArticle
-                    {
-                        Guid = x.Article.Guid,
-                        Ean = x.Article.Ean,
-                        Description = x.Article.Description,
-                        Price = x.Article.Price,
-                        Quantity = x.Quantity
-                    }).ToList(),
-                    Cash = client.Cash,
-                    BankCard = client.BankCard
-                });
-            }
+            }).ToList();
+            //  transactions from clients shopping cart
+            transactions.AddRange(ClientShoppingCartsViewModel.BuildTransactions());
+
             //  closure summary
             CashRegisterClosure closure = new CashRegisterClosure
             {
@@ -586,12 +430,28 @@ namespace PPC.Shop.ViewModels
 
         #region Transactions
 
-        public ObservableCollection<ShopTransactionItem> Transactions { get; }
+        private ObservableCollection<ShopTransactionItem> _transactions;
+        public ObservableCollection<ShopTransactionItem> Transactions
+        {
+            get { return _transactions; }
+            set
+            {
+                if (Set(() => Transactions, ref _transactions, value))
+                {
+                    RaisePropertyChanged(() => Cash);
+                    RaisePropertyChanged(() => BankCard);
+                }
+            }
+        }
 
         private void AddTransaction(ShopTransactionItem transaction)
         {
             Transactions.Add(transaction);
+            RaisePropertyChanged(() => Cash);
+            RaisePropertyChanged(() => BankCard);
+
             SaveTransactions();
+
             RefreshSoldArticles();
         }
 
@@ -633,22 +493,18 @@ namespace PPC.Shop.ViewModels
 
         public ShopViewModel()
         {
-            ShopState = ShopStates.ShoppingCarts;
+            Mode = ShopModes.CashRegister;
 
             Transactions = new ObservableCollection<ShopTransactionItem>();
             CashRegisterViewModel = new CashRegisterViewModel(AddTransaction);
-
-            Buttons = new ObservableCollection<ShoppingCartBasedViewModelBase>
-            {
-                CashRegisterViewModel
-            };
-
-            Mediator.Default.Register<PlayerSelectedMessage>(this, PlayerSelected);
+            ClientShoppingCartsViewModel = new ClientShoppingCartsViewModel(AddTransaction, ClientPaid, RefreshSoldArticles);
+            SoldArticles = new List<ShopArticleItem>();
         }
 
-        private void ClientPaid()
+        private void ClientPaid(decimal cash, decimal bankCard)
         {
-            ShopState = ShopStates.ShoppingCarts;
+            Mode = ShopModes.CashRegister;
+
             RefreshSoldArticles();
         }
 
@@ -672,10 +528,10 @@ namespace PPC.Shop.ViewModels
                 }
                 soldItem.Quantity += item.Quantity;
             }
-            totalCash += CashRegisterViewModel.Cash;
-            totalBankCard += CashRegisterViewModel.BankCard;
+            totalCash += Cash;
+            totalBankCard += BankCard;
             // Gather sold items in closed client shopping carts
-            foreach (ClientViewModel client in Buttons.OfType<ClientViewModel>().Where(x => x.PaymentState == PaymentStates.Paid))
+            foreach (ClientShoppingCartViewModel client in ClientShoppingCartsViewModel.Clients.Where(x => x.PaymentState == ClientShoppingCartPaymentStates.Paid))
             {
                 foreach (ShopArticleItem item in client.ShoppingCart.ShoppingCartArticles)
                 {
@@ -701,34 +557,6 @@ namespace PPC.Shop.ViewModels
             SoldArticlesTotal = SoldArticles.Sum(x => x.Total);
             SoldArticlesTotalCash = totalCash;
             SoldArticlesTotalBankCard = totalBankCard;
-            //
-            RaisePropertyChanged(() => PaidClientShoppingCartsCount);
-            RaisePropertyChanged(() => UnpaidClientShoppingCartsCount);
-        }
-
-        private void PlayerSelected(PlayerSelectedMessage msg)
-        {
-            // Select shopping cart or create it
-            ClientViewModel client = Buttons.OfType<ClientViewModel>().FirstOrDefault(x => x.DciNumber == msg.DciNumber && x.ClientFirstName == msg.FirstName && x.ClientLastName == msg.LastName);
-            if (client == null)
-            {
-                ClientViewModel newClient = new ClientViewModel(ClientPaid, RefreshSoldArticles)
-                {
-                    HasFullPlayerInfos = true,
-                    ClientName = msg.FirstName,
-                    ClientFirstName = msg.FirstName,
-                    ClientLastName = msg.LastName,
-                    DciNumber = msg.DciNumber
-                };
-                Buttons.Add(newClient);
-                SelectedButton = newClient;
-                //
-                RaisePropertyChanged(() => ClientShoppingCartsCount);
-                RaisePropertyChanged(() => PaidClientShoppingCartsCount);
-                RaisePropertyChanged(() => UnpaidClientShoppingCartsCount);
-            }
-            else
-                SelectedButton = client;
         }
     }
 
@@ -737,34 +565,9 @@ namespace PPC.Shop.ViewModels
         public ShopViewModelDesignData()
         {
             CashRegisterViewModel = new CashRegisterViewModelDesignData();
+            ClientShoppingCartsViewModel = new ClientShoppingCartsViewModelDesignData();
 
-            Buttons = new ObservableCollection<ShoppingCartBasedViewModelBase>
-            {
-                CashRegisterViewModel,
-                new ClientViewModelDesignData
-                {
-                    ClientName = "un super long nom0",
-                    PaymentState = PaymentStates.Unpaid
-                },
-
-                new ClientViewModelDesignData
-                {
-                    ClientName = "Joel",
-                    PaymentState = PaymentStates.Paid
-                },
-                new ClientViewModelDesignData
-                {
-                    ClientName = "Pouet",
-                    PaymentState = PaymentStates.Unpaid
-                }
-            };
-            Buttons.AddRange(Enumerable.Range(1, 5).Select(x => new ClientViewModelDesignData
-            {
-                ClientName = $"un super long nom[{x}]",
-                PaymentState = x%2 == 0 ? PaymentStates.Unpaid : PaymentStates.Paid
-            }));
-
-            ShopState = ShopStates.ShoppingCarts;
+            Mode = ShopModes.CashRegister;
         }
     }
 }

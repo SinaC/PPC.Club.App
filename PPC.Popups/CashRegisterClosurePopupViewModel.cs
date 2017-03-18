@@ -6,6 +6,12 @@ using PPC.Data.Contracts;
 
 namespace PPC.Popups
 {
+    public enum ClosureDisplayModes
+    {
+        Articles,
+        Count,
+    }
+
     public class CashRegisterClosurePopupViewModel : ObservableObject
     {
         private readonly IPopupService _popupService;
@@ -13,6 +19,31 @@ namespace PPC.Popups
         private readonly Action<CashRegisterClosure> _sendMailAction;
 
         public CashRegisterClosure ClosureData { get; }
+
+        private CashRegisterCountViewModel _countViewModel;
+        public CashRegisterCountViewModel CountViewModel
+        {
+            get { return _countViewModel; }
+            set { Set(() => CountViewModel, ref _countViewModel, value); }
+        }
+
+        private ClosureDisplayModes _mode;
+        public ClosureDisplayModes Mode
+        {
+            get { return _mode; }
+            set { Set(() => Mode, ref _mode, value); }
+        }
+
+        private ICommand _switchModeCommand;
+        public ICommand SwitchModeCommand => _switchModeCommand = _switchModeCommand ?? new RelayCommand(SwitchMode);
+
+        private void SwitchMode()
+        {
+            if (Mode == ClosureDisplayModes.Articles)
+                Mode = ClosureDisplayModes.Count;
+            else
+                Mode = ClosureDisplayModes.Articles;
+        }
 
         private ICommand _okCommand;
         public ICommand OkCommand => _okCommand = _okCommand ?? new RelayCommand(Ok);
@@ -32,6 +63,9 @@ namespace PPC.Popups
             _sendMailAction = sendMailAction;
 
             ClosureData = closure;
+            CountViewModel = new CashRegisterCountViewModel();
+
+            Mode = ClosureDisplayModes.Count;
         }
     }
 
@@ -67,6 +101,9 @@ namespace PPC.Popups
             }).ToList()
         }, () => { }, _ => { })
         {
+            CountViewModel = new CashRegisterCountViewModelDesignData();
+
+            Mode = ClosureDisplayModes.Count;
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
+using EasyIoc;
 using EasyMVVM;
 using PPC.Data.Contracts;
 using PPC.Data.Players;
@@ -18,12 +19,12 @@ namespace PPC.Players.ViewModels
 {
     public class PlayersViewModel : ObservableObject
     {
-        private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
+        private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
 
         #region Filtered players
 
-        private IEnumerable<PlayerModel> _filteredPlayers;
-        public IEnumerable<PlayerModel> FilteredPlayers
+        private IEnumerable<PlayerItem> _filteredPlayers;
+        public IEnumerable<PlayerItem> FilteredPlayers
         {
             get { return _filteredPlayers;}
             set { Set(() => FilteredPlayers, ref _filteredPlayers, value); }
@@ -40,7 +41,7 @@ namespace PPC.Players.ViewModels
             }
         }
 
-        private bool FilterPlayer(PlayerModel p)
+        private bool FilterPlayer(PlayerItem p)
         {
             if (string.IsNullOrWhiteSpace(Filter))
                 return true;
@@ -63,8 +64,8 @@ namespace PPC.Players.ViewModels
 
         #endregion
 
-        private ObservableCollection<PlayerModel> _players;
-        public ObservableCollection<PlayerModel> Players
+        private ObservableCollection<PlayerItem> _players;
+        public ObservableCollection<PlayerItem> Players
         {
             get { return _players; }
             protected set
@@ -74,8 +75,8 @@ namespace PPC.Players.ViewModels
             }
         }
 
-        private PlayerModel _selectedPlayer;
-        public PlayerModel SelectedPlayer
+        private PlayerItem _selectedPlayer;
+        public PlayerItem SelectedPlayer
         {
             get { return _selectedPlayer; }
             set { Set(() => SelectedPlayer, ref _selectedPlayer, value); }
@@ -93,8 +94,8 @@ namespace PPC.Players.ViewModels
                 string filename = ConfigurationManager.AppSettings["PlayersPath"];
                 if (onlyIfExists && !File.Exists(filename))
                     return;
-                List<Player> players = PlayersDb.Instance.Load(filename);
-                Players = new ObservableCollection<PlayerModel>(players.Select(x => new PlayerModel
+                List<Player> players = IocContainer.Default.Resolve<IPlayersDb>().Load(filename);
+                Players = new ObservableCollection<PlayerItem>(players.Select(x => new PlayerItem
                 {
                     DCINumber = x.DCINumber,
                     FirstName = x.FirstName,
@@ -131,7 +132,7 @@ namespace PPC.Players.ViewModels
                     CountryCode = x.CountryCode,
                     IsJudge = x.IsJudge
                 }).ToList();
-                PlayersDb.Instance.Save(ConfigurationManager.AppSettings["PlayersPath"], players);
+                IocContainer.Default.Resolve<IPlayersDb>().Save(ConfigurationManager.AppSettings["PlayersPath"], players);
                 Load(false); //TODO crappy workaround to reset row.IsNewItem
             }
             catch (Exception ex)
@@ -145,12 +146,12 @@ namespace PPC.Players.ViewModels
         #region Select player
 
         private ICommand _selectPlayerCommand;
-        public ICommand SelectPlayerCommand => _selectPlayerCommand = _selectPlayerCommand ?? new RelayCommand<PlayerModel>(pm => SelectPlayer(pm, true));
+        public ICommand SelectPlayerCommand => _selectPlayerCommand = _selectPlayerCommand ?? new RelayCommand<PlayerItem>(pm => SelectPlayer(pm, true));
 
         private ICommand _selectPlayerWithModifierCommand;
-        public ICommand SelectPlayerWithModifierCommand => _selectPlayerWithModifierCommand = _selectPlayerWithModifierCommand ?? new RelayCommand<PlayerModel>(pm => SelectPlayer(pm, false));
+        public ICommand SelectPlayerWithModifierCommand => _selectPlayerWithModifierCommand = _selectPlayerWithModifierCommand ?? new RelayCommand<PlayerItem>(pm => SelectPlayer(pm, false));
 
-        private void SelectPlayer(PlayerModel player, bool switchToShop)
+        private void SelectPlayer(PlayerItem player, bool switchToShop)
         {
             if (player != null)
             {
@@ -178,16 +179,16 @@ namespace PPC.Players.ViewModels
     {
         public PlayersViewModelDesignData()
         {
-            Players = new ObservableCollection<PlayerModel>
+            Players = new ObservableCollection<PlayerItem>
             {
-                new PlayerModel
+                new PlayerItem
                 {
                     DCINumber = "123456789",
                     FirstName = "pouet",
                     LastName = "taratata",
                     CountryCode = "BE"
                 },
-                 new PlayerModel
+                 new PlayerItem
                 {
                     DCINumber = "9876543",
                     FirstName = "tsekwa",

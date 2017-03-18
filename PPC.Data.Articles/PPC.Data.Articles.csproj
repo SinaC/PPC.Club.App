@@ -43,12 +43,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArticlesDb.cs" />
+    <Compile Include="ArticlesDesignData.cs" />
+    <Compile Include="IArticleDb.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EasyDBFParser\EasyDBFParser.csproj">
       <Project>{e85892e8-7837-483d-b20d-dfe6a89d8330}</Project>
       <Name>EasyDBFParser</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EasyIoc\EasyIoc.csproj">
+      <Project>{38d20e7f-9510-4b80-8755-1def2ef07bcf}</Project>
+      <Name>EasyIoc</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Data.Contracts\PPC.Data.Contracts.csproj">
       <Project>{73f28b1d-02d3-4bdf-891a-df4ee2248353}</Project>

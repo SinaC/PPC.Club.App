@@ -2,7 +2,7 @@
 
 namespace PPC.Players.Models
 {
-    public class PlayerModel : ObservableObject
+    public class PlayerItem : ObservableObject
     {
         private string _dciNumber;
         public string DCINumber

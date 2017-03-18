@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Windows.Input;
+using EasyIoc;
 using EasyMVVM;
 using PPC.Data.Articles;
 using PPC.Data.Contracts;
@@ -13,15 +14,12 @@ namespace PPC.Inventory.ViewModels
 {
     public class InventoryViewModel : ObservableObject
     {
-        private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
+        private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
 
-        private static readonly string[] EmptyList = { string.Empty };
-
-        public IEnumerable<Article> Articles => ArticlesDb.Instance.Articles;
-
-        private IEnumerable<string> Categories => EmptyList.Concat(ArticlesDb.Instance.Articles.Where(x => !string.IsNullOrWhiteSpace(x.Category)).Select(x => x.Category).Distinct());
-        private IEnumerable<string> Producers => EmptyList.Concat(ArticlesDb.Instance.Articles.Where(x => !string.IsNullOrWhiteSpace(x.Producer)).Select(x => x.Producer).Distinct());
-        private Func<string,IEnumerable<string>> BuildSubCategories => category => EmptyList.Concat(ArticlesDb.Instance.Articles.Where(x => x.Category == category && !string.IsNullOrWhiteSpace(x.SubCategory)).Select(x => x.SubCategory).Distinct());
+        public IEnumerable<Article> Articles => IocContainer.Default.Resolve<IArticleDb>().Articles;
+        public IEnumerable<string> Categories => IocContainer.Default.Resolve<IArticleDb>().Categories;
+        public IEnumerable<string> Producers => IocContainer.Default.Resolve<IArticleDb>().Producers;
+        private Func<string, IEnumerable<string>> BuildSubCategories => IocContainer.Default.Resolve<IArticleDb>().SubCategories;
 
         #region Selected article
 
@@ -43,7 +41,7 @@ namespace PPC.Inventory.ViewModels
         {
             try
             {
-                ArticlesDb.Instance.Load();
+                IocContainer.Default.Resolve<IArticleDb>().Load();
                 RaisePropertyChanged(() => Articles);
                 PopupService.DisplayQuestion("Load", "Articles successfully loaded.", new ActionButton
                 {
@@ -68,7 +66,7 @@ namespace PPC.Inventory.ViewModels
         {
             try
             {
-                ArticlesDb.Instance.Save();
+                IocContainer.Default.Resolve<IArticleDb>().Save();
                 PopupService.DisplayQuestion("Save", "Articles successfully saved.", new ActionButton
                 {
                     Caption = "Ok",
@@ -98,7 +96,7 @@ namespace PPC.Inventory.ViewModels
             {
                 try
                 {
-                    ArticlesDb.Instance.ImportFromDbf(filename);
+                    IocContainer.Default.Resolve<IArticleDb>().ImportFromDbf(filename);
                     RaisePropertyChanged(() => Articles);
                     PopupService.DisplayQuestion("Import", $"{Articles.Count()} articles successfully imported. Don't forget to click on 'Save' button to save imported articles.",
                         new ActionButton
@@ -108,7 +106,7 @@ namespace PPC.Inventory.ViewModels
                         });
                     //!! after import -> every article guid are modified -> shopping carts and backup files are invalid
                     // TODO: 
-                    //  import button must be disabled once a shopping cart has been created
+                    //  import button must be disabled once a shopping cart/transaction has been created
                     //  backup files must be deleted once import is performed
                 }
                 catch (Exception ex)
@@ -155,7 +153,7 @@ namespace PPC.Inventory.ViewModels
 
             try
             {
-                ArticlesDb.Instance.Add(article);
+                IocContainer.Default.Resolve<IArticleDb>().Add(article);
             }
             catch (Exception ex)
             {
@@ -208,7 +206,7 @@ namespace PPC.Inventory.ViewModels
 
             try
             {
-                ArticlesDb.Instance.Save();
+                IocContainer.Default.Resolve<IArticleDb>().Save();
             }
             catch (Exception ex)
             {
@@ -223,7 +221,8 @@ namespace PPC.Inventory.ViewModels
     {
         public InventoryViewModelDesignData()
         {
-            ArticlesDb.Instance.Inject(new List<Article>
+            IocContainer.Default.Unregister<IArticleDb>();
+            IocContainer.Default.RegisterInstance<IArticleDb>(new ArticlesDesignData(new List<Article>
             {
                 new Article
                 {
@@ -257,7 +256,7 @@ namespace PPC.Inventory.ViewModels
                     Category = "Cat3",
                     SubCategory = "Sub31"
                 },
-            });
+            }));
         }
     }
 }

@@ -39,6 +39,8 @@
     <Compile Include="Article.cs" />
     <Compile Include="CashRegisterClosure.cs" />
     <Compile Include="CashRegisterClosureConfig.cs" />
+    <Compile Include="CashRegisterCount.cs" />
+    <Compile Include="CashRegisterCountEntry.cs" />
     <Compile Include="FullArticle.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Shop.cs" />

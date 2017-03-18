@@ -6,20 +6,28 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Windows.Input;
 using System.Xml;
+using EasyIoc;
 using EasyMVVM;
 using PPC.Data.Articles;
 using PPC.Data.Contracts;
 using PPC.Helpers;
 using PPC.Popups;
+using PPC.Shop.Models;
 
 namespace PPC.Shop.ViewModels
 {
-    public class ClientViewModel : ShoppingCartBasedViewModelBase
+    public enum ClientShoppingCartPaymentStates
     {
-        private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
+        Paid,
+        Unpaid
+    }
 
-        private readonly Action _cartPaidAction;
-        private readonly Action _cartReopenedAction;
+    public class ClientShoppingCartViewModel : ObservableObject
+    {
+        private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
+
+        private Action<decimal, decimal> _cartPaidAction;
+        private Action _cartReopenedAction;
 
         public string Filename => $"{ConfigurationManager.AppSettings["BackupPath"]}{(HasFullPlayerInfos ? DciNumber : ClientName.ToLowerInvariant())}.xml";
 
@@ -72,24 +80,59 @@ namespace PPC.Shop.ViewModels
         public ICommand ReOpenCommand => _reOpenCommand = _reOpenCommand ?? new RelayCommand(ReOpen);
         private void ReOpen()
         {
-            PaymentState = PaymentStates.Unpaid;
+            PaymentState = ClientShoppingCartPaymentStates.Unpaid;
             _cartReopenedAction();
             Save();
         }
 
         #endregion
 
-        public ClientViewModel(Action cartPaidAction, Action cartReopenedAction)
+        private ClientShoppingCartPaymentStates _paymentState;
+        public ClientShoppingCartPaymentStates PaymentState
+        {
+            get { return _paymentState; }
+            protected set { Set(() => PaymentState, ref _paymentState, value); }
+        }
+
+        private ShoppingCartViewModel _shoppingCart;
+        public ShoppingCartViewModel ShoppingCart
+        {
+            get { return _shoppingCart; }
+            protected set { Set(() => ShoppingCart, ref _shoppingCart, value); }
+        }
+
+        private decimal _cash;
+        public decimal Cash
+        {
+            get { return _cash; }
+            protected set { Set(() => Cash, ref _cash, value); }
+        }
+
+        private decimal _bankCard;
+        public decimal BankCard
+        {
+            get { return _bankCard; }
+            protected set { Set(() => BankCard, ref _bankCard, value); }
+        }
+
+        public void RemoveHandlers()
+        {
+            _cartPaidAction = null;
+            _cartReopenedAction = null;
+            ShoppingCart.RemoveHandlers();
+        }
+
+        public ClientShoppingCartViewModel(Action<decimal, decimal> cartPaidAction, Action cartReopenedAction)
         {
             _cartPaidAction = cartPaidAction;
             _cartReopenedAction = cartReopenedAction;
 
-            PaymentState = PaymentStates.Unpaid;
+            PaymentState = ClientShoppingCartPaymentStates.Unpaid;
 
             ShoppingCart = new ShoppingCartViewModel(Payment, Save);
         }
 
-        public ClientViewModel(Action cartPaidAction, Action cartReopenedAction, string filename) 
+        public ClientShoppingCartViewModel(Action<decimal, decimal> cartPaidAction, Action cartReopenedAction, string filename) 
             : this(cartPaidAction, cartReopenedAction)
         {
             Load(filename);
@@ -97,12 +140,14 @@ namespace PPC.Shop.ViewModels
 
         private void Payment(decimal cash, decimal bankCard)
         {
-            PaymentState = PaymentStates.Paid;
+            PaymentState = ClientShoppingCartPaymentStates.Paid;
             Cash = cash;
             BankCard = bankCard;
-            _cartPaidAction();
             PaymentTimestamp = DateTime.Now;
+
             Save();
+
+            _cartPaidAction(cash, bankCard);
         }
 
         #region Load/Save
@@ -120,16 +165,16 @@ namespace PPC.Shop.ViewModels
             ClientLastName = cart.ClientLastName;
             DciNumber = cart.DciNumber;
             HasFullPlayerInfos = cart.HasFullPlayerInfos;
-            PaymentState = cart.IsPaid 
-                ? PaymentStates.Paid 
-                : PaymentStates.Unpaid;
+            PaymentState = cart.IsPaid
+                ? ClientShoppingCartPaymentStates.Paid
+                : ClientShoppingCartPaymentStates.Unpaid;
             PaymentTimestamp = cart.PaymentTimeStamp;
             Cash = cart.Cash;
             BankCard = cart.BankCard;
             ShoppingCart.ShoppingCartArticles.Clear();
             ShoppingCart.ShoppingCartArticles.AddRange(cart.Articles.Select(x => new ShopArticleItem
             {
-                Article = ArticlesDb.Instance.Articles.FirstOrDefault(a => a.Guid == x.Guid),
+                Article = IocContainer.Default.Resolve<IArticleDb>().GetById(x.Guid),
                 Quantity = x.Quantity
             }));
 
@@ -149,7 +194,7 @@ namespace PPC.Shop.ViewModels
                     ClientLastName = ClientLastName,
                     DciNumber = DciNumber,
                     HasFullPlayerInfos = HasFullPlayerInfos,
-                    IsPaid = PaymentState == PaymentStates.Paid,
+                    IsPaid = PaymentState == ClientShoppingCartPaymentStates.Paid,
                     PaymentTimeStamp = PaymentTimestamp,
                     Cash = Cash,
                     BankCard = BankCard,
@@ -176,9 +221,9 @@ namespace PPC.Shop.ViewModels
         #endregion
     }
 
-    public class ClientViewModelDesignData : ClientViewModel
+    public class ClientShoppingCartViewModelDesignData : ClientShoppingCartViewModel
     {
-        public ClientViewModelDesignData() : base(() => { }, () => { })
+        public ClientShoppingCartViewModelDesignData() : base((c, b) => { }, () => { })
         {
             ShoppingCart = new ShoppingCartViewModelDesignData();
 
@@ -187,7 +232,7 @@ namespace PPC.Shop.ViewModels
             ClientFirstName = "Toto";
             ClientLastName = "Tsekwa";
             DciNumber = "123456789";
-            PaymentState = PaymentStates.Paid;
+            PaymentState = ClientShoppingCartPaymentStates.Unpaid;
             Cash = 15;
             BankCard = 20;
         }

@@ -1,7 +1,7 @@
 ﻿using EasyMVVM;
 using PPC.Data.Contracts;
 
-namespace PPC.Shop.ViewModels
+namespace PPC.Shop.Models
 {
     public class ShopArticleItem : ObservableObject
     {

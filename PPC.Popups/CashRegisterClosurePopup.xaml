@@ -6,15 +6,46 @@
              xmlns:popups="clr-namespace:PPC.Popups"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance popups:CashRegisterClosurePopupViewModelDesignData, IsDesignTimeCreatable=True}"
-             d:DesignHeight="300" d:DesignWidth="300"
+             d:DesignHeight="400" d:DesignWidth="520"
              MaxWidth="700"
-             MaxHeight="500">
+             MaxHeight="480">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Styles.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Images.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <DataTemplate DataType="{x:Type popups:CashRegisterClosurePopupViewModel}" x:Key="ArticlesTemplate">
+                <DataGrid IsReadOnly="True"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          AutoGenerateColumns="False"
+                          ItemsSource="{Binding ClosureData.Articles}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Ean"
+                                            Binding="{Binding Ean}"/>
+                        <DataGridTextColumn Header="Description"
+                                            Binding="{Binding Description}"/>
+                        <DataGridTextColumn Header="Quantity"
+                                            Binding="{Binding Quantity}"/>
+                        <DataGridTextColumn Header="Price"
+                                            Binding="{Binding Price, StringFormat=C}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type popups:CashRegisterClosurePopupViewModel}" x:Key="CountTemplate">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Separator Grid.Row="0"
+                               Margin="2,0"
+                               HorizontalAlignment="Stretch"/>
+                    <popups:CashRegisterCountView Grid.Row="1"
+                                                  DataContext="{Binding CountViewModel}"/>
+                </Grid>
+            </DataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
     <Border BorderBrush="Black" 
@@ -26,7 +57,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-        
+
             <UniformGrid Grid.Row="0"
                          Rows="1">
                 <StackPanel Margin="5,2"
@@ -58,42 +89,81 @@
                 </StackPanel>
             </UniformGrid>
 
-            <DataGrid Grid.Row="1"
-                      IsReadOnly="True"
-                      CanUserAddRows="False"
-                      CanUserDeleteRows="False"
-                      AutoGenerateColumns="False"
-                      ItemsSource="{Binding ClosureData.Articles}">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Ean"
-                                            Binding="{Binding Ean}"/>
-                    <DataGridTextColumn Header="Description"
-                                            Binding="{Binding Description}"/>
-                    <DataGridTextColumn Header="Quantity"
-                                            Binding="{Binding Quantity}"/>
-                    <DataGridTextColumn Header="Price"
-                                            Binding="{Binding Price, StringFormat=C}"/>
-                </DataGrid.Columns>
-            </DataGrid>
+            <ContentPresenter Grid.Row="1"
+                              Content="{Binding}">
+                <ContentPresenter.Style>
+                    <Style TargetType="{x:Type ContentPresenter}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Mode}" Value="{x:Static popups:ClosureDisplayModes.Articles}">
+                                <Setter Property="ContentTemplate" Value="{StaticResource ArticlesTemplate}"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Mode}" Value="{x:Static popups:ClosureDisplayModes.Count}">
+                                <Setter Property="ContentTemplate" Value="{StaticResource CountTemplate}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ContentPresenter.Style>
+            </ContentPresenter>
 
-            <StackPanel Grid.Row="2"
-                        HorizontalAlignment="Center"
-                        Orientation="Horizontal">
-                <Button Margin="15,2" 
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0"
+                        Margin="5,2"
                         Width="32"
-                        ToolTip="Delete backup files and close application"
-                        Command="{Binding OkCommand}">
-                    <Image Style="{StaticResource AutoDisableImageStyle}"
-                           Source="{StaticResource CheckmarkImage}"/>
+                        Command="{Binding SwitchModeCommand}">
+                    <Image>
+                        <Image.Style>
+                            <Style TargetType="{x:Type Image}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Mode}" Value="{x:Static popups:ClosureDisplayModes.Articles}">
+                                        <Setter Property="Source" Value="{StaticResource CashImage}"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Mode}" Value="{x:Static popups:ClosureDisplayModes.Count}">
+                                        <Setter Property="Source" Value="{StaticResource ListImage}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Image.Style>
+                    </Image>
+                    <!--<TextBlock>
+                        <TextBlock.Style>
+                            <Style TargetType="{x:Type TextBlock}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Mode}" Value="{x:Static popups:ClosureDisplayModes.Articles}">
+                                        <Setter Property="Text" Value="Count"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Mode}" Value="{x:Static popups:ClosureDisplayModes.Count}">
+                                        <Setter Property="Text" Value="List"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>-->
                 </Button>
-                <Button Margin="15,2" 
-                        Width="32"
-                        ToolTip="Send closure mail"
-                        Command="{Binding SendMailCommand}">
-                    <Image Style="{StaticResource AutoDisableImageStyle}"
-                           Source="{StaticResource MailImage}"/>
-                </Button>
-            </StackPanel>
+
+                <StackPanel Grid.Column="1"
+                            HorizontalAlignment="Center"
+                            Orientation="Horizontal">
+                    <Button Margin="15,2" 
+                            Width="32"
+                            ToolTip="Delete backup files and close application"
+                            Command="{Binding OkCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="{StaticResource CheckmarkImage}"/>
+                    </Button>
+                    <Button Margin="15,2" 
+                            Width="32"
+                            ToolTip="Send closure mail"
+                            Command="{Binding SendMailCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="{StaticResource MailImage}"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
         </Grid>
     </Border>
 </UserControl>

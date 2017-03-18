@@ -55,7 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Converters\IsNamedObjectVisibilityConverter.cs" />
-    <Compile Include="Models\PlayerModel.cs" />
+    <Compile Include="Models\PlayerItem.cs" />
     <Compile Include="Views\PlayersView.xaml.cs">
       <DependentUpon>PlayersView.xaml</DependentUpon>
     </Compile>

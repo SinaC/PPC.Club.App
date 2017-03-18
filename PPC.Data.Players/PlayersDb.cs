@@ -2,27 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Xml;
 using System.Xml.Serialization;
 using PPC.Data.Contracts;
 
 namespace PPC.Data.Players
 {
-    public class PlayersDb
+    public class PlayersDb : IPlayersDb
     {
-        #region Singleton
-
-        private static readonly Lazy<PlayersDb> Lazy = new Lazy<PlayersDb>(() => new PlayersDb(), LazyThreadSafetyMode.ExecutionAndPublication);
-        public static PlayersDb Instance => Lazy.Value;
-
-        private PlayersDb()
-        {
-            // TODO: ideally Load should be called here but if an exception occurs in Load, it will not bubble
-        }
-
-        #endregion
-
         public List<Player> Load(string path)
         {
             global::LocalPlayers localPlayers;

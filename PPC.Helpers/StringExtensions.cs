@@ -8,5 +8,12 @@ namespace PPC.Helpers
         {
             return source.IndexOf(toCheck, comp) >= 0;
         }
+
+        public static string AppendIfNotEmpty(this string source, string toAdd)
+        {
+            if (string.IsNullOrWhiteSpace(source) || string.IsNullOrWhiteSpace(toAdd))
+                return source;
+            return source + toAdd;
+        }
     }
 }

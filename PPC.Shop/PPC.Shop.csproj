@@ -84,34 +84,36 @@
   <ItemGroup>
     <Compile Include="Converters\VisibilityToNullableBooleanConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewModels\ArticleSelectorViewModel.cs" />
+    <Compile Include="ViewModels\ClientShoppingCartsViewModel.cs" />
+    <Compile Include="ViewModels\ClientShoppingCartViewModel.cs" />
+    <Compile Include="ViewModels\ArticleSelector\DesktopArticleSelectorViewModel.cs" />
+    <Compile Include="ViewModels\ArticleSelector\MobileArticleSelectorViewModel.cs" />
     <Compile Include="ViewModels\CashRegisterViewModel.cs" />
-    <Compile Include="ViewModels\ClientViewModel.cs" />
-    <Compile Include="ViewModels\ShopArticleItem.cs" />
-    <Compile Include="ViewModels\ShoppingCartBasedViewModelBase.cs" />
+    <Compile Include="ViewModels\ArticleSelector\IArticleSelector.cs" />
+    <Compile Include="Models\ShopArticleItem.cs" />
     <Compile Include="ViewModels\ShoppingCartViewModel.cs" />
-    <Compile Include="ViewModels\ShopTransactionItem.cs" />
+    <Compile Include="Models\ShopTransactionItem.cs" />
     <Compile Include="ViewModels\ShopViewModel.cs" />
-    <Compile Include="Views\ArticleSelectorView.xaml.cs">
-      <DependentUpon>ArticleSelectorView.xaml</DependentUpon>
+    <Compile Include="Views\ArticleSelector\DesktopArticleSelectorView.xaml.cs">
+      <DependentUpon>DesktopArticleSelectorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ArticleSelector\MobileArticleSelectorView.xaml.cs">
+      <DependentUpon>MobileArticleSelectorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CashRegisterView.xaml.cs">
       <DependentUpon>CashRegisterView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ClientView.xaml.cs">
-      <DependentUpon>ClientView.xaml</DependentUpon>
+    <Compile Include="Views\ClientShoppingCartsView.xaml.cs">
+      <DependentUpon>ClientShoppingCartsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ShopDetailView.xaml.cs">
-      <DependentUpon>ShopDetailView.xaml</DependentUpon>
+    <Compile Include="Views\ClientShoppingCartView.xaml.cs">
+      <DependentUpon>ClientShoppingCartView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ShoppingCartView.xaml.cs">
       <DependentUpon>ShoppingCartView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ShopSoldArticlesView.xaml.cs">
       <DependentUpon>ShopSoldArticlesView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\ShopShoppingCartsView.xaml.cs">
-      <DependentUpon>ShopShoppingCartsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ShopView.xaml.cs">
       <DependentUpon>ShopView.xaml</DependentUpon>
@@ -156,7 +158,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\ArticleSelectorView.xaml">
+    <Page Include="Views\ArticleSelector\DesktopArticleSelectorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ArticleSelector\MobileArticleSelectorView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -164,11 +170,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ClientView.xaml">
+    <Page Include="Views\ClientShoppingCartsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ShopDetailView.xaml">
+    <Page Include="Views\ClientShoppingCartView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -177,12 +183,8 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ShopSoldArticlesView.xaml">
-      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\ShopShoppingCartsView.xaml">
       <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ShopView.xaml">
       <SubType>Designer</SubType>
@@ -192,6 +194,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

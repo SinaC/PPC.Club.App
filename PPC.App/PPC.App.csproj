@@ -166,6 +166,10 @@
       <Project>{73f28b1d-02d3-4bdf-891a-df4ee2248353}</Project>
       <Name>PPC.Data.Contracts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PPC.Data.Players\PPC.Data.Players.csproj">
+      <Project>{A639D237-42CB-45B7-A987-3FCD8C3203AE}</Project>
+      <Name>PPC.Data.Players</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PPC.Inventory\PPC.Inventory.csproj">
       <Project>{e734f70a-12e8-46bb-857d-35d606169a11}</Project>
       <Name>PPC.Inventory</Name>

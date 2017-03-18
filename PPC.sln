@@ -17,11 +17,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyIoc", "EasyIoc\EasyIoc.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.Helpers", "PPC.Helpers\PPC.Helpers.csproj", "{3523C53F-4317-4AC6-B077-76544BDD174A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TODO", "TODO", "{7538B18B-F1D3-4EDE-B69F-FBA0D690F7A6}"
-	ProjectSection(SolutionItems) = preProject
-		TODO.txt = TODO.txt
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.Controls", "PPC.Controls\PPC.Controls.csproj", "{04CD3C36-E320-4A14-952B-1E09340E9B58}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.Messages", "PPC.Messages\PPC.Messages.csproj", "{137EF3D3-E60D-45E9-8A3B-43042FC36105}"
@@ -41,6 +36,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyDBFParser", "EasyDBFParser\EasyDBFParser.csproj", "{E85892E8-7837-483D-B20D-DFE6A89D8330}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{DF6F7A91-1607-418C-A551-B690E7D64261}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TODO", "TODO", "{65CA7F7C-6851-4776-B210-B6EDEFE11719}"
+	ProjectSection(SolutionItems) = preProject
+		TODO.txt = TODO.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

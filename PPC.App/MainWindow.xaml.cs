@@ -1,5 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Input;
+using EasyIoc;
+using PPC.Data.Articles;
+using PPC.Data.Players;
 using PPC.Popups;
 
 namespace PPC.App
@@ -13,7 +16,9 @@ namespace PPC.App
         {
             InitializeComponent();
 
-            EasyIoc.IocContainer.Default.RegisterInstance<IPopupService>(ModalPopupPresenter);
+            IocContainer.Default.RegisterInstance<IArticleDb>(new ArticlesDb());
+            IocContainer.Default.RegisterInstance<IPlayersDb>(new PlayersDb());
+            IocContainer.Default.RegisterInstance<IPopupService>(ModalPopupPresenter);
 
             DataContext = new MainWindowViewModel();
         }
