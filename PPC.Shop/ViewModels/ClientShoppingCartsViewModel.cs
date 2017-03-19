@@ -60,7 +60,10 @@ namespace PPC.Shop.ViewModels
                     if (value == null)
                         Mode = ClientShoppingCartsMode.List;
                     else
+                    {
                         Mode = ClientShoppingCartsMode.Detail;
+                        value.ShoppingCart.GotFocus();
+                    }
                 }
             }
         }

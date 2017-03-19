@@ -50,7 +50,13 @@ namespace PPC.Shop.ViewModels
         }
 
         private ICommand _viewCashRegisterCommand;
-        public ICommand ViewCashRegisterCommand => _viewCashRegisterCommand = _viewCashRegisterCommand ?? new RelayCommand(() => Mode = ShopModes.CashRegister);
+        public ICommand ViewCashRegisterCommand => _viewCashRegisterCommand = _viewCashRegisterCommand ?? new RelayCommand(ViewCashRegister);
+
+        private void ViewCashRegister()
+        {
+            Mode = ShopModes.CashRegister;
+            CashRegisterViewModel.ShoppingCart.GotFocus();
+        }
 
         private ICommand _viewShoppingCartsCommand;
         public ICommand ViewShoppingCartsCommand => _viewShoppingCartsCommand = _viewShoppingCartsCommand ?? new RelayCommand(ViewShoppingCarts);
@@ -499,6 +505,8 @@ namespace PPC.Shop.ViewModels
             CashRegisterViewModel = new CashRegisterViewModel(AddTransaction);
             ClientShoppingCartsViewModel = new ClientShoppingCartsViewModel(AddTransaction, ClientPaid, RefreshSoldArticles);
             SoldArticles = new List<ShopArticleItem>();
+
+            CashRegisterViewModel.ShoppingCart.GotFocus();
         }
 
         private void ClientPaid(decimal cash, decimal bankCard)
