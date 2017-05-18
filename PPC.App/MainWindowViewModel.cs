@@ -233,8 +233,12 @@ namespace PPC.App
 
         private void CloseApplicationAfterClosurePopup()
         {
-            ShopViewModel.DeleteBackupFiles();
-            CardsViewModel.DeleteBackupFiles();
+            string savePath = ConfigurationManager.AppSettings["BackupPath"] + $"{DateTime.Now:yyyy-MM-dd hh-mm-ss}\\";
+            if (!Directory.Exists(savePath))
+                Directory.CreateDirectory(savePath);
+
+            ShopViewModel.DeleteBackupFiles(savePath);
+            CardsViewModel.DeleteBackupFiles(savePath);
 
             Application.Current.Shutdown();
         }

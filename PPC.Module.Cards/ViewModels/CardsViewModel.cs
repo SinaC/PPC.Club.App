@@ -28,7 +28,7 @@ namespace PPC.Module.Cards.ViewModels
         private CardSellers _cardSellers;
 
         private Func<string,string> SearchEmailByName => name => _cardSellers?.Sellers.FirstOrDefault(x => CultureInfo.CurrentCulture.CompareInfo.IndexOf(x.Name, name, CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreCase) >= 0)?.Email;
-        private IEnumerable<string> SellerNames => _cardSellers?.Sellers.Select(x => x.Name);
+        private IEnumerable<string> SellerNames => _cardSellers?.Sellers.Select(x => x.Name) ?? Enumerable.Empty<string>();
 
         #region Seller selection
 
@@ -155,14 +155,17 @@ namespace PPC.Module.Cards.ViewModels
             }).ToList();
         }
 
-        public void DeleteBackupFiles()
+        public void DeleteBackupFiles(string savePath)
         {
-            // Delete backup files
+            // Move backup files into save folder
             try
             {
                 string backupPath = CardSellerViewModel.Path;
                 foreach (string file in Directory.EnumerateFiles(backupPath))
-                    File.Delete(file);
+                {
+                    string saveFilename = savePath + "cards_"+Path.GetFileName(file);
+                    File.Move(file, saveFilename);
+                }
             }
             catch (Exception ex)
             {

@@ -371,14 +371,17 @@ namespace PPC.Module.Shop.ViewModels
             return closure;
         }
 
-        public void DeleteBackupFiles()
+        public void DeleteBackupFiles(string savePath)
         {
-            // Delete backup files
+            // Move backup files into save folder
             try
             {
                 string backupPath = ConfigurationManager.AppSettings["BackupPath"];
                 foreach (string file in Directory.EnumerateFiles(backupPath))
-                    File.Delete(file);
+                {
+                    string saveFilename = savePath + Path.GetFileName(file);
+                    File.Move(file, saveFilename);
+                }
             }
             catch (Exception ex)
             {
