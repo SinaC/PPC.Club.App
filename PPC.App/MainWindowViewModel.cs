@@ -223,11 +223,9 @@ namespace PPC.App
 
         private void DisplayClosurePopup()
         {
-            //Old way: ShopViewModel.CashRegisterClosureCommand.Execute(null);
-
             CashRegisterClosure closureData = ShopViewModel.PrepareClosure();
             List<SoldCards> soldCards = CardsViewModel.PrepareClosure();
-            ClosurePopupViewModel vm = new ClosurePopupViewModel(CloseApplicationAfterClosurePopup, closureData, soldCards, async (closure,cards) => await SendMailsAsync(closure, cards));
+            ClosurePopupViewModel vm = new ClosurePopupViewModel(CloseApplicationAfterClosurePopup, closureData, soldCards, SendMailsAsync);
             PopupService.DisplayModal(vm, "Cash register closure", 640, 480);
         }
 
@@ -397,32 +395,6 @@ namespace PPC.App
             ApplicationMode = ApplicationModes.Shop;
 
             IsWaiting = false;
-        }
-    }
-
-    // TODO: Use following code in ClosurePopupViewModel
-
-    //http://stackoverflow.com/questions/12466049/passing-an-awaitable-anonymous-function-as-a-parameter
-    public class Test
-    {
-        // In ClosurePopupViewModel SendMailCommand
-        private async Task DoStuff(string a, string b, Func<string,string,Task> sendMailFunc)
-        {
-            // IsWaiting = true;
-            await sendMailFunc(a, b);
-            // IsWaiting = false
-        }
-
-        // In MainViewModel
-        private async Task SendMailAsync(string a, string b)
-        {
-        }
-
-        //
-        private void PerformTest()
-        {
-            string a = "", b = "";
-            DoStuff(a, b, SendMailAsync);
         }
     }
 }

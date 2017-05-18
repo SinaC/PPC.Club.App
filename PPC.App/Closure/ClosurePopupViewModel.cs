@@ -22,7 +22,7 @@ namespace PPC.App.Closure
         private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
 
         private readonly Action _closeAction;
-        private readonly Action<CashRegisterClosure, List<SoldCards>> _sendMailsAction;
+        private readonly Func<CashRegisterClosure, List<SoldCards>, Task> _sendMailsAsyncFunc;
 
         private bool _isWaiting;
         public bool IsWaiting
@@ -68,15 +68,14 @@ namespace PPC.App.Closure
         }
 
         private ICommand _sendMailsCommand;
-        public ICommand SendMailsCommand => _sendMailsCommand = _sendMailsCommand ?? new RelayCommand(() => _sendMailsAction?.Invoke(ArticlesViewModel.ClosureData, SoldCardsViewModel.SoldCards));
-        //public ICommand SendMailsCommand => _sendMailsCommand = _sendMailsCommand ?? new RelayCommand(async () => await SendMails());
+        public ICommand SendMailsCommand => _sendMailsCommand = _sendMailsCommand ?? new RelayCommand(async () => await SendMails());
 
-        //private async Task SendMails()
-        //{
-        //    IsWaiting = true;
-        //    await _sendMailsAsyncAction;
-        //    IsWaiting = false;
-        //}
+        private async Task SendMails()
+        {
+            IsWaiting = true;
+            await _sendMailsAsyncFunc(ArticlesViewModel.ClosureData, SoldCardsViewModel.SoldCards);
+            IsWaiting = false;
+        }
 
         private ICommand _switchToArticlesCommand;
         public ICommand SwitchToArticlesCommand => _switchToArticlesCommand = _switchToArticlesCommand ?? new RelayCommand(() => Mode = ClosureDisplayModes.Articles);
@@ -87,12 +86,13 @@ namespace PPC.App.Closure
         private ICommand _switchToCashCountCommand;
         public ICommand SwitchToCashCountCommand => _switchToCashCountCommand = _switchToCashCountCommand ?? new RelayCommand(() => Mode = ClosureDisplayModes.CashCount);
 
-        public ClosurePopupViewModel(Action closeAction, CashRegisterClosure cashRegisterClosure, List<SoldCards> soldCards, Action<CashRegisterClosure, List<SoldCards>> sendMailsAction)
+        //http://stackoverflow.com/questions/12466049/passing-an-awaitable-anonymous-function-as-a-parameter
+        public ClosurePopupViewModel(Action closeAction, CashRegisterClosure cashRegisterClosure, List<SoldCards> soldCards, Func<CashRegisterClosure, List<SoldCards>, Task> sendMailsAsyncFunc)
         {
             Mode = ClosureDisplayModes.Articles;
 
             _closeAction = closeAction;
-            _sendMailsAction = sendMailsAction;
+            _sendMailsAsyncFunc = sendMailsAsyncFunc;
 
             ArticlesViewModel = new ArticlesViewModel(cashRegisterClosure);
             SoldCardsViewModel = new SoldCardsViewModel(soldCards);
