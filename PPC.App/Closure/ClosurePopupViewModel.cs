@@ -56,8 +56,20 @@ namespace PPC.App.Closure
         public ClosureDisplayModes Mode
         {
             get { return _mode; }
-            protected set { Set(() => Mode, ref _mode, value); }
+            protected set
+            {
+                if (Set(() => Mode, ref _mode, value))
+                {
+                    RaisePropertyChanged(() => IsArticlesSelected);
+                    RaisePropertyChanged(() => IsSoldCardsSelected);
+                    RaisePropertyChanged(() => IsCashCountSelected);
+                }
+            }
         }
+
+        public bool IsArticlesSelected => Mode == ClosureDisplayModes.Articles;
+        public bool IsSoldCardsSelected => Mode == ClosureDisplayModes.SoldCards;
+        public bool IsCashCountSelected => Mode == ClosureDisplayModes.CashCount;
 
         private ICommand _okCommand;
         public ICommand OkCommand => _okCommand = _okCommand ?? new RelayCommand(Ok);

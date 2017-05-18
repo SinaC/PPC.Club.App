@@ -1,6 +1,4 @@
 AskNameEmailPopup: check email validity
-ClosurePopup: waiting screen
-check each module (players, shop, inventory) before closing application
 article refund (client doesn't want anymore an already paid article !! only for cash payment)
 article DB (real DB instead of xml file)
 PlayersDb: store the list of players (similar to ArticlesDb + call load from MainViewModel)

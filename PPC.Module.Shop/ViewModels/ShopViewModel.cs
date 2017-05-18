@@ -41,6 +41,7 @@ namespace PPC.Module.Shop.ViewModels
             protected set { Set(() => Mode, ref _mode, value); }
         }
 
+        //TODO: replace command with public method
         private ICommand _viewCashRegisterCommand;
         public ICommand ViewCashRegisterCommand => _viewCashRegisterCommand = _viewCashRegisterCommand ?? new RelayCommand(ViewCashRegister);
 
@@ -50,6 +51,7 @@ namespace PPC.Module.Shop.ViewModels
             CashRegisterViewModel.ShoppingCart.GotFocus();
         }
 
+        //TODO: replace command with public method
         private ICommand _viewShoppingCartsCommand;
         public ICommand ViewShoppingCartsCommand => _viewShoppingCartsCommand = _viewShoppingCartsCommand ?? new RelayCommand(ViewShoppingCarts);
 
@@ -59,6 +61,7 @@ namespace PPC.Module.Shop.ViewModels
             Mode = ShopModes.ClientShoppingCarts;
         }
 
+        //TODO: replace command with public method
         private ICommand _viewSoldArticlesCommand;
         public ICommand ViewSoldArticlesCommand => _viewSoldArticlesCommand = _viewSoldArticlesCommand ?? new RelayCommand(() => Mode = ShopModes.SoldArticles);
 

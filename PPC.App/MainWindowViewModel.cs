@@ -22,6 +22,7 @@ using PPC.Module.Inventory.ViewModels;
 using PPC.Module.Players.ViewModels;
 using PPC.Module.Shop.ViewModels;
 using PPC.Services.Popup;
+using Xceed.Wpf.DataGrid.Automation;
 
 namespace PPC.App
 {
@@ -81,6 +82,23 @@ namespace PPC.App
             set { Set(() => ApplicationMode, ref _applicationMode, value); }
         }
 
+        public bool IsCashRegisterSelected => ApplicationMode == ApplicationModes.Shop && ShopViewModel.Mode == ShopModes.CashRegister;
+        public bool IsClientShoppingCartSelected => ApplicationMode == ApplicationModes.Shop && ShopViewModel.Mode == ShopModes.ClientShoppingCarts;
+        public bool IsSoldArticlesSelected => ApplicationMode == ApplicationModes.Shop && ShopViewModel.Mode == ShopModes.SoldArticles;
+        public bool IsPlayersSelected => ApplicationMode == ApplicationModes.Players;
+        public bool IsInventorySelected => ApplicationMode == ApplicationModes.Inventory;
+        public bool IsCardsSelected => ApplicationMode == ApplicationModes.Cards;
+
+        private void RaiseSelectedMode()
+        {
+            RaisePropertyChanged(() => IsCashRegisterSelected);
+            RaisePropertyChanged(() => IsClientShoppingCartSelected);
+            RaisePropertyChanged(() => IsSoldArticlesSelected);
+            RaisePropertyChanged(() => IsPlayersSelected);
+            RaisePropertyChanged(() => IsInventorySelected);
+            RaisePropertyChanged(() => IsCardsSelected);
+        }
+
         private ICommand _switchToCashRegisterCommand;
         public ICommand SwitchToCashRegisterCommand => _switchToCashRegisterCommand = _switchToCashRegisterCommand ?? new RelayCommand(SwitchToCashRegister);
 
@@ -88,6 +106,7 @@ namespace PPC.App
         {
             ApplicationMode = ApplicationModes.Shop;
             ShopViewModel.ViewCashRegisterCommand.Execute(null);
+            RaiseSelectedMode();
         }
 
         private ICommand _switchToShoppingCartsCommand;
@@ -97,6 +116,7 @@ namespace PPC.App
         {
             ApplicationMode = ApplicationModes.Shop;
             ShopViewModel.ViewShoppingCartsCommand.Execute(null);
+            RaiseSelectedMode();
         }
 
         private ICommand _switchToSoldArticlesCommand;
@@ -106,6 +126,7 @@ namespace PPC.App
         {
             ApplicationMode = ApplicationModes.Shop;
             ShopViewModel.ViewSoldArticlesCommand.Execute(null);
+            RaiseSelectedMode();
         }
 
         private ICommand _addNewClientCommand;
@@ -116,6 +137,7 @@ namespace PPC.App
             ApplicationMode = ApplicationModes.Shop;
             ShopViewModel.ViewShoppingCartsCommand.Execute(null);
             ShopViewModel.ClientShoppingCartsViewModel.AddNewClientCommand.Execute(null);
+            RaiseSelectedMode();
         }
 
         private ICommand _switchToPlayersCommand;
@@ -124,6 +146,7 @@ namespace PPC.App
         private void SwitchToPlayers()
         {
             ApplicationMode = ApplicationModes.Players;
+            RaiseSelectedMode();
         }
 
         private ICommand _switchToInventoryCommand;
@@ -132,6 +155,7 @@ namespace PPC.App
         private void SwitchToInventory()
         {
             ApplicationMode = ApplicationModes.Inventory;
+            RaiseSelectedMode();
         }
 
         private ICommand _switchToCardSellerCommand;
@@ -141,6 +165,7 @@ namespace PPC.App
         {
             ApplicationMode = ApplicationModes.Cards;
             CardsViewModel.SelectedSeller = null; // unselect currently selected if any and switch to list mode
+            RaiseSelectedMode();
         }
 
         #endregion

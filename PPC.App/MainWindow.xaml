@@ -65,21 +65,23 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <!-- Go to cash register -->
-                <Button Grid.Row="0"
-                        Width="64"
-                        Margin="2"
-                        Command="{Binding SwitchToCashRegisterCommand}"
-                        ToolTip="Cash register">
+                <ToggleButton Grid.Row="0"
+                              Width="64"
+                              Margin="2"
+                              ToolTip="Cash register"
+                              IsChecked="{Binding IsCashRegisterSelected, Mode=OneWay}"
+                              Command="{Binding SwitchToCashRegisterCommand}">
                     <Image Style="{StaticResource AutoDisableImageStyle}"
                            Source="{StaticResource CashRegisterImage}"/>
-                </Button>
+                </ToggleButton>
                 <!-- Go to shopping carts -->
-                <Button Grid.Row="1"
-                        Width="64"
-                        Margin="2"
-                        IsEnabled="{Binding ShopViewModel.ClientShoppingCartsViewModel.HasClientShoppingCartsOpened}"
-                        Command="{Binding SwitchToShoppingCartsCommand}">
-                    <Button.ToolTip>
+                <ToggleButton Grid.Row="1"
+                              Width="64"
+                              Margin="2"
+                              IsEnabled="{Binding ShopViewModel.ClientShoppingCartsViewModel.HasClientShoppingCartsOpened}"
+                              IsChecked="{Binding IsClientShoppingCartSelected, Mode=OneWay}"
+                              Command="{Binding SwitchToShoppingCartsCommand}">
+                    <ToggleButton.ToolTip>
                         <StackPanel Orientation="Vertical">
                             <TextBlock Text="Shopping carts"/>
                             <TextBlock>
@@ -107,10 +109,10 @@
                                 </TextBlock.Text>
                             </TextBlock>
                         </StackPanel>
-                    </Button.ToolTip>
+                    </ToggleButton.ToolTip>
                     <Image Style="{StaticResource AutoDisableImageStyle}"
                            Source="{StaticResource ShopImage}"/>
-                </Button>
+                </ToggleButton>
                 <!-- Create new client -->
                 <Button Grid.Row="2"
                         Width="64"
@@ -118,21 +120,22 @@
                         ToolTip="Add new client shopping cart"
                         Command="{Binding AddNewClientCommand}">
                     <Image Style="{StaticResource AutoDisableImageStyle}"
-                            Source="{StaticResource PlusImage}"/>
+                           Source="{StaticResource PlusImage}"/>
                 </Button>
                 <!-- Go to sold articles -->
-                <Button Grid.Row="3"
-                        Width="64"
-                        Margin="2"
-                        Command="{Binding SwitchToSoldArticlesCommand}">
-                    <Button.ToolTip>
+                <ToggleButton Grid.Row="3"
+                              Width="64"
+                              Margin="2"
+                              IsChecked="{Binding IsSoldArticlesSelected, Mode=OneWay}"
+                              Command="{Binding SwitchToSoldArticlesCommand}">
+                    <ToggleButton.ToolTip>
                         <StackPanel Orientation="Vertical">
                             <TextBlock Text="Sold articles and transactions"/>
                             <TextBlock Text="{Binding ShopViewModel.SoldArticlesTotalCash, StringFormat={}Cash: {0:C}}"/>
                             <TextBlock Text="{Binding ShopViewModel.SoldArticlesTotalBankCard, StringFormat={}Bank card: {0:C}}"/>
                             <TextBlock Text="{Binding ShopViewModel.SoldArticlesTotal, StringFormat={}Total: {0:C}}"/>
                         </StackPanel>
-                    </Button.ToolTip>
+                    </ToggleButton.ToolTip>
                     <Grid>
                         <Image Style="{StaticResource AutoDisableImageStyle}"
                                Source="{StaticResource TransactionsImage}"/>
@@ -151,33 +154,36 @@
                             <TextBlock Text="{Binding ShopViewModel.SoldArticlesTotal, StringFormat=C}"/>
                         </StackPanel>-->
                     </Grid>
-                </Button>
+                </ToggleButton>
                 <!-- Players -->
-                <Button Grid.Row="4"
-                        Width="64"
-                        Margin="2"
-                        ToolTip="Players"
-                        Command="{Binding SwitchToPlayersCommand}">
+                <ToggleButton Grid.Row="4"
+                              Width="64"
+                              Margin="2"
+                              ToolTip="Players"
+                              IsChecked="{Binding IsPlayersSelected, Mode=OneWay}"
+                              Command="{Binding SwitchToPlayersCommand}">
                     <Image Style="{StaticResource AutoDisableImageStyle}"
                            Source="{StaticResource PlayersImage}"/>
-                </Button>
+                </ToggleButton>
                 <!-- Inventory -->
-                <Button Grid.Row="5"
+                <ToggleButton Grid.Row="5"
                         Width="64"
                         Margin="2"
                         ToolTip="Inventory/Stock"
+                        IsChecked="{Binding IsInventorySelected, Mode=OneWay}"
                         Command="{Binding SwitchToInventoryCommand}">
                     <Image Style="{StaticResource AutoDisableImageStyle}"
                            Source="{StaticResource ListImage}"/>
-                </Button>
-                <Button Grid.Row="6"
-                        Width="64"
-                        Margin="2"
-                        ToolTip="Cards seller"
-                        Command="{Binding SwitchToCardSellerCommand}">
+                </ToggleButton>
+                <ToggleButton Grid.Row="6"
+                              Width="64"
+                              Margin="2"
+                              ToolTip="Cards seller"
+                              IsChecked="{Binding IsCardsSelected, Mode=OneWay}"
+                              Command="{Binding SwitchToCardSellerCommand}">
                     <Image Style="{StaticResource AutoDisableImageStyle}"
                            Source="{StaticResource Cards}"/>
-                </Button>
+                </ToggleButton>
                 <!-- dummy row 7 -->
                 <!-- Reload -->
                 <Button Grid.Row="8"

@@ -33,27 +33,45 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <UniformGrid Grid.Row="0"
                          Rows="1">
-                <!-- TODO: image button -->
-                <Button Margin="5,2"
-                        Command="{Binding SwitchToArticlesCommand}">
-                    <TextBlock Text="Articles"/>
-                </Button>
-                <Button Margin="5,2"
-                        Command="{Binding SwitchToSoldCardsCommand}">
-                    <TextBlock Text="Sold Cards"/>
-                </Button>
-                <Button Margin="5,2"
-                        Command="{Binding SwitchToCashCountCommand}">
-                    <TextBlock Text="Cash Count"/>
-                </Button>
+                <ToggleButton Width="64"
+                              Height="64"
+                              Margin="5,2"
+                              ToolTip="Articles list"
+                              IsChecked="{Binding IsArticlesSelected, Mode=OneWay}"
+                              Command="{Binding SwitchToArticlesCommand}">
+                    <Image Style="{StaticResource AutoDisableImageStyle}"
+                           Source="{StaticResource TransactionsImage}"/>
+                </ToggleButton>
+                <ToggleButton Width="64"
+                              Height="64"
+                              Margin="5,2"
+                              ToolTip="Sold cards"
+                              IsChecked="{Binding IsSoldCardsSelected, Mode=OneWay}"
+                              Command="{Binding SwitchToSoldCardsCommand}">
+                    <Image Style="{StaticResource AutoDisableImageStyle}"
+                           Source="{StaticResource Cards}"/>
+                </ToggleButton>
+                <ToggleButton Width="64"
+                              Height="64"
+                              Margin="5,2"
+                              ToolTip="Cash count"
+                              IsChecked="{Binding IsCashCountSelected, Mode=OneWay}"
+                              Command="{Binding SwitchToCashCountCommand}">
+                    <Image Style="{StaticResource AutoDisableImageStyle}"
+                           Source="{StaticResource CashImage}"/>
+                </ToggleButton>
             </UniformGrid>
 
-            <ContentPresenter Grid.Row="1"
+            <Separator Grid.Row="1"
+                       Margin="5,2"/>
+
+            <ContentPresenter Grid.Row="2"
                               Content="{Binding}">
                 <ContentPresenter.Style>
                     <Style TargetType="{x:Type ContentPresenter}">
@@ -72,7 +90,7 @@
                 </ContentPresenter.Style>
             </ContentPresenter>
 
-            <StackPanel Grid.Row="2"
+            <StackPanel Grid.Row="3"
                         HorizontalAlignment="Center"
                         Orientation="Horizontal">
                 <Button Margin="15,2" 
