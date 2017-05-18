@@ -73,47 +73,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AskNamePopup.xaml.cs">
-      <DependentUpon>AskNamePopup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="AskNamePopupViewModel.cs" />
-    <Compile Include="CashRegisterClosurePopup.xaml.cs">
-      <DependentUpon>CashRegisterClosurePopup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="CashRegisterClosurePopupViewModel.cs" />
-    <Compile Include="CashRegisterCountView.xaml.cs">
-      <DependentUpon>CashRegisterCountView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="CashRegisterCountViewModel.cs" />
-    <Compile Include="ErrorPopup.xaml.cs">
-      <DependentUpon>ErrorPopup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ErrorPopupViewModel.cs" />
-    <Compile Include="IPopup.cs" />
-    <Compile Include="IPopupService.cs" />
-    <Compile Include="ISaveNavigationAndFocusPopup.cs" />
-    <Compile Include="MessagePopup.xaml.cs">
-      <DependentUpon>MessagePopup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="MessagePopupViewModel.cs" />
-    <Compile Include="ModalPopup.xaml.cs">
-      <DependentUpon>ModalPopup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ModalPopupPresenter.cs" />
     <Compile Include="CreateEditArticlePopup.xaml.cs">
       <DependentUpon>CreateEditArticlePopup.xaml</DependentUpon>
     </Compile>
     <Compile Include="CreateEditArticlePopupViewModel.cs" />
-    <Compile Include="PaymentPopup.xaml.cs">
-      <DependentUpon>PaymentPopup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="PaymentPopupViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="QuestionPopup.xaml.cs">
-      <DependentUpon>QuestionPopup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="QuestionPopupAnswerItem.cs" />
-    <Compile Include="QuestionPopupViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EasyIoc\EasyIoc.csproj">
@@ -132,47 +96,19 @@
       <Project>{10833c79-c3fb-4f70-ad1d-7f0173d01966}</Project>
       <Name>EasyMVVM</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PPC.Services\PPC.Services.csproj">
+      <Project>{DAAB6105-1A4D-4AF9-9CAE-B76204B411D0}</Project>
+      <Name>PPC.Services</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PPC.Styles\PPC.Styles.csproj">
       <Project>{d75a55fb-738b-4771-be10-7db9008c412f}</Project>
       <Name>PPC.Styles</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="AskNamePopup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CashRegisterClosurePopup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CashRegisterCountView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ErrorPopup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="MessagePopup.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="ModalPopup.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="CreateEditArticlePopup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="PaymentPopup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="QuestionPopup.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>

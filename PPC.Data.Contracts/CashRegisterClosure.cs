@@ -22,82 +22,51 @@ namespace PPC.Data.Contracts
 
         public override string ToString()
         {
-            //StringBuilder sb = new StringBuilder();
-            //sb.AppendLine($"Cloture de la caisse du club (date: {DateTime.Now:F})");
-            //sb.AppendLine("**********************");
-            //sb.AppendLine("Résumé:");
-            //sb.AppendLine("===================");
-            //sb.AppendLine($"Cash: {Cash:C}");
-            //sb.AppendLine($"Bancontact: {BankCard:C}");
-            //sb.AppendLine("Articles:");
-            //if (Articles != null)
-            //{
-            //    foreach (FullArticle article in Articles)
-            //        sb.AppendLine($"{article.Quantity,5} * {article.Ean,15} {article.Description,30} {article.Price,10:C}");
-            //}
-            //else
-            //    sb.AppendLine("néant");
-            //sb.AppendLine("**********************");
-            //sb.AppendLine("Détails:");
-            //sb.AppendLine("===================");
-            //if (Transactions != null)
-            //{
-            //    int id = 1;
-            //    foreach (TransactionFullArticle transaction in Transactions.OrderBy(x => x.Timestamp))
-            //    {
-            //        sb.AppendLine($"Transaction:{id}");
-            //        sb.AppendLine($"Cash:{transaction.Cash:C}");
-            //        sb.AppendLine($"Bancontact:{transaction.BankCard:C}");
-            //        sb.AppendLine("Articles:");
-            //        foreach (FullArticle article in transaction.Articles)
-            //            sb.AppendLine($"{article.Quantity,5} * {article.Ean,15} {article.Description,30} {article.Price,10:C}");
-            //        id++;
-            //        sb.AppendLine("------");
-            //    }
-            //}
-            //else
-            //    sb.AppendLine("néant");
-
             StringBuilder sb = new StringBuilder();
             sb.AppendLine($"Cloture de la caisse du club (date: {DateTime.Now:F})");
             sb.AppendLine("**********************");
             sb.AppendLine($"Cash: {Cash:C}");
             sb.AppendLine($"Bancontact: {BankCard:C}");
             sb.AppendLine("**********************");
-            // Group cash transactions
-            decimal cash = 0;
-            Dictionary<Guid, FullArticle> cashArticles = new Dictionary<Guid, FullArticle>();
-            foreach (TransactionFullArticle transaction in Transactions.Where(x => x.BankCard == 0))
+            if (Transactions.Any(x => x.BankCard == 0 && x.DiscountPercentage == 0))
             {
-                cash += transaction.Cash;
-                foreach (FullArticle article in transaction.Articles)
+                // Group cash-only transactions
+                decimal cash = 0;
+                Dictionary<Guid, FullArticle> cashArticles = new Dictionary<Guid, FullArticle>();
+                foreach (TransactionFullArticle transaction in Transactions.Where(x => x.BankCard == 0 && x.DiscountPercentage == 0))
                 {
-                    FullArticle existingArticle;
-                    if (!cashArticles.TryGetValue(article.Guid, out existingArticle))
+                    cash += transaction.Cash;
+                    foreach (FullArticle article in transaction.Articles)
                     {
-                        existingArticle = new FullArticle
+                        FullArticle existingArticle;
+                        if (!cashArticles.TryGetValue(article.Guid, out existingArticle))
                         {
-                            Guid = article.Guid,
-                            Ean = article.Ean,
-                            Description = article.Description,
-                            Price = article.Price,
-                            Quantity = 0,
-                        };
-                        cashArticles.Add(existingArticle.Guid, existingArticle);
+                            existingArticle = new FullArticle
+                            {
+                                Guid = article.Guid,
+                                Ean = article.Ean,
+                                Description = article.Description,
+                                Price = article.Price,
+                                Quantity = 0,
+                            };
+                            cashArticles.Add(existingArticle.Guid, existingArticle);
+                        }
+                        existingArticle.Quantity += article.Quantity;
                     }
-                    existingArticle.Quantity += article.Quantity;
                 }
+                sb.AppendLine($"Cash: {cash:C}");
+                sb.AppendLine("Articles:");
+                foreach (FullArticle article in cashArticles.Values)
+                    sb.AppendLine(article.ToString());
+                sb.AppendLine("**********************");
             }
-            sb.AppendLine($"Cash: {cash:C}");
-            sb.AppendLine("Articles:");
-            foreach (FullArticle article in cashArticles.Values)
-                sb.AppendLine(article.ToString());
-            sb.AppendLine("**********************");
-            // Transactions with positive bank payment
-            foreach (TransactionFullArticle transaction in Transactions.Where(x => x.BankCard > 0))
+            // Transactions with positive bank payment or non-zero discount
+            foreach (TransactionFullArticle transaction in Transactions.Where(x => x.BankCard > 0 || x.DiscountPercentage > 0))
             {
                 sb.AppendLine($"Cash: {transaction.Cash:C}");
                 sb.AppendLine($"Bancontact: {transaction.BankCard:C}");
+                if (transaction.DiscountPercentage > 0)
+                    sb.AppendLine($"Remise: {transaction.DiscountPercentage:P}");
                 sb.AppendLine("Articles:");
                 foreach (FullArticle article in transaction.Articles)
                     sb.AppendLine(article.ToString());

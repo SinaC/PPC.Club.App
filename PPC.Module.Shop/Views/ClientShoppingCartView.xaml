@@ -1,0 +1,160 @@
+﻿<UserControl x:Class="PPC.Module.Shop.Views.ClientShoppingCartView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:viewModels="clr-namespace:PPC.Module.Shop.ViewModels"
+             xmlns:views="clr-namespace:PPC.Module.Shop.Views"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance viewModels:ClientShoppingCartViewModelDesignData, IsDesignTimeCreatable=True}"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Images.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <DataTemplate DataType="{x:Type viewModels:ClientShoppingCartViewModel}" x:Key="FullClientInfoTemplate">
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel Margin="5,2"
+                                Orientation="Horizontal">
+                        <TextBlock Margin="5,0,0,0"
+                                   FontWeight="Bold"
+                                   Text="{Binding ClientFirstName}"/>
+                        <TextBlock Margin="2,0,0,0"
+                                   FontWeight="Bold"
+                                   Text="{Binding ClientLastName}"/>
+                    </StackPanel>
+                    <TextBlock Margin="5,2"
+                               FontWeight="Bold"
+                               Text="{Binding DciNumber, StringFormat={}(dci {0})}"/>
+                </StackPanel>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:ClientShoppingCartViewModel}" x:Key="PartialClientInfoTemplate">
+                <TextBlock FontWeight="Bold"
+                           Text="{Binding ClientName}"/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewModels:ClientShoppingCartViewModel}" x:Key="UnpaidTemplate">
+                <views:ShoppingCartView DataContext="{Binding ShoppingCart}"/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewModels:ClientShoppingCartViewModel}" x:Key="PaidTemplate">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <GroupBox Grid.Row="0"
+                              Header="Paid">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button Grid.Column="0"
+                                    Margin="5,2"
+                                    Width="24"
+                                    Command="{Binding ReOpenCommand}"
+                                    ToolTip="Re-open client shopping cart">
+                                <Image Style="{StaticResource AutoDisableImageStyle}"
+                                       Source="{StaticResource LockedImage}"/>
+                            </Button>
+
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Horizontal">
+                                <Image Width="32"
+                                       Style="{StaticResource AutoDisableImageStyle}"
+                                       Source="{StaticResource SumImage}"/>
+                                <TextBlock Margin="5,2"
+                                           VerticalAlignment="Center"
+                                           Style="{StaticResource DataTextBlockStyle}"
+                                           Text="{Binding ShoppingCart.Total, StringFormat=C}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2"
+                                        Orientation="Horizontal">
+                                <Image Width="32"
+                                       Style="{StaticResource AutoDisableImageStyle}"
+                                       Source="{StaticResource CashImage}"/>
+                                <TextBlock Margin="5,2"
+                                           VerticalAlignment="Center"
+                                           Style="{StaticResource DataTextBlockStyle}"
+                                           Text="{Binding Cash, StringFormat=C}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="3"
+                                        Orientation="Horizontal">
+                                <Image Width="32"
+                                       Style="{StaticResource AutoDisableImageStyle}"
+                                       Source="{StaticResource BankCardImage}"/>
+                                <TextBlock Margin="5,2"
+                                           VerticalAlignment="Center"
+                                           Style="{StaticResource DataTextBlockStyle}"
+                                           Text="{Binding BankCard, StringFormat=C}"/>
+                            </StackPanel>
+                        </Grid>
+                    </GroupBox>
+                    <views:ShoppingCartView Grid.Row="1"
+                                            IsEnabled="False"
+                                            DataContext="{Binding ShoppingCart}"/>
+                </Grid>
+            </DataTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0"
+                    Width="16"
+                    Margin="5,2"
+                    Command="{Binding DataContext.CloseClientCommand, RelativeSource={RelativeSource AncestorType={x:Type views:ClientShoppingCartsView}}}"
+                    CommandParameter="{Binding}">
+                <Image Style="{StaticResource AutoDisableImageStyle}"
+                       Source="{StaticResource CloseImage}"/>
+            </Button>
+
+            <ContentControl Grid.Column="1"
+                            Margin="5,2"
+                            Content="{Binding}">
+                <ContentControl.Style>
+                    <Style TargetType="{x:Type ContentControl}">
+                        <Setter Property="ContentTemplate" Value="{StaticResource PartialClientInfoTemplate}"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding HasFullPlayerInfos}" Value="True">
+                                <Setter Property="ContentTemplate" Value="{StaticResource FullClientInfoTemplate}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ContentControl.Style>
+            </ContentControl>
+        </Grid>
+
+        <ContentControl Grid.Row="1"
+                        Content="{Binding}">
+            <ContentControl.Style>
+                <Style TargetType="{x:Type ContentControl}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding PaymentState}" Value="{x:Static viewModels:ClientShoppingCartPaymentStates.Paid}">
+                            <Setter Property="ContentTemplate" Value="{StaticResource PaidTemplate}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding PaymentState}" Value="{x:Static viewModels:ClientShoppingCartPaymentStates.Unpaid}">
+                            <Setter Property="ContentTemplate" Value="{StaticResource UnpaidTemplate}"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ContentControl.Style>
+        </ContentControl>
+    </Grid>
+</UserControl>

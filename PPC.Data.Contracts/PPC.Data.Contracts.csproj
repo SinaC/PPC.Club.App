@@ -37,6 +37,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Article.cs" />
+    <Compile Include="CardSeller.cs" />
+    <Compile Include="CardSellers.cs" />
+    <Compile Include="SoldCard.cs" />
+    <Compile Include="SoldCards.cs" />
     <Compile Include="CashRegisterClosure.cs" />
     <Compile Include="CashRegisterClosureConfig.cs" />
     <Compile Include="CashRegisterCount.cs" />

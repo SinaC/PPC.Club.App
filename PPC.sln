@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.App", "PPC.App\PPC.App.csproj", "{C54AEEE9-6D49-4C76-93B8-4DC1B0497A4C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.Players", "PPC.Players\PPC.Players.csproj", "{E48A0AB3-A906-4909-B965-C6286B01D3E9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.Module.Players", "PPC.Module.Players\PPC.Module.Players.csproj", "{E48A0AB3-A906-4909-B965-C6286B01D3E9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyMVVM", "EasyMVVM\EasyMVVM.csproj", "{10833C79-C3FB-4F70-AD1D-7F0173D01966}"
 EndProject
@@ -21,7 +21,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.Controls", "PPC.Control
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.Messages", "PPC.Messages\PPC.Messages.csproj", "{137EF3D3-E60D-45E9-8A3B-43042FC36105}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.Shop", "PPC.Shop\PPC.Shop.csproj", "{C55D71F3-09AB-4B1A-B76F-CFDF52A680F0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.Module.Shop", "PPC.Module.Shop\PPC.Module.Shop.csproj", "{C55D71F3-09AB-4B1A-B76F-CFDF52A680F0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.Styles", "PPC.Styles\PPC.Styles.csproj", "{D75A55FB-738B-4771-BE10-7DB9008C412F}"
 EndProject
@@ -29,7 +29,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.Data.Articles", "PPC.Da
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.Data.Players", "PPC.Data.Players\PPC.Data.Players.csproj", "{A639D237-42CB-45B7-A987-3FCD8C3203AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.Inventory", "PPC.Inventory\PPC.Inventory.csproj", "{E734F70A-12E8-46BB-857D-35D606169A11}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.Module.Inventory", "PPC.Module.Inventory\PPC.Module.Inventory.csproj", "{E734F70A-12E8-46BB-857D-35D606169A11}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.Services", "PPC.Services\PPC.Services.csproj", "{DAAB6105-1A4D-4AF9-9CAE-B76204B411D0}"
 EndProject
@@ -41,6 +41,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TODO", "TODO", "{65CA7F7C-6
 	ProjectSection(SolutionItems) = preProject
 		TODO.txt = TODO.txt
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.Module.Cards", "PPC.Module.Cards\PPC.Module.Cards.csproj", "{464113AF-4BC7-4326-853C-32707A1284E7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -112,6 +114,10 @@ Global
 		{E85892E8-7837-483D-B20D-DFE6A89D8330}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E85892E8-7837-483D-B20D-DFE6A89D8330}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E85892E8-7837-483D-B20D-DFE6A89D8330}.Release|Any CPU.Build.0 = Release|Any CPU
+		{464113AF-4BC7-4326-853C-32707A1284E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{464113AF-4BC7-4326-853C-32707A1284E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{464113AF-4BC7-4326-853C-32707A1284E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{464113AF-4BC7-4326-853C-32707A1284E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

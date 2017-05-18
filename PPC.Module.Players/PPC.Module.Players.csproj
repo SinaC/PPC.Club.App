@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E48A0AB3-A906-4909-B965-C6286B01D3E9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PPC.Module.Players</RootNamespace>
+    <AssemblyName>PPC.Module.Players</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Controls.Input.Toolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\WPFToolkit.3.5.50211.1\lib\System.Windows.Controls.Input.Toolkit.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Windows.Controls.Layout.Toolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\WPFToolkit.3.5.50211.1\lib\System.Windows.Controls.Layout.Toolkit.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="WPFToolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\WPFToolkit.3.5.50211.1\lib\WPFToolkit.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Converters\IsNamedObjectVisibilityConverter.cs" />
+    <Compile Include="Models\PlayerItem.cs" />
+    <Compile Include="Views\PlayersView.xaml.cs">
+      <DependentUpon>PlayersView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModels\PlayersViewModel.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EasyIoc\EasyIoc.csproj">
+      <Project>{38d20e7f-9510-4b80-8755-1def2ef07bcf}</Project>
+      <Name>EasyIoc</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Controls\PPC.Controls.csproj">
+      <Project>{04CD3C36-E320-4A14-952B-1E09340E9B58}</Project>
+      <Name>PPC.Controls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Data.Players\PPC.Data.Players.csproj">
+      <Project>{a639d237-42cb-45b7-a987-3fcd8c3203ae}</Project>
+      <Name>PPC.Data.Players</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Data.Contracts\PPC.Data.Contracts.csproj">
+      <Project>{73F28B1D-02D3-4BDF-891A-DF4EE2248353}</Project>
+      <Name>PPC.Data.Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Helpers\PPC.Helpers.csproj">
+      <Project>{3523c53f-4317-4ac6-b077-76544bdd174a}</Project>
+      <Name>PPC.Helpers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Messages\PPC.Messages.csproj">
+      <Project>{137EF3D3-E60D-45E9-8A3B-43042FC36105}</Project>
+      <Name>PPC.Messages</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EasyMVVM\EasyMVVM.csproj">
+      <Project>{10833c79-c3fb-4f70-ad1d-7f0173d01966}</Project>
+      <Name>EasyMVVM</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Popups\PPC.Popups.csproj">
+      <Project>{c06f804c-58a5-48ea-a3b4-935470804b05}</Project>
+      <Name>PPC.Popups</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Services\PPC.Services.csproj">
+      <Project>{DAAB6105-1A4D-4AF9-9CAE-B76204B411D0}</Project>
+      <Name>PPC.Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Styles\PPC.Styles.csproj">
+      <Project>{d75a55fb-738b-4771-be10-7db9008c412f}</Project>
+      <Name>PPC.Styles</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Views\PlayersView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

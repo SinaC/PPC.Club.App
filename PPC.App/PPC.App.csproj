@@ -55,6 +55,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Controls.Input.Toolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\WPFToolkit.3.5.50211.1\lib\System.Windows.Controls.Input.Toolkit.dll</HintPath>
@@ -119,9 +120,41 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Closure\ArticlesView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Closure\CashCountView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Closure\ClosurePopup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Closure\SoldCardsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainWindowViewModel.cs" />
+    <Compile Include="Closure\ArticlesViewModel.cs" />
+    <Compile Include="Closure\ArticlesView.xaml.cs">
+      <DependentUpon>ArticlesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Closure\CashCountView.xaml.cs">
+      <DependentUpon>CashCountView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Closure\CashCountViewModel.cs" />
+    <Compile Include="Closure\ClosurePopup.xaml.cs">
+      <DependentUpon>ClosurePopup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Closure\ClosurePopupViewModel.cs" />
+    <Compile Include="Closure\SoldCardsView.xaml.cs">
+      <DependentUpon>SoldCardsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Closure\SoldCardsViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -154,6 +187,14 @@
       <Project>{38d20e7f-9510-4b80-8755-1def2ef07bcf}</Project>
       <Name>EasyIoc</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PPC.Helpers\PPC.Helpers.csproj">
+      <Project>{3523C53F-4317-4AC6-B077-76544BDD174A}</Project>
+      <Name>PPC.Helpers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Module.Cards\PPC.Module.Cards.csproj">
+      <Project>{464113AF-4BC7-4326-853C-32707A1284E7}</Project>
+      <Name>PPC.Module.Cards</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PPC.Controls\PPC.Controls.csproj">
       <Project>{04cd3c36-e320-4a14-952b-1e09340e9b58}</Project>
       <Name>PPC.Controls</Name>
@@ -170,9 +211,9 @@
       <Project>{A639D237-42CB-45B7-A987-3FCD8C3203AE}</Project>
       <Name>PPC.Data.Players</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PPC.Inventory\PPC.Inventory.csproj">
+    <ProjectReference Include="..\PPC.Module.Inventory\PPC.Module.Inventory.csproj">
       <Project>{e734f70a-12e8-46bb-857d-35d606169a11}</Project>
-      <Name>PPC.Inventory</Name>
+      <Name>PPC.Module.Inventory</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Messages\PPC.Messages.csproj">
       <Project>{137EF3D3-E60D-45E9-8A3B-43042FC36105}</Project>
@@ -182,17 +223,21 @@
       <Project>{10833c79-c3fb-4f70-ad1d-7f0173d01966}</Project>
       <Name>EasyMVVM</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PPC.Players\PPC.Players.csproj">
+    <ProjectReference Include="..\PPC.Module.Players\PPC.Module.Players.csproj">
       <Project>{e48a0ab3-a906-4909-b965-c6286b01d3e9}</Project>
-      <Name>PPC.Players</Name>
+      <Name>PPC.Module.Players</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Popups\PPC.Popups.csproj">
       <Project>{c06f804c-58a5-48ea-a3b4-935470804b05}</Project>
       <Name>PPC.Popups</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PPC.Shop\PPC.Shop.csproj">
+    <ProjectReference Include="..\PPC.Services\PPC.Services.csproj">
+      <Project>{DAAB6105-1A4D-4AF9-9CAE-B76204B411D0}</Project>
+      <Name>PPC.Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Module.Shop\PPC.Module.Shop.csproj">
       <Project>{c55d71f3-09ab-4b1a-b76f-cfdf52a680f0}</Project>
-      <Name>PPC.Shop</Name>
+      <Name>PPC.Module.Shop</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Styles\PPC.Styles.csproj">
       <Project>{d75a55fb-738b-4771-be10-7db9008c412f}</Project>

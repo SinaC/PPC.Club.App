@@ -16,10 +16,9 @@ namespace PPC.Data.Articles
         IEnumerable<string> Categories { get; }
         IEnumerable<string> Producers { get; }
         IEnumerable<string> SubCategories(string category);
-        IEnumerable<Article> GetArticles(string category);
-        IEnumerable<Article> GetArticles(string category, string subCategory);
+        IEnumerable<Article> FilterArticles(string category);
+        IEnumerable<Article> FilterArticles(string category, string subCategory);
 
-        void ImportFromCsv(string filename);
         void ImportFromDbf(string filename);
 
         void Load();

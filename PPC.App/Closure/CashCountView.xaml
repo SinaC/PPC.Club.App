@@ -1,0 +1,145 @@
+﻿<UserControl x:Class="PPC.App.Closure.CashCountView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:viewModels="clr-namespace:PPC.App.Closure"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance viewModels:CashCountViewModelDesignData, IsDesignTimeCreatable=True}"
+             d:DesignHeight="240" d:DesignWidth="520">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Images.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <DataTemplate DataType="{x:Type viewModels:CashCountItem}" x:Key="CashRegisterCountItemTemplate">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="ValueGroup"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="ReferenceGroup"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="ReferenceTotalGroup"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="CurrentGroup"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="CurrentTotalGroup"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                               VerticalAlignment="Center"
+                               Margin="5,2"
+                               Text="{Binding Value, StringFormat=C}"/>
+                    <TextBlock Grid.Column="1"
+                               VerticalAlignment="Center"
+                               Text="*"/>
+                    <TextBlock Grid.Column="2"
+                               VerticalAlignment="Center"
+                               Margin="5,2"
+                               Text="{Binding Reference}"/>
+                    <TextBlock Grid.Column="3"
+                               VerticalAlignment="Center"
+                               Text="="/>
+                    <TextBlock Grid.Column="4"
+                               VerticalAlignment="Center"
+                               Margin="5,2"
+                               Text="{Binding ReferenceTotal, StringFormat=C}"/>
+                    <xctk:IntegerUpDown  Grid.Column="5"
+                                         MinWidth="50"
+                                         VerticalAlignment="Center"
+                                         Margin="5,2"
+                                         Minimum="0"
+                                         Increment="1"
+                                         Value="{Binding Current}"/>
+                    <TextBlock Grid.Column="6"
+                               VerticalAlignment="Center"
+                               Text="="/>
+                    <TextBlock Grid.Column="7"
+                               MinWidth="60"
+                               VerticalAlignment="Center"
+                               Margin="5,2"
+                               Text="{Binding CurrentTotal, StringFormat=C}"/>
+                </Grid>
+            </DataTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <ItemsControl Grid.Column="0"
+                          Grid.IsSharedSizeScope="True"
+                          IsTabStop="False"
+                          ItemTemplate="{StaticResource CashRegisterCountItemTemplate}"
+                          ItemsSource="{Binding Figures}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Vertical"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+            <Rectangle Grid.Column="1"
+                       Width="1"
+                       Margin="5,2"
+                       VerticalAlignment="Stretch"
+                       Fill="{x:Static SystemColors.ControlDarkBrush}"/>
+            <ItemsControl Grid.Column="2"
+                          Grid.IsSharedSizeScope="True"
+                          IsTabStop="False"
+                          ItemTemplate="{StaticResource CashRegisterCountItemTemplate}"
+                          ItemsSource="{Binding Coins}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Vertical"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </Grid>
+
+        <Rectangle Grid.Row="1"
+                   Height="1"
+                   Margin="2,0"
+                   HorizontalAlignment="Stretch"
+                   Fill="Gray"/>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0"
+                        Margin="5,2"
+                        Orientation="Vertical">
+                <TextBlock Style="{StaticResource HeaderTextBlockStyle}"
+                           Text="Reference Total"/>
+                <TextBlock Style="{StaticResource DataTextBlockStyle}"
+                           Text="{Binding ReferenceTotal, StringFormat=C}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1"
+                        Margin="5,2"
+                        Orientation="Vertical">
+                <TextBlock Style="{StaticResource HeaderTextBlockStyle}"
+                           Text="Current Total"/>
+                <TextBlock Style="{StaticResource DataTextBlockStyle}"
+                           Text="{Binding CurrentTotal, StringFormat=C}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="2"
+                        Margin="5,2"
+                        Orientation="Vertical">
+                <TextBlock Style="{StaticResource HeaderTextBlockStyle}"
+                           Text="Difference (Current - Reference)"/>
+                <TextBlock Style="{StaticResource DataTextBlockStyle}"
+                           Text="{Binding DifferenceTotal, StringFormat=C}"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

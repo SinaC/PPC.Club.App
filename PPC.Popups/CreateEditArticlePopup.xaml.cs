@@ -12,7 +12,18 @@ namespace PPC.Popups
         public CreateEditArticlePopup()
         {
             InitializeComponent();
+            //Loaded += OnLoaded;
         }
+
+        //private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
+        //{
+        //    Loaded -= OnLoaded;
+        //    NameTextBox.Dispatcher.BeginInvoke((Action)delegate
+        //    {
+        //        NameTextBox.Focus();
+        //        Keyboard.Focus(NameTextBox);
+        //    }, DispatcherPriority.Input);
+        //}
 
         private void UpDownBase_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {

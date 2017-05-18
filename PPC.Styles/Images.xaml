@@ -1,13 +1,17 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <BitmapImage UriSource="Images/add-shopping-cart.png" x:Key="AddShoppingCartImage"/>
+    <BitmapImage UriSource="Images/amonkhet.png" x:Key="Magic"/>
+    <BitmapImage UriSource="Images/back.png" x:Key="BackImage"/>
     <BitmapImage UriSource="Images/bankcard.png" x:Key="BankCardImage"/>
+    <BitmapImage UriSource="Images/cards.png" x:Key="Cards"/>
     <BitmapImage UriSource="Images/cash-change.png" x:Key="CashChangeImage"/>
     <BitmapImage UriSource="Images/cash-register.png" x:Key="CashRegisterImage"/>
     <BitmapImage UriSource="Images/cash.png" x:Key="CashImage"/>
     <BitmapImage UriSource="Images/checkmark-round.png" x:Key="CheckmarkImage"/>
     <BitmapImage UriSource="Images/client-cash.png" x:Key="ClientCashImage"/>
     <BitmapImage UriSource="Images/close-round.png" x:Key="CloseImage"/>
+    <BitmapImage UriSource="Images/computer.png" x:Key="ComputerImage"/>
     <BitmapImage UriSource="Images/discount.png" x:Key="DiscountImage"/>
     <BitmapImage UriSource="Images/edit.png" x:Key="EditImage"/>
     <BitmapImage UriSource="Images/error.png" x:Key="ErrorImage"/>
@@ -16,12 +20,14 @@
     <BitmapImage UriSource="Images/locked.png" x:Key="LockedImage"/>
     <BitmapImage UriSource="Images/mail.png" x:Key="MailImage"/>
     <BitmapImage UriSource="Images/minus-round.png" x:Key="MinusImage"/>
+    <BitmapImage UriSource="Images/mobile.png" x:Key="MobileImage"/>
     <BitmapImage UriSource="Images/people.png" x:Key="PlayersImage"/>
     <BitmapImage UriSource="Images/plus-round.png" x:Key="PlusImage"/>
     <BitmapImage UriSource="Images/power.png" x:Key="PowerImage"/>
     <BitmapImage UriSource="Images/refresh.png" x:Key="RefreshImage"/>
     <BitmapImage UriSource="Images/shop.png" x:Key="ShopImage"/>
     <BitmapImage UriSource="Images/sum.png" x:Key="SumImage"/>
+    <BitmapImage UriSource="Images/top.png" x:Key="TopImage"/>
     <BitmapImage UriSource="Images/transactions.png" x:Key="TransactionsImage"/>
     <BitmapImage UriSource="Images/unlocked.png" x:Key="UnlockedImage"/>
 </ResourceDictionary>

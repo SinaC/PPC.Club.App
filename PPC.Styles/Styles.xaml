@@ -9,7 +9,13 @@
         <Setter Property="Foreground" Value="RoyalBlue"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
     </Style>
-    
+    <Style TargetType="{x:Type TextBlock}" x:Key="SubButtonTextBlockStyle">
+        <Setter Property="Foreground" Value="Purple"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+        <Setter Property="FontSize" Value="8"/>
+    </Style>
+
     <!-- Image -->
     <Style TargetType="{x:Type Image}" x:Key="AutoDisableImageStyle">
         <Setter Property="RenderOptions.EdgeMode" Value="Aliased"/>

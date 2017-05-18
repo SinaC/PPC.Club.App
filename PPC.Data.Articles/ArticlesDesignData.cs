@@ -18,14 +18,16 @@ namespace PPC.Data.Articles
         {
             return EmptyList.Concat(Articles.Where(x => x.Category == category && !string.IsNullOrWhiteSpace(x.SubCategory)).Select(x => x.SubCategory).Distinct());
         }
-        public IEnumerable<Article> GetArticles(string category)
+
+        public IEnumerable<Article> FilterArticles(string category)
         {
             IQueryable<Article> query = Articles.AsQueryable();
             if (!string.IsNullOrWhiteSpace(category))
                 query = query.Where(x => x.Category == category);
             return query;
         }
-        public IEnumerable<Article> GetArticles(string category, string subCategory)
+
+        public IEnumerable<Article> FilterArticles(string category, string subCategory)
         {
             IQueryable<Article> query = Articles.AsQueryable();
             if (!string.IsNullOrWhiteSpace(category))
@@ -53,11 +55,6 @@ namespace PPC.Data.Articles
         }
 
         public Article GetById(Guid guid)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ImportFromCsv(string filename)
         {
             throw new NotImplementedException();
         }

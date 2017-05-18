@@ -1,0 +1,211 @@
+﻿<UserControl x:Class="PPC.Module.Shop.Views.ArticleSelector.MobileArticleSelectorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:viewModels="clr-namespace:PPC.Module.Shop.ViewModels.ArticleSelector"
+             xmlns:contracts="clr-namespace:PPC.Data.Contracts;assembly=PPC.Data.Contracts"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance viewModels:MobileArticleSelectorViewModelDesignData, IsDesignTimeCreatable=True}"
+             d:DesignHeight="500" d:DesignWidth="700">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Images.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <!-- Article template -->
+            <DataTemplate x:Key="ArticleTemplate" DataType="{x:Type contracts:Article}">
+                <Button MinHeight="64"
+                        Margin="2"
+                        Command="{Binding DataContext.SelectArticleCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                        CommandParameter="{Binding}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0"
+                                   TextWrapping="WrapWithOverflow"
+                                   Text="{Binding Description}"/>
+                        <TextBlock Grid.Row="1"
+                                   Text="{Binding Price, StringFormat=C}"/>
+                    </Grid>
+                </Button>
+            </DataTemplate>
+            <!-- Category or SubCategory template -->
+            <DataTemplate x:Key="CategorySubCategoryTemplate" DataType="{x:Type system:String}">
+                <Button MinHeight="64"
+                        Margin="2"
+                        Command="{Binding DataContext.SelectCategoryOrSubCategoryCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                        CommandParameter="{Binding}">
+                    <TextBlock TextWrapping="WrapWithOverflow"
+                               Text="{Binding}"/>
+                </Button>
+            </DataTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Current category/subcategory/articles -->
+            <TextBlock Grid.Row="0"
+                       Text="{Binding CurrentSelectionPath}"/>
+
+            <!-- Categories/SubCategories/Articles + Action buttons-->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Categories/SubCategories/Articles -->
+                <ScrollViewer x:Name="ScrollViewerActive"
+                                Grid.Column="0"
+                                HorizontalScrollBarVisibility="Disabled"
+                                VerticalScrollBarVisibility="Auto">
+                    <ItemsControl VerticalAlignment="Top"
+                                  ItemsSource="{Binding CurrentlyDisplayedCollection}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <!--<WrapPanel Orientation="Horizontal"/>-->
+                                <UniformGrid Columns="6"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <ContentControl Content="{Binding}">
+                                    <ContentControl.Style>
+                                        <Style TargetType="{x:Type ContentControl}">
+                                            <!-- ContentTemplate is not set at design time -->
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding DataContext.Mode, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" Value="{x:Static viewModels:ArticleSelectorModes.ArticleSelection}">
+                                                    <Setter Property="ContentTemplate" Value="{StaticResource ArticleTemplate}"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding DataContext.Mode, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" Value="{x:Static viewModels:ArticleSelectorModes.SubCategorySelection}">
+                                                    <Setter Property="ContentTemplate" Value="{StaticResource CategorySubCategoryTemplate}"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding DataContext.Mode, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" Value="{x:Static viewModels:ArticleSelectorModes.CategorySelection}">
+                                                    <Setter Property="ContentTemplate" Value="{StaticResource CategorySubCategoryTemplate}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ContentControl.Style>
+                                </ContentControl>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <!-- Function buttons -->
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <!-- Top -->
+                    <Button Grid.Row="0"
+                            Width="64"
+                            Height="64"
+                            Margin="2"
+                            Command="{Binding TopCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="{StaticResource TopImage}"/>
+                    </Button>
+                    <!-- Back -->
+                    <Button Grid.Row="1"
+                            Width="64"
+                            Height="64"
+                            Margin="2"
+                            Command="{Binding BackCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="{StaticResource BackImage}"/>
+                    </Button>
+                    <!-- +Quantity -->
+                    <StackPanel Grid.Row="2"
+                                Margin="2"
+                                Orientation="Horizontal">
+                        <Button Width="28"
+                                Height="28"
+                                Margin="2"
+                                Command="{Binding IncrementQuantityCommand}">
+                            <Image Style="{StaticResource AutoDisableImageStyle}" 
+                               Source="{StaticResource PlusImage}"/>
+                        </Button>
+                        <!-- -Quantity -->
+                        <Button Width="28"
+                                Height="28"
+                                Margin="2"
+                                Command="{Binding DecrementQuantityCommand}">
+                            <Image Style="{StaticResource AutoDisableImageStyle}" 
+                               Source="{StaticResource MinusImage}"/>
+                        </Button>
+                    </StackPanel>
+                    <!-- Quantity -->
+                    <TextBlock Grid.Row="4"
+                               Width="64"
+                               Margin="2"
+                               TextAlignment="Center"
+                               Text="{Binding Quantity}"/>
+                    <!-- Add to shopping cart -->
+                    <Button Grid.Row="5"
+                            Width="64"
+                            Height="64"
+                            Margin="2"
+                            Command="{Binding AddArticleCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="{StaticResource AddShoppingCartImage}"/>
+                    </Button>
+
+                    <!-- Dummy row 6 -->
+
+                    <!-- Edit -->
+                    <Button Grid.Row="7"
+                            Width="64"
+                            Height="64"
+                            Margin="2"
+                            Command="{Binding EditArticleCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="{StaticResource EditImage}"/>
+                    </Button>
+
+                    <!-- Create -->
+                    <Button Grid.Row="8"
+                            Width="64"
+                            Height="64"
+                            Margin="2"
+                            Command="{Binding CreateArticleCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="{StaticResource PlusImage}"/>
+                    </Button>
+                </Grid>
+            </Grid>
+        </Grid>
+        <TextBlock VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   Opacity="0.5"
+                   IsHitTestVisible="False"
+                   FontSize="45"
+                   FontWeight="Bold"
+                   Text="Under Construction"
+                   RenderTransformOrigin="0.5,0.5">
+            <TextBlock.RenderTransform>
+                <RotateTransform>
+                    <RotateTransform.Angle>-45</RotateTransform.Angle>
+                </RotateTransform>
+            </TextBlock.RenderTransform>
+        </TextBlock>
+    </Grid>
+</UserControl>

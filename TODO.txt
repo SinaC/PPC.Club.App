@@ -1,13 +1,12 @@
+AskNameEmailPopup: check email validity
+ClosurePopup: waiting screen
 check each module (players, shop, inventory) before closing application
 article refund (client doesn't want anymore an already paid article !! only for cash payment)
-transaction edition
 article DB (real DB instead of xml file)
 PlayersDb: store the list of players (similar to ArticlesDb + call load from MainViewModel)
 Players -> remove save button, save automatically once a modification has been done
 
-move popup logic in a new project depending on EasyMVVM (EasyPopup)
-
-Discount: % or free article (not fixed amount anymore)
+popup style
 
 inventory:
 !! after import -> every article guid are modified -> shopping carts and backup files are invalid

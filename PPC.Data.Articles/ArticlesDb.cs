@@ -16,9 +16,10 @@ namespace PPC.Data.Articles
 {
     public class ArticlesDb : IArticleDb
     {
-        private static readonly string[] EmptyList = { string.Empty };
-
         private List<Article> _articles;
+
+        #region IArticleDb
+
         public IEnumerable<Article> Articles => _articles ?? Enumerable.Empty<Article>();
 
         public void Add(Article article)
@@ -37,20 +38,20 @@ namespace PPC.Data.Articles
             return _articles.FirstOrDefault(x => x.Guid == guid);
         }
 
-        public IEnumerable<string> Categories => EmptyList.Concat(Articles.Where(x => !string.IsNullOrWhiteSpace(x.Category)).Select(x => x.Category).Distinct());
-        public IEnumerable<string> Producers => EmptyList.Concat(Articles.Where(x => !string.IsNullOrWhiteSpace(x.Producer)).Select(x => x.Producer).Distinct());
+        public IEnumerable<string> Categories => Articles.Where(x => !string.IsNullOrWhiteSpace(x.Category)).Select(x => x.Category).Distinct();
+        public IEnumerable<string> Producers => Articles.Where(x => !string.IsNullOrWhiteSpace(x.Producer)).Select(x => x.Producer).Distinct();
         public IEnumerable<string> SubCategories(string category)
         {
-            return EmptyList.Concat(Articles.Where(x => x.Category == category && !string.IsNullOrWhiteSpace(x.SubCategory)).Select(x => x.SubCategory).Distinct());
+            return Articles.Where(x => x.Category == category && !string.IsNullOrWhiteSpace(x.SubCategory)).Select(x => x.SubCategory).Distinct();
         }
-        public IEnumerable<Article> GetArticles(string category)
+        public IEnumerable<Article> FilterArticles(string category)
         {
             IQueryable<Article> query = Articles.AsQueryable();
             if (!string.IsNullOrWhiteSpace(category))
                 query = query.Where(x => x.Category == category);
             return query;
         }
-        public IEnumerable<Article> GetArticles(string category, string subCategory)
+        public IEnumerable<Article> FilterArticles(string category, string subCategory)
         {
             IQueryable<Article> query = Articles.AsQueryable();
             if (!string.IsNullOrWhiteSpace(category))
@@ -62,7 +63,76 @@ namespace PPC.Data.Articles
             return query;
         }
 
-        public void ImportFromCsv(string filename)
+        public void ImportFromDbf(string filename)
+        {
+            // Extract articles from DBF
+            DBFParser parser = new DBFParser();
+            parser.Parse(filename);
+
+            _articles = parser.DataTable.AsEnumerable().Select(row => new Article
+            {
+                Guid = Guid.NewGuid(),
+                Ean = row.Field<string>("CODE_ART"),
+                Description = row.Field<string>("NOM_ART"),
+                Category = row.Field<string>("CATEGORIE"),
+                SubCategory = row.Field<string>("CATEGORIE2"),
+                Stock = ConvertFromDoubleToInt(row.Field<double>("QTE_STOCK")),
+                SupplierPrice = ConvertFromDoubleToDecimal(row.Field<double>("PRIX_ACHAT")),
+                Price = ConvertFromDoubleToDecimal(row.Field<double>("PX_VTE_TC")),
+                Producer = row.Field<string>("NOM_FOU"),
+                VatRate = row.Field<int>("CODE_TVA") == 2 ? VatRates.FoodDrink : VatRates.Other
+            }).ToList();
+        }
+
+        public void Save()
+        {
+            string filename = ConfigurationManager.AppSettings["ArticlesPath"];
+            using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
+            {
+                writer.Formatting = Formatting.Indented;
+                DataContractSerializer serializer = new DataContractSerializer(typeof(List<Article>));
+                serializer.WriteObject(writer, Articles);
+            }
+        }
+
+        public void Load()
+        {
+            // Load articles
+            string filename = ConfigurationManager.AppSettings["ArticlesPath"];
+            if (File.Exists(filename))
+            {
+                List<Article> newArticles;
+                using (XmlTextReader reader = new XmlTextReader(filename))
+                {
+                    DataContractSerializer serializer = new DataContractSerializer(typeof(List<Article>));
+                    newArticles = (List<Article>)serializer.ReadObject(reader);
+                }
+                _articles = newArticles;
+            }
+            else
+                throw new InvalidOperationException("Article DB not found.");
+        }
+
+        #endregion
+
+        private static decimal ConvertFromDoubleToDecimal(double d)
+        {
+            if (double.IsInfinity(d) || double.IsNaN(d) || double.IsNegativeInfinity(d) || double.IsPositiveInfinity(d))
+                return 0;
+            return (decimal)d;
+        }
+
+        private static int ConvertFromDoubleToInt(double d)
+        {
+            if (double.IsInfinity(d) || double.IsNaN(d) || double.IsNegativeInfinity(d) || double.IsPositiveInfinity(d))
+                return 0;
+            return (int)d;
+        }
+
+        private static readonly Regex CsvSplitRegEx = new Regex("(?:^|,)(\"(?:[^\"]+|\"\")*\"|[^,]*)", RegexOptions.Compiled);
+
+        [Obsolete("Use ImportFromDBF instead.")]
+        private void ImportFromCsv(string filename)
         {
             //string filename = @"C:\temp\ppc\liste des produits.csv";
             if (File.Exists(filename))
@@ -100,7 +170,7 @@ namespace PPC.Data.Articles
                         decimal priceNoVat;
                         if (!decimal.TryParse(tokens[16], out priceNoVat))
                             priceNoVat = 0;
-                        decimal vat = Math.Round(100*(price - priceNoVat)/priceNoVat, 0, MidpointRounding.AwayFromZero);
+                        decimal vat = Math.Round(100 * (price - priceNoVat) / priceNoVat, 0, MidpointRounding.AwayFromZero);
 
                         VatRates vatRate = vat == 6 ? VatRates.FoodDrink : VatRates.Other;
                         Article article = new Article
@@ -121,72 +191,6 @@ namespace PPC.Data.Articles
                 _articles = articles;
             }
         }
-
-        public void ImportFromDbf(string filename)
-        {
-            // Extract articles from DBF
-            DBFParser parser = new DBFParser();
-            parser.Parse(filename);
-
-            _articles = parser.DataTable.AsEnumerable().Select(row => new Article
-            {
-                Guid = Guid.NewGuid(),
-                Ean = row.Field<string>("CODE_ART"),
-                Description = row.Field<string>("NOM_ART"),
-                Category = row.Field<string>("CATEGORIE"),
-                SubCategory = row.Field<string>("CATEGORIE2"),
-                Stock = ConvertFromDoubleToInt(row.Field<double>("QTE_STOCK")),
-                SupplierPrice = ConvertFromDoubleToDecimal(row.Field<double>("PRIX_ACHAT")),
-                Price = ConvertFromDoubleToDecimal(row.Field<double>("PX_VTE_TC")),
-                Producer = row.Field<string>("NOM_FOU"),
-                VatRate = row.Field<int>("CODE_TVA") == 2 ? VatRates.FoodDrink : VatRates.Other
-            }).ToList();
-        }
-
-        private static decimal ConvertFromDoubleToDecimal(double d)
-        {
-            if (double.IsInfinity(d) || double.IsNaN(d) || double.IsNegativeInfinity(d) || double.IsPositiveInfinity(d))
-                return 0;
-            return (decimal)d;
-        }
-
-        private static int ConvertFromDoubleToInt(double d)
-        {
-            if (double.IsInfinity(d) || double.IsNaN(d) || double.IsNegativeInfinity(d) || double.IsPositiveInfinity(d))
-                return 0;
-            return (int)d;
-        }
-
-        public void Save()
-        {
-            string filename = ConfigurationManager.AppSettings["ArticlesPath"];
-            using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
-            {
-                writer.Formatting = Formatting.Indented;
-                DataContractSerializer serializer = new DataContractSerializer(typeof(List<Article>));
-                serializer.WriteObject(writer, Articles);
-            }
-        }
-
-        public void Load()
-        {
-            // Load articles
-            string filename = ConfigurationManager.AppSettings["ArticlesPath"];
-            if (File.Exists(filename))
-            {
-                List<Article> newArticles;
-                using (XmlTextReader reader = new XmlTextReader(filename))
-                {
-                    DataContractSerializer serializer = new DataContractSerializer(typeof(List<Article>));
-                    newArticles = (List<Article>)serializer.ReadObject(reader);
-                }
-                _articles = newArticles;
-            }
-            else
-                throw new InvalidOperationException("Article DB not found.");
-        }
-
-        private static readonly Regex CsvSplitRegEx = new Regex("(?:^|,)(\"(?:[^\"]+|\"\")*\"|[^,]*)", RegexOptions.Compiled);
 
         private static IEnumerable<string> SplitCsv(string input)
         {

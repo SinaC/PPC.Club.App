@@ -7,12 +7,14 @@ using System.Reflection;
 using System.Windows.Input;
 using EasyMVVM;
 using PPC.Data.Contracts;
+using PPC.Services.Popup;
 
 namespace PPC.Popups
 {
+    [PopupAssociatedView(typeof(CreateEditArticlePopup))]
     public class CreateEditArticlePopupViewModel : ObservableObject
     {
-        private readonly IPopupService _popupService;
+        private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
         private readonly Action<CreateEditArticlePopupViewModel> _saveArticleAction;
         private readonly Func<string, IEnumerable<string>> _buildSubCategoriesFunc;
 
@@ -119,13 +121,12 @@ namespace PPC.Popups
 
         private void SaveArticle()
         {
-            _popupService.Close(this);
+            PopupService?.Close(this);
             _saveArticleAction(this);
         }
 
-        public CreateEditArticlePopupViewModel(IPopupService popupService, IEnumerable<string> categories, IEnumerable<string> producers, Func<string, IEnumerable<string>> buildSubCategoriesFunc, Action<CreateEditArticlePopupViewModel> saveArticleAction)
+        public CreateEditArticlePopupViewModel(IEnumerable<string> categories, IEnumerable<string> producers, Func<string, IEnumerable<string>> buildSubCategoriesFunc, Action<CreateEditArticlePopupViewModel> saveArticleAction)
         {
-            _popupService = popupService;
             _saveArticleAction = saveArticleAction;
             _buildSubCategoriesFunc = buildSubCategoriesFunc;
             Categories = new ObservableCollection<string>(categories);
@@ -146,7 +147,7 @@ namespace PPC.Popups
 
     public class CreateEditArticlePopupViewModelDesignData : CreateEditArticlePopupViewModel
     {
-        public CreateEditArticlePopupViewModelDesignData() : base(null, new[] {""}, new[] {""}, _ => new[] {""}, _ => { })
+        public CreateEditArticlePopupViewModelDesignData() : base(new[] {""}, new[] {""}, _ => new[] {""}, _ => { })
         {
             Ean = "1111111111111";
             Description = "Article1";

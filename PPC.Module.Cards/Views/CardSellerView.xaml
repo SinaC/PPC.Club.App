@@ -1,0 +1,234 @@
+﻿<UserControl x:Class="PPC.Module.Cards.Views.CardSellerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:viewModels="clr-namespace:PPC.Module.Cards.ViewModels"
+             xmlns:helpers="clr-namespace:PPC.Helpers;assembly=PPC.Helpers"
+             xmlns:models="clr-namespace:PPC.Module.Cards.Models"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance viewModels:CardSellerViewModelDesignData, IsDesignTimeCreatable=True}"
+             d:DesignHeight="300" d:DesignWidth="400">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Images.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <!-- Seller info -->
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <!-- Seller name -->
+            <TextBlock Grid.Row="0"
+                       Grid.Column="0"
+                       Margin="5,2"
+                       Style="{StaticResource HeaderTextBlockStyle}"
+                       Text="Seller:"/>
+            <TextBlock Grid.Row="0"
+                       Grid.Column="1"
+                       Margin="5,2"
+                       Style="{StaticResource DataTextBlockStyle}"
+                       Text="{Binding SellerName}"/>
+
+            <!-- Email -->
+            <TextBlock Grid.Row="1"
+                       Grid.Column="0"
+                       Margin="5,2"
+                       Style="{StaticResource HeaderTextBlockStyle}"
+                       Text="Email:"/>
+            <TextBlock Grid.Row="1"
+                       Grid.Column="1"
+                       Margin="5,2"
+                       Style="{StaticResource DataTextBlockStyle}"
+                       Text="{Binding Email}"/>
+        </Grid>
+
+        <!-- Card selection -->
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <!-- Card name -->
+            <TextBlock Grid.Row="0"
+                       Grid.Column="0"
+                       Margin="5,2"
+                       Style="{StaticResource HeaderTextBlockStyle}"
+                       Text="Card name:"/>
+            <TextBox Grid.Row="1"
+                     Grid.Column="0"
+                     Grid.ColumnSpan="2"
+                     MinWidth="240"
+                     Margin="5,2"
+                     helpers:AttachedFocus.IsFocused="{Binding IsCardNameFocused}"
+                     Focusable="True"
+                     GotKeyboardFocus="UIElement_OnGotKeyboardFocus"
+                     Text="{Binding CardName}"/>
+
+            <!-- Price -->
+            <TextBlock Grid.Row="2"
+                       Grid.Column="0"
+                       Margin="5,2"
+                       VerticalAlignment="Center"
+                       Style="{StaticResource HeaderTextBlockStyle}"
+                       Text="Price:"/>
+            <xctk:DecimalUpDown Grid.Row="3"
+                                Grid.Column="0"
+                                Margin="5,2"
+                                Minimum="0" 
+                                Increment="0.01"
+                                FormatString="C"
+                                GotFocus="DecimalUpDown_OnGotFocus"
+                                ValueChanged="DecimalUpDown_OnValueChanged"
+                                Value="{Binding Price}">
+                <xctk:DecimalUpDown.InputBindings>
+                    <KeyBinding Key="Return"
+                                Command="{Binding AddCardCommand}"/>
+                </xctk:DecimalUpDown.InputBindings>
+            </xctk:DecimalUpDown>
+
+            <!-- Quantity -->
+            <TextBlock Grid.Row="2"
+                       Grid.Column="1"
+                       Margin="5,2"
+                       Style="{StaticResource HeaderTextBlockStyle}"
+                       Text="Quantity:"/>
+            <StackPanel Grid.Row="3"
+                        Grid.Column="1"
+                        HorizontalAlignment="Left"
+                        Orientation="Horizontal">
+                <!-- +Quantity -->
+                <Button Width="20"
+                        Margin="5,2"
+                        Command="{Binding IncrementQuantityCommand}">
+                    <Image Style="{StaticResource AutoDisableImageStyle}" 
+                           Source="{StaticResource PlusImage}"/>
+                </Button>
+
+                <!-- Quantity -->
+                <TextBox Margin="2"
+                         MinWidth="30"
+                         Text="{Binding Quantity}"/>
+
+                <!-- -Quantity -->
+                <Button Width="20"
+                        Margin="5,2"
+                        Command="{Binding DecrementQuantityCommand}">
+                    <Image Style="{StaticResource AutoDisableImageStyle}"
+                           Source="{StaticResource MinusImage}"/>
+                </Button>
+            </StackPanel>
+
+            <!-- Add card to list -->
+            <Button Grid.Row="0" 
+                    Grid.RowSpan="4"
+                    Grid.Column="2"
+                    Width="64"
+                    Height="64"
+                    Margin="5,2"
+                    ToolTip="Add card(s) to list"
+                    Command="{Binding AddCardCommand}">
+                <Image Style="{StaticResource AutoDisableImageStyle}"
+                       Source="{StaticResource AddShoppingCartImage}"/>
+            </Button>
+        </Grid>
+
+        <!-- Items -->
+        <DataGrid Grid.Row="2"
+                  Margin="5,2"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  AutoGenerateColumns="False"
+                  VerticalScrollBarVisibility="Auto"
+                  ScrollViewer.CanContentScroll="True"
+                  helpers:DataGridHelpers.Autoscroll="True"
+                  SelectedItem="{Binding SelectedCard}"
+                  ItemsSource="{Binding Items}">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type models:SoldCardItem}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Grid.Column="0"
+                                        Width="16"
+                                        Command="{Binding DataContext.DeleteCardCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                                        CommandParameter="{Binding}">
+                                    <Image Style="{StaticResource AutoDisableImageStyle}"
+                                           Source="{StaticResource CloseImage}"/>
+                                </Button>
+                                <Button Grid.Column="1"
+                                        Width="16"
+                                        Command="{Binding DataContext.IncrementCardCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                                        CommandParameter="{Binding}">
+                                    <Image Style="{StaticResource AutoDisableImageStyle}"
+                                           Source="{StaticResource PlusImage}"/>
+                                </Button>
+                                <Button Grid.Column="2"
+                                        Width="16"
+                                        Command="{Binding DataContext.DecrementCardCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                                        CommandParameter="{Binding}">
+                                    <Image Style="{StaticResource AutoDisableImageStyle}"
+                                           Source="{StaticResource MinusImage}"/>
+                                </Button>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn IsReadOnly="True" 
+                                    Width="*" 
+                                    MaxWidth="400"
+                                    Header="Description" 
+                                    Binding="{Binding CardName}"/>
+                <DataGridTextColumn IsReadOnly="True" 
+                                    Header="Quantity" 
+                                    Binding="{Binding Quantity}"/>
+                <DataGridTextColumn IsReadOnly="True" 
+                                    Header="Price" 
+                                    Binding="{Binding Price, StringFormat=C}"/>
+                <DataGridTextColumn IsReadOnly="True" 
+                                    Header="Total" 
+                                    Binding="{Binding Total, StringFormat=C}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel Grid.Row="3"
+                    VerticalAlignment="Center"
+                    Orientation="Vertical">
+            <TextBlock Margin="5,2"
+                       Style="{StaticResource HeaderTextBlockStyle}"
+                       Text="Total:"/>
+            <TextBlock Margin="5,2"
+                       Style="{StaticResource DataTextBlockStyle}"
+                       Text="{Binding Total, StringFormat=C}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

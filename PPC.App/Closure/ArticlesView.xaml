@@ -1,0 +1,76 @@
+﻿<UserControl x:Class="PPC.App.Closure.ArticlesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:viewModels="clr-namespace:PPC.App.Closure"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance viewModels:ArticlesViewModelDesignData, IsDesignTimeCreatable=True}"
+             d:DesignHeight="400" d:DesignWidth="520"
+             MaxWidth="700"
+             MaxHeight="480">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Images.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <UniformGrid Grid.Row="0"
+                     Rows="1">
+            <StackPanel Margin="5,2"
+                        Orientation="Vertical">
+                <Image Width="32"
+                       Style="{StaticResource AutoDisableImageStyle}"
+                       Source="{StaticResource SumImage}"/>
+                <TextBlock HorizontalAlignment="Center"
+                           Style="{StaticResource DataTextBlockStyle}"
+                           Text="{Binding ClosureData.Total, StringFormat=C}"/>
+            </StackPanel>
+            <StackPanel Margin="5,2"
+                        Orientation="Vertical">
+                <Image Width="32"
+                       Style="{StaticResource AutoDisableImageStyle}"
+                       Source="{StaticResource CashImage}"/>
+                <TextBlock HorizontalAlignment="Center"
+                           Style="{StaticResource DataTextBlockStyle}"
+                           Text="{Binding ClosureData.Cash, StringFormat=C}"/>
+            </StackPanel>
+            <StackPanel Margin="5,2"
+                        Orientation="Vertical">
+                <Image Width="32"
+                       Style="{StaticResource AutoDisableImageStyle}"
+                       Source="{StaticResource BankCardImage}"/>
+                <TextBlock HorizontalAlignment="Center"
+                           Style="{StaticResource DataTextBlockStyle}"
+                           Text="{Binding ClosureData.BankCard, StringFormat=C}"/>
+            </StackPanel>
+        </UniformGrid>
+
+        <DataGrid Grid.Row="1"
+                  IsReadOnly="True"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  AutoGenerateColumns="False"
+                  ItemsSource="{Binding ClosureData.Articles}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Ean"
+                                    Binding="{Binding Ean}"/>
+                <DataGridTextColumn Header="Description"
+                                    Binding="{Binding Description}"/>
+                <DataGridTextColumn Header="Quantity"
+                                    Binding="{Binding Quantity}"/>
+                <DataGridTextColumn Header="Price"
+                                    Binding="{Binding Price, StringFormat=C}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

@@ -1,0 +1,63 @@
+﻿<UserControl x:Class="PPC.Services.Popup.ErrorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:popup="clr-namespace:PPC.Services.Popup"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance popup:ErrorViewModelDesignData, IsDesignTimeCreatable=True}"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Images.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Image Width="32"
+                    VerticalAlignment="Top"
+                    Style="{StaticResource AutoDisableImageStyle}"
+                    Source="{StaticResource ErrorImage}"/>
+            <TextBlock Grid.Column="1"
+                    Margin="5,2"
+                    TextWrapping="Wrap"
+                    Text="{Binding Summary}"/>
+        </Grid>
+        <Expander Grid.Row="1"
+                    IsExpanded="False"
+                    Header="Details">
+            <Expander.Style>
+                <Style TargetType="{x:Type Expander}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding HasDetails}" Value="True">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Expander.Style>
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <TextBox TextWrapping="Wrap"
+                            Text="{Binding Details}"/>
+            </ScrollViewer>
+        </Expander>
+        <Button Grid.Row="2"
+                Width="80"
+                Margin="5,2"
+                Command="{Binding ClickCommand}">
+            <TextBlock Text="Ok"/>
+        </Button>
+    </Grid>
+</UserControl>

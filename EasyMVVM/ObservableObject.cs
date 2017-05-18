@@ -74,7 +74,7 @@ namespace EasyMVVM
             if (propertyExpression == null)
                 return default(TProperty);
 
-            string propertyName = GetPropertyName(propertyExpression);
+            //string propertyName = GetPropertyName(propertyExpression);
             TProperty value = propertyExpression.Compile()();
             //Debug.WriteLine("{0} : {1}", propertyName, value);
             return value;

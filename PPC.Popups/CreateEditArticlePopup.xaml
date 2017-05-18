@@ -18,163 +18,159 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Border BorderBrush="Black" 
-            BorderThickness="1" 
-            Background="{x:Static SystemColors.ControlLightBrush}">
-        <Grid FocusManager.FocusedElement="{Binding ElementName=NameTextBox}">
+    <Grid FocusManager.FocusedElement="{Binding ElementName=NameTextBox}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto" MinWidth="350"/>
+            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <Grid Grid.Row="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto" MinWidth="350"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <!-- Ean -->
-                <TextBlock Grid.Row="0"
-                           Grid.Column="0"
-                           Margin="5,2"
-                           Style="{StaticResource HeaderTextBlockStyle}"
-                           Text="EAN:"/>
-                <TextBox Grid.Row="0"
-                         Grid.Column="1"
-                         Margin="5,2"
-                         MaxLength="13"
-                         Text="{Binding Ean}"/>
-            
-                <!-- Name -->
-                <TextBlock Grid.Row="1"
-                           Grid.Column="0"
-                           Margin="5,2"
-                           Style="{StaticResource HeaderTextBlockStyle}"
-                           Text="Name:"/>
-                <TextBox x:Name="NameTextBox"
-                         Grid.Row="1"
-                         Grid.Column="1"
-                         Margin="5,2"
-                         Text="{Binding Description}"/>
+            <!-- Ean -->
+            <TextBlock Grid.Row="0"
+                        Grid.Column="0"
+                        Margin="5,2"
+                        Style="{StaticResource HeaderTextBlockStyle}"
+                        Text="EAN:"/>
+            <TextBox Grid.Row="0"
+                        Grid.Column="1"
+                        Margin="5,2"
+                        MaxLength="13"
+                        Text="{Binding Ean}"/>
 
-                <!-- Category -->
-                <TextBlock Grid.Row="2"
-                           Grid.Column="0"
-                           Margin="5,2"
-                           Style="{StaticResource HeaderTextBlockStyle}"
-                           Text="Category:"/>
-                <ComboBox Grid.Row="2"
-                          Grid.Column="1"
-                          Margin="5,2"
-                          IsEditable="True"
-                          IsTextSearchEnabled="True" 
-                          IsTextSearchCaseSensitive="False"
-                          ItemsSource="{Binding Categories}"
-                          Text="{Binding Category}"/>
+            <!-- Name -->
+            <TextBlock Grid.Row="1"
+                        Grid.Column="0"
+                        Margin="5,2"
+                        Style="{StaticResource HeaderTextBlockStyle}"
+                        Text="Name:"/>
+            <TextBox x:Name="NameTextBox"
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Margin="5,2"
+                        Text="{Binding Description}"/>
 
-                <!-- SubCategory -->
-                <TextBlock Grid.Row="3"
-                           Grid.Column="0"
-                           Margin="5,2"
-                           Style="{StaticResource HeaderTextBlockStyle}"
-                           Text="Sub category:"/>
-                <ComboBox Grid.Row="3"
-                          Grid.Column="1"
-                          Margin="5,2"
-                          IsEditable="True"
-                          IsTextSearchEnabled="True" 
-                          IsTextSearchCaseSensitive="False"
-                          ItemsSource="{Binding SubCategories}"
-                          Text="{Binding SubCategory}"/>
+            <!-- Category -->
+            <TextBlock Grid.Row="2"
+                        Grid.Column="0"
+                        Margin="5,2"
+                        Style="{StaticResource HeaderTextBlockStyle}"
+                        Text="Category:"/>
+            <ComboBox Grid.Row="2"
+                        Grid.Column="1"
+                        Margin="5,2"
+                        IsEditable="True"
+                        IsTextSearchEnabled="True" 
+                        IsTextSearchCaseSensitive="False"
+                        ItemsSource="{Binding Categories}"
+                        Text="{Binding Category}"/>
 
-                <!-- Producer -->
-                <TextBlock Grid.Row="4"
-                           Grid.Column="0"
-                           Margin="5,2"
-                           Style="{StaticResource HeaderTextBlockStyle}"
-                           Text="Producer/seller:"/>
-                <ComboBox Grid.Row="4"
-                          Grid.Column="1"
-                          Margin="5,2"
-                          IsEditable="True"
-                          IsTextSearchEnabled="True" 
-                          IsTextSearchCaseSensitive="False"
-                          ItemsSource="{Binding Producers}"
-                          Text="{Binding Producer}"/>
+            <!-- SubCategory -->
+            <TextBlock Grid.Row="3"
+                        Grid.Column="0"
+                        Margin="5,2"
+                        Style="{StaticResource HeaderTextBlockStyle}"
+                        Text="Sub category:"/>
+            <ComboBox Grid.Row="3"
+                        Grid.Column="1"
+                        Margin="5,2"
+                        IsEditable="True"
+                        IsTextSearchEnabled="True" 
+                        IsTextSearchCaseSensitive="False"
+                        ItemsSource="{Binding SubCategories}"
+                        Text="{Binding SubCategory}"/>
 
-                <!-- Supplier price -->
-                <TextBlock Grid.Row="5"
-                           Grid.Column="0"
-                           Margin="5,2"
-                           Style="{StaticResource HeaderTextBlockStyle}"
-                           Text="Supplier price:"/>
-                <xctk:DecimalUpDown Grid.Row="5"
-                                    Grid.Column="1"
-                                    Margin="5,2"
-                                    Minimum="0"
-                                    Increment="0.01"
-                                    FormatString="C"
-                                    ValueChanged="UpDownBase_OnValueChanged"
-                                    Value="{Binding SupplierPrice}"/>
+            <!-- Producer -->
+            <TextBlock Grid.Row="4"
+                        Grid.Column="0"
+                        Margin="5,2"
+                        Style="{StaticResource HeaderTextBlockStyle}"
+                        Text="Producer/seller:"/>
+            <ComboBox Grid.Row="4"
+                        Grid.Column="1"
+                        Margin="5,2"
+                        IsEditable="True"
+                        IsTextSearchEnabled="True" 
+                        IsTextSearchCaseSensitive="False"
+                        ItemsSource="{Binding Producers}"
+                        Text="{Binding Producer}"/>
 
-                <!-- Vat rate -->
-                <TextBlock Grid.Row="6"
-                           Grid.Column="0"
-                           Margin="5,2"
-                           Style="{StaticResource HeaderTextBlockStyle}"
-                           Text="Vat:"/>
-                <ComboBox Grid.Row="6"
-                          Grid.Column="1"
-                          Margin="5,2"
-                          ItemsSource="{Binding VatRateList}"
-                          SelectedValuePath="Key"
-                          DisplayMemberPath="Value"
-                          SelectedValue="{Binding VatRate}"/>
+            <!-- Supplier price -->
+            <TextBlock Grid.Row="5"
+                        Grid.Column="0"
+                        Margin="5,2"
+                        Style="{StaticResource HeaderTextBlockStyle}"
+                        Text="Supplier price:"/>
+            <xctk:DecimalUpDown Grid.Row="5"
+                                Grid.Column="1"
+                                Margin="5,2"
+                                Minimum="0"
+                                Increment="0.01"
+                                FormatString="C"
+                                ValueChanged="UpDownBase_OnValueChanged"
+                                Value="{Binding SupplierPrice}"/>
 
-                <!-- Price -->
-                <TextBlock Grid.Row="7"
-                           Grid.Column="0"
-                           Margin="5,2"
-                           Style="{StaticResource HeaderTextBlockStyle}"
-                           Text="Price:"/>
-                <xctk:DecimalUpDown Grid.Row="7"
-                                    Grid.Column="1"
-                                    Margin="5,2"
-                                    Minimum="0"
-                                    Increment="0.01"
-                                    FormatString="C"
-                                    ValueChanged="UpDownBase_OnValueChanged"
-                                    Value="{Binding Price}"/>
+            <!-- Vat rate -->
+            <TextBlock Grid.Row="6"
+                        Grid.Column="0"
+                        Margin="5,2"
+                        Style="{StaticResource HeaderTextBlockStyle}"
+                        Text="Vat:"/>
+            <ComboBox Grid.Row="6"
+                        Grid.Column="1"
+                        Margin="5,2"
+                        ItemsSource="{Binding VatRateList}"
+                        SelectedValuePath="Key"
+                        DisplayMemberPath="Value"
+                        SelectedValue="{Binding VatRate}"/>
 
-                <!-- Stock price -->
-                <TextBlock Grid.Row="8"
-                           Grid.Column="0"
-                           Margin="5,2"
-                           Style="{StaticResource HeaderTextBlockStyle}"
-                           Text="Stock:"/>
-                <xctk:IntegerUpDown Grid.Row="8"
-                                    Grid.Column="1"
-                                    Margin="5,2"
-                                    Minimum="0"
-                                    Increment="1"
-                                    Value="{Binding Stock}"/>
-            </Grid>
-            <Button Grid.Row="1"
-                    Width="32"
-                    Margin="5,2"
-                    Command="{Binding SaveArticleCommand}">
-                <Image Style="{StaticResource AutoDisableImageStyle}"
-                       Source="{StaticResource CheckmarkImage}"/>
-            </Button>
+            <!-- Price -->
+            <TextBlock Grid.Row="7"
+                        Grid.Column="0"
+                        Margin="5,2"
+                        Style="{StaticResource HeaderTextBlockStyle}"
+                        Text="Price:"/>
+            <xctk:DecimalUpDown Grid.Row="7"
+                                Grid.Column="1"
+                                Margin="5,2"
+                                Minimum="0"
+                                Increment="0.01"
+                                FormatString="C"
+                                ValueChanged="UpDownBase_OnValueChanged"
+                                Value="{Binding Price}"/>
+
+            <!-- Stock price -->
+            <TextBlock Grid.Row="8"
+                        Grid.Column="0"
+                        Margin="5,2"
+                        Style="{StaticResource HeaderTextBlockStyle}"
+                        Text="Stock:"/>
+            <xctk:IntegerUpDown Grid.Row="8"
+                                Grid.Column="1"
+                                Margin="5,2"
+                                Minimum="0"
+                                Increment="1"
+                                Value="{Binding Stock}"/>
         </Grid>
-    </Border>
+        <Button Grid.Row="1"
+                Width="32"
+                Margin="5,2"
+                Command="{Binding SaveArticleCommand}">
+            <Image Style="{StaticResource AutoDisableImageStyle}"
+                    Source="{StaticResource CheckmarkImage}"/>
+        </Button>
+    </Grid>
 </UserControl>
