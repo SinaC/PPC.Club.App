@@ -22,10 +22,10 @@ namespace PPC.Module.Shop.ViewModels.ArticleSelector
         private ILog Logger => IocContainer.Default.Resolve<ILog>();
         private IArticleDb ArticlesDb => IocContainer.Default.Resolve<IArticleDb>();
 
-        private Func<string, IEnumerable<string>> BuildSubCategories => category => EmptyList.Concat(ArticlesDb.SubCategories(category));
-        public IEnumerable<Article> Articles => ArticlesDb.FilterArticles(SelectedCategory);
-        public IEnumerable<string> Categories => EmptyList.Concat(ArticlesDb.Categories);
-        public IEnumerable<string> Producers => EmptyList.Concat(ArticlesDb.Producers);
+        private Func<string, IEnumerable<string>> BuildSubCategories => category => EmptyList.Concat(ArticlesDb.SubCategories(category).OrderBy(x => x));
+        public IEnumerable<Article> Articles => ArticlesDb.FilterArticles(SelectedCategory).OrderBy(x => x.Description);
+        public IEnumerable<string> Categories => EmptyList.Concat(ArticlesDb.Categories).OrderBy(x => x);
+        public IEnumerable<string> Producers => EmptyList.Concat(ArticlesDb.Producers).OrderBy(x => x);
 
         #region Ean
 

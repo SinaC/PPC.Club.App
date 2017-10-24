@@ -28,10 +28,10 @@ namespace PPC.Module.Shop.ViewModels.ArticleSelector
 
         public const bool GoToTopWhenArticleSelected = false; // TODO: config???
 
-        public IEnumerable<Article> Articles => ArticlesDb.FilterArticles(SelectedCategory, SelectedSubCategory);
-        public IEnumerable<string> Categories => ArticlesDb.Categories;
-        public IEnumerable<string> Producers => ArticlesDb.Producers;
-        public IEnumerable<string> SubCategories => BuildSubCategories(SelectedCategory);
+        public IEnumerable<Article> Articles => ArticlesDb.FilterArticles(SelectedCategory, SelectedSubCategory).OrderBy(x => x.Description);
+        public IEnumerable<string> Categories => ArticlesDb.Categories.OrderBy(x => x);
+        public IEnumerable<string> Producers => ArticlesDb.Producers.OrderBy(x => x);
+        public IEnumerable<string> SubCategories => BuildSubCategories(SelectedCategory).OrderBy(x => x);
         private Func<string, IEnumerable<string>> BuildSubCategories => ArticlesDb.SubCategories;
 
         public string CurrentSelectionPath => SelectedCategory.AppendIfNotEmpty(">").AppendIfNotEmpty(SelectedSubCategory.AppendIfNotEmpty(">")).AppendIfNotEmpty((SelectedArticle?.Description).AppendIfNotEmpty("(").AppendIfNotEmpty(SelectedArticle?.Price.ToString("C")).AppendIfNotEmpty(")"));

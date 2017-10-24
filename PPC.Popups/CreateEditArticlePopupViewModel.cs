@@ -63,7 +63,7 @@ namespace PPC.Popups
                     else
                     {
                         SubCategory = null;
-                        SubCategories = new ObservableCollection<string>(_buildSubCategoriesFunc(Category));
+                        SubCategories = new ObservableCollection<string>(_buildSubCategoriesFunc(Category).OrderBy(x => x));
                         RaisePropertyChanged(() => SubCategories);
                     }
                 }
@@ -131,8 +131,8 @@ namespace PPC.Popups
         {
             _saveArticleAction = saveArticleAction;
             _buildSubCategoriesFunc = buildSubCategoriesFunc;
-            Categories = new ObservableCollection<string>(categories);
-            Producers = new ObservableCollection<string>(producers);
+            Categories = new ObservableCollection<string>(categories.OrderBy(x => x));
+            Producers = new ObservableCollection<string>(producers.OrderBy(x => x));
             VatRateList = Enum.GetValues(typeof(VatRates)).Cast<VatRates>().ToDictionary(x => x, x => GetEnumDescription(x));
 
             Stock = 9999;
