@@ -7,10 +7,10 @@
         SnapsToDevicePixels="True"
         ShowInTaskbar="False"
         WindowState="Normal"
-        WindowStyle="ToolWindow"
+        WindowStyle="SingleBorderWindow"
         ResizeMode="CanResize"
         WindowStartupLocation="CenterOwner"
-        TextElement.FontSize="14">
+        MouseWheel="MainWindow_OnMouseWheel">
     <Grid>
         <ContentPresenter x:Name="PopupContentPresenter"
                           Margin="2"/>

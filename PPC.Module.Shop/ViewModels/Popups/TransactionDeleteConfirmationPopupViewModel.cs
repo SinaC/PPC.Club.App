@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Input;
+using EasyIoc;
 using EasyMVVM;
 using PPC.Data.Contracts;
 using PPC.Module.Shop.Models;
@@ -12,7 +13,7 @@ namespace PPC.Module.Shop.ViewModels.Popups
     [PopupAssociatedView(typeof(TransactionDeleteConfirmationPopup))]
     public class TransactionDeleteConfirmationPopupViewModel : ObservableObject
     {
-        private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
+        private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
 
         private readonly Action<ShopTransactionItem> _confirmDeleteAction;
         private readonly ShopTransactionItem _transactionItem;

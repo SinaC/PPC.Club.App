@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:PPC.Module.Shop.ViewModels.Popups"
              xmlns:models="clr-namespace:PPC.Module.Shop.Models"
+             xmlns:helpers="clr-namespace:PPC.Helpers;assembly=PPC.Helpers"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance viewModels:TransactionEditorPopupViewModelDesignData, IsDesignTimeCreatable=True}"
              d:DesignHeight="300" d:DesignWidth="500"
@@ -15,6 +16,52 @@
                 <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Styles.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Images.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <DataTemplate DataType="{x:Type viewModels:TransactionEditorPopupViewModel}" x:Key="PayTemplate">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0"
+                            Width="48"
+                            Height="48"
+                            Margin="5,2"
+                            ToolTip="Cash payment"
+                            Command="{Binding CashCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="{StaticResource CashImage}"/>
+                    </Button>
+                    <Button Grid.Column="1"
+                            Width="48"
+                            Height="48"
+                            Margin="5,2"
+                            ToolTip="Bank card payment"
+                            Command="{Binding BankCardCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="{StaticResource BankCardImage}"/>
+                    </Button>
+                    <StackPanel Grid.Column="2"
+                                VerticalAlignment="Center"
+                                Orientation="Vertical">
+                        <TextBlock Margin="5,2"
+                                   Style="{StaticResource HeaderTextBlockStyle}"
+                                   Text="Total:"/>
+                        <TextBlock Margin="5,2"
+                                   Style="{StaticResource DataTextBlockStyle}"
+                                   Text="{Binding Total, StringFormat=C}"/>
+                    </StackPanel>
+                </Grid>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:TransactionEditorPopupViewModel}" x:Key="DeleteTemplate">
+                <Button Width="48"
+                        Height="48"
+                        Margin="5,2"
+                        Command="{Binding DeleteCommand}"
+                        ToolTip="Delete transaction">
+                    <Image Source="{StaticResource DeleteImage}"/>
+                </Button>
+            </DataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -79,12 +126,14 @@
         </UniformGrid>
         <!-- Articles -->
         <ScrollViewer Grid.Row="2"
-                      Margin="5,2">
+                      Margin="5,2"
+                      helpers:BubbleMouseWheelBehavior.IsBubblingEnabled="True">
             <DataGrid CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
                       VerticalScrollBarVisibility="Auto"
                       ScrollViewer.CanContentScroll="True"
+                      helpers:BubbleMouseWheelBehavior.IsBubblingEnabled="True"
                       ItemsSource="{Binding Articles}">
                 <DataGrid.Columns>
                     <DataGridTemplateColumn>
@@ -137,48 +186,28 @@
                                         Binding="{Binding Total, StringFormat=C}"/>
                 </DataGrid.Columns>
             </DataGrid>
-        </ScrollViewer>
-        <!-- Save/Cancel -->
+        </ScrollViewer >
+        <!-- Pay/Delete/Cancel -->
         <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0"
-                        Width="48"
-                        Height="48"
-                        Margin="5,2"
-                        ToolTip="Cash payment"
-                        Command="{Binding CashCommand}">
-                    <Image Style="{StaticResource AutoDisableImageStyle}"
-                           Source="{StaticResource CashImage}"/>
-                </Button>
-                <Button Grid.Column="1"
-                        Width="48"
-                        Height="48"
-                        Margin="5,2"
-                        ToolTip="Bank card payment"
-                        Command="{Binding BankCardCommand}">
-                    <Image Style="{StaticResource AutoDisableImageStyle}"
-                           Source="{StaticResource BankCardImage}"/>
-                </Button>
-                <StackPanel Grid.Column="2"
-                            VerticalAlignment="Center"
-                            Orientation="Vertical">
-                    <TextBlock Margin="5,2"
-                               Style="{StaticResource HeaderTextBlockStyle}"
-                               Text="Total:"/>
-                    <TextBlock Margin="5,2"
-                               Style="{StaticResource DataTextBlockStyle}"
-                               Text="{Binding Total, StringFormat=C}"/>
-                </StackPanel>
-            </Grid>
+            <ContentPresenter Grid.Column="0"
+                              Content="{Binding}">
+                <ContentPresenter.Style>
+                    <Style TargetType="{x:Type ContentPresenter}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsListEmpty}" Value="True">
+                                <Setter Property="ContentTemplate" Value="{StaticResource DeleteTemplate}"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsListEmpty}" Value="False">
+                                <Setter Property="ContentTemplate" Value="{StaticResource PayTemplate}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ContentPresenter.Style>
+            </ContentPresenter>
             <Button Grid.Column="1"
                     Width="48"
                     Height="48"

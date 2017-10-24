@@ -54,12 +54,14 @@
 
         <!-- mouse wheel scroll: http://stackoverflow.com/questions/2922303/mouse-scroll-not-working-in-a-scroll-viewer-with-a-wpf-datagrid-and-additional-u-->
         <ScrollViewer Grid.Row="1"
-                      PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
+                      PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
+                      helpers:BubbleMouseWheelBehavior.IsBubblingEnabled="True">
             <DataGrid Margin="5,2"
                       IsReadOnly="True" 
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
+                      helpers:BubbleMouseWheelBehavior.IsBubblingEnabled="True"
                       RowHeaderStyle="{StaticResource TransactionRowHeaderStyle}"
                       ItemsSource="{Binding Transactions}">
                 <DataGrid.RowDetailsTemplate>
@@ -150,13 +152,15 @@
         </StackPanel>
 
         <ScrollViewer Grid.Row="3"
-                      PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
+                      PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
+                      helpers:BubbleMouseWheelBehavior.IsBubblingEnabled="True">
             <DataGrid Margin="5,2"
                       IsReadOnly="True" 
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
                       RowHeaderStyle="{StaticResource TransactionRowHeaderStyle}"
+                      helpers:BubbleMouseWheelBehavior.IsBubblingEnabled="True"
                       ItemsSource="{Binding PaidCarts}">
                 <DataGrid.RowDetailsTemplate>
                     <DataTemplate DataType="{x:Type models:ShopTransactionItem}">
@@ -249,6 +253,7 @@
                   ScrollViewer.CanContentScroll="True" 
                   ScrollViewer.VerticalScrollBarVisibility="Auto"
                   ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                  helpers:BubbleMouseWheelBehavior.IsBubblingEnabled="True"
                   ItemsSource="{Binding SoldArticles}">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Ean"

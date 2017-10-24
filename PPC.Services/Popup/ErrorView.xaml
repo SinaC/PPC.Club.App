@@ -50,13 +50,14 @@
             </Expander.Style>
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                 <TextBox TextWrapping="Wrap"
-                            Text="{Binding Details}"/>
+                         IsReadOnly="True"
+                         Text="{Binding Details, Mode=OneWay}"/>
             </ScrollViewer>
         </Expander>
         <Button Grid.Row="2"
                 Width="80"
                 Margin="5,2"
-                Command="{Binding ClickCommand}">
+                Command="{Binding OkCommand}">
             <TextBlock Text="Ok"/>
         </Button>
     </Grid>

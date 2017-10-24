@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:viewModels="clr-namespace:PPC.App.Closure"
+             xmlns:helpers="clr-namespace:PPC.Helpers;assembly=PPC.Helpers"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance viewModels:ArticlesViewModelDesignData, IsDesignTimeCreatable=True}"
              d:DesignHeight="400" d:DesignWidth="520"
@@ -61,6 +62,7 @@
                   CanUserAddRows="False"
                   CanUserDeleteRows="False"
                   AutoGenerateColumns="False"
+                  helpers:BubbleMouseWheelBehavior.IsBubblingEnabled="True"
                   ItemsSource="{Binding ClosureData.Articles}">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Ean"

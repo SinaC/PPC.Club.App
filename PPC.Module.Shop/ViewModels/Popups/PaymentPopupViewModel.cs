@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Input;
+using EasyIoc;
 using EasyMVVM;
 using PPC.Module.Shop.Views.Popups;
 using PPC.Services.Popup;
@@ -9,7 +10,8 @@ namespace PPC.Module.Shop.ViewModels.Popups
     [PopupAssociatedView(typeof(PaymentPopup))]
     public class PaymentPopupViewModel : ObservableObject
     {
-        private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
+        private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
+
         private readonly Action<decimal, decimal, decimal> _paidAction;
 
         public decimal TotalWithoutDiscount { get; }
@@ -149,6 +151,9 @@ namespace PPC.Module.Shop.ViewModels.Popups
                 }
             }
         }
+
+        private ICommand _setDiscountCommand;
+        public ICommand SetDiscountCommand => _setDiscountCommand = _setDiscountCommand ?? new RelayCommand<decimal>(discount => DiscountPercentage = discount/100m);
 
         public bool HasDiscount => DiscountPercentage > 0;
 

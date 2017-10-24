@@ -27,14 +27,14 @@ namespace PPC.Services.Popup
         public string Question
         {
             get { return _question; }
-            set { Set(() => Question, ref _question, value); }
+            protected set { Set(() => Question, ref _question, value); }
         }
 
         private List<QuestionPopupAnswerItem> _answerItems;
         public List<QuestionPopupAnswerItem> AnswerItems
         {
             get { return _answerItems; }
-            set { Set(() => AnswerItems, ref _answerItems, value); }
+            protected set { Set(() => AnswerItems, ref _answerItems, value); }
         }
 
         private ICommand _clickCommand;
@@ -49,12 +49,13 @@ namespace PPC.Services.Popup
         {
             Question = question;
             AnswerItems = (actionButtons ?? Enumerable.Empty<QuestionActionButton>())
+                .Select((x,i) => new {Button = x, Order = x.Order ?? i})
                 .OrderBy(x => x.Order)
                 .Select(x => new QuestionPopupAnswerItem
                 {
-                    Caption = x.Caption,
-                    ClickCallback = x.ClickCallback,
-                    CloseOnClick = x.CloseOnClick
+                    Caption = x.Button.Caption,
+                    ClickCallback = x.Button.ClickCallback,
+                    CloseOnClick = x.Button.CloseOnClick
                 }).ToList();
         }
 

@@ -5,9 +5,11 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
+using EasyIoc;
 using EasyMVVM;
 using PPC.Data.Contracts;
 using PPC.Helpers;
+using PPC.Log;
 using PPC.Messages;
 using PPC.Module.Shop.Models;
 using PPC.Module.Shop.ViewModels.Popups;
@@ -23,7 +25,8 @@ namespace PPC.Module.Shop.ViewModels
 
     public class ClientShoppingCartsViewModel : ObservableObject
     {
-        private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
+        private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
+        private ILog Logger => IocContainer.Default.Resolve<ILog>();
 
         private readonly Action<ShopTransactionItem> _addTransactionAction;
         private readonly Action<decimal, decimal, decimal> _clientCartPaidAction;
@@ -36,6 +39,7 @@ namespace PPC.Module.Shop.ViewModels
         public int PaidClientShoppingCartsCount => Clients.Count(x => x.PaymentState == ClientShoppingCartPaymentStates.Paid);
 
         public int UnpaidClientShoppingCartsCount => Clients.Count(x => x.PaymentState == ClientShoppingCartPaymentStates.Unpaid);
+        public bool HasUnpaidClientShoppingCards => Clients.Any(x => x.PaymentState == ClientShoppingCartPaymentStates.Unpaid && x.ShoppingCart.ShoppingCartArticles.Any());
 
         public decimal ClientShoppingCartsTotal => PaidClientShoppingCartsTotal + UnpaidClientShoppingCartsTotal;
 
@@ -92,13 +96,18 @@ namespace PPC.Module.Shop.ViewModels
 
         private void AddNewClientNameSelected(string name)
         {
-            if (Clients.Any(x => x.ClientName == name))
+            ClientShoppingCartViewModel alreadyExistingClient = Clients.FirstOrDefault(x => String.Equals(x.ClientName, name, StringComparison.InvariantCultureIgnoreCase));
+            if (alreadyExistingClient != null)
             {
-                PopupService.DisplayError("Error", "A shopping cart with that client name has already been opened!");
+                Logger.Warning($"A shopping cart with that client name '{name}' has already been opened!");
+                PopupService.DisplayError(
+                    "Warning",
+                    $"A shopping cart with that client name '{name}' has already been opened! Switching to {name} shopping cart.",
+                    () => SelectedClient = alreadyExistingClient); // switch to already existing client
             }
             else
             {
-                ClientShoppingCartViewModel newClient = new ClientShoppingCartViewModel(_clientCartPaidAction, _clientCartReopenedAction)
+                ClientShoppingCartViewModel newClient = new ClientShoppingCartViewModel(ClientCartPaid, ClientCartReopened)
                 {
                     HasFullPlayerInfos = false,
                     ClientName = name,
@@ -118,27 +127,9 @@ namespace PPC.Module.Shop.ViewModels
         private void CloseClient(ClientShoppingCartViewModel client)
         {
             if (client.PaymentState == ClientShoppingCartPaymentStates.Unpaid && client.ShoppingCart.ShoppingCartArticles.Any())
-                PopupService.DisplayQuestion($"Close {client.ClientName} shopping cart", $"Client {client.ClientName} has yet not paid, therefore shopping cart cannot be closed.",
-                    new QuestionActionButton
-                    {
-                        Caption = "Ok",
-                        Order = 2,
-                        ClickCallback = () => { }
-                    });
+                PopupService.DisplayQuestion($"Close {client.ClientName} shopping cart", $"Client {client.ClientName} has yet not paid, therefore shopping cart cannot be closed.", QuestionActionButton.Ok());
             else
-                PopupService.DisplayQuestion($"Close {client.ClientName} shopping cart", "Are you sure ?",
-                    new QuestionActionButton
-                    {
-                        Caption = "Yes",
-                        Order = 1,
-                        ClickCallback = () => CloseClientConfirmed(client)
-                    },
-                    new QuestionActionButton
-                    {
-                        Caption = "No",
-                        Order = 2,
-                        ClickCallback = () => { }
-                    });
+                PopupService.DisplayQuestion($"Close {client.ClientName} shopping cart", "Are you sure ?", QuestionActionButton.Yes(() => CloseClientConfirmed(client)), QuestionActionButton.No());
         }
 
         private void CloseClientConfirmed(ClientShoppingCartViewModel client)
@@ -171,6 +162,7 @@ namespace PPC.Module.Shop.ViewModels
             }
             catch (Exception ex)
             {
+                Logger.Exception("Error while deleting backup file", ex);
                 PopupService.DisplayError("Error while deleting backup file", ex);
             }
             //
@@ -191,12 +183,13 @@ namespace PPC.Module.Shop.ViewModels
                 {
                     try
                     {
-                        ClientShoppingCartViewModel client = new ClientShoppingCartViewModel(_clientCartPaidAction, _clientCartReopenedAction, filename);
+                        ClientShoppingCartViewModel client = new ClientShoppingCartViewModel(ClientCartPaid, ClientCartReopened, filename);
                         Clients.Add(client);
                     }
                     catch (Exception ex)
                     {
-                        PopupService.DisplayError($"Error while loading {filename} cart", ex);
+                        Logger.Exception($"Error while loading {filename ?? "??"} cart", ex);
+                        PopupService.DisplayError($"Error while loading {filename ?? "??"} cart", ex);
                     }
                 }
             }
@@ -242,13 +235,7 @@ namespace PPC.Module.Shop.ViewModels
             Clients = new ObservableCollection<ClientShoppingCartViewModel>();
             Clients.CollectionChanged += (sender, args) =>
             {
-                RaisePropertyChanged(() => ClientShoppingCartsCount);
-                RaisePropertyChanged(() => PaidClientShoppingCartsCount);
-                RaisePropertyChanged(() => UnpaidClientShoppingCartsCount);
-                RaisePropertyChanged(() => ClientShoppingCartsTotal);
-                RaisePropertyChanged(() => PaidClientShoppingCartsTotal);
-                RaisePropertyChanged(() => UnpaidClientShoppingCartsTotal);
-                RaisePropertyChanged(() => HasClientShoppingCartsOpened);
+                RefreshCounters();
             };
 
             Mediator.Default.Register<PlayerSelectedMessage>(this, PlayerSelected);
@@ -260,7 +247,7 @@ namespace PPC.Module.Shop.ViewModels
             ClientShoppingCartViewModel client = Clients.FirstOrDefault(x => x.DciNumber == msg.DciNumber && x.ClientFirstName == msg.FirstName && x.ClientLastName == msg.LastName);
             if (client == null)
             {
-                ClientShoppingCartViewModel newClient = new ClientShoppingCartViewModel(_clientCartPaidAction, _clientCartReopenedAction)
+                ClientShoppingCartViewModel newClient = new ClientShoppingCartViewModel(ClientCartPaid, ClientCartReopened)
                 {
                     HasFullPlayerInfos = true,
                     ClientName = msg.FirstName,
@@ -273,6 +260,34 @@ namespace PPC.Module.Shop.ViewModels
             }
             else
                 SelectedClient = client;
+        }
+
+        private void RefreshCounters()
+        {
+            RaisePropertyChanged(() => ClientShoppingCartsCount);
+            RaisePropertyChanged(() => PaidClientShoppingCartsCount);
+            RaisePropertyChanged(() => UnpaidClientShoppingCartsCount);
+            RaisePropertyChanged(() => HasUnpaidClientShoppingCards);
+            RaisePropertyChanged(() => ClientShoppingCartsTotal);
+            RaisePropertyChanged(() => PaidClientShoppingCartsTotal);
+            RaisePropertyChanged(() => UnpaidClientShoppingCartsTotal);
+            RaisePropertyChanged(() => HasClientShoppingCartsOpened);
+        }
+
+        // TODO: RefreshCounters should be called when an item is added in shopping cart
+
+        private void ClientCartReopened()
+        {
+            RefreshCounters();
+
+             _clientCartReopenedAction?.Invoke();
+        }
+
+        private void ClientCartPaid(decimal cash, decimal bankCard, decimal discountPercentage)
+        {
+            RefreshCounters();
+
+            _clientCartPaidAction?.Invoke(cash, bankCard, discountPercentage);
         }
     }
 

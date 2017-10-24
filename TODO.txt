@@ -1,8 +1,13 @@
+add informative logging
 AskNameEmailPopup: check email validity
 article refund (client doesn't want anymore an already paid article !! only for cash payment)
 article DB (real DB instead of xml file)
 PlayersDb: store the list of players (similar to ArticlesDb + call load from MainViewModel)
 Players -> remove save button, save automatically once a modification has been done
+BubbleMouseWheelBehavior:
+	datagrid column are not recomputed correctly (reproduce: zoom in 5-6 times then zoom out 5-6 times)
+	window title is not zoomed
+finish mobile article selector view
 
 popup style
 

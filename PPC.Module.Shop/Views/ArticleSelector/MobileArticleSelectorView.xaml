@@ -6,6 +6,7 @@
              xmlns:viewModels="clr-namespace:PPC.Module.Shop.ViewModels.ArticleSelector"
              xmlns:contracts="clr-namespace:PPC.Data.Contracts;assembly=PPC.Data.Contracts"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:helpers="clr-namespace:PPC.Helpers;assembly=PPC.Helpers"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance viewModels:MobileArticleSelectorViewModelDesignData, IsDesignTimeCreatable=True}"
              d:DesignHeight="500" d:DesignWidth="700">
@@ -15,9 +16,13 @@
                 <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Styles.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Images.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <system:Double x:Key="ArticleCategoryButtonMinHeight">48</system:Double>
+            <system:Double x:Key="ButtonSize">64</system:Double>
+            <system:Double x:Key="IncDecButtonSize">24</system:Double>
+            <system:Int32 x:Key="UniformGridColumnCount">6</system:Int32>
             <!-- Article template -->
             <DataTemplate x:Key="ArticleTemplate" DataType="{x:Type contracts:Article}">
-                <Button MinHeight="64"
+                <Button MinHeight="{StaticResource ArticleCategoryButtonMinHeight}"
                         Margin="2"
                         Command="{Binding DataContext.SelectArticleCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                         CommandParameter="{Binding}">
@@ -36,7 +41,7 @@
             </DataTemplate>
             <!-- Category or SubCategory template -->
             <DataTemplate x:Key="CategorySubCategoryTemplate" DataType="{x:Type system:String}">
-                <Button MinHeight="64"
+                <Button MinHeight="{StaticResource ArticleCategoryButtonMinHeight}"
                         Margin="2"
                         Command="{Binding DataContext.SelectCategoryOrSubCategoryCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                         CommandParameter="{Binding}">
@@ -68,13 +73,14 @@
                 <ScrollViewer x:Name="ScrollViewerActive"
                                 Grid.Column="0"
                                 HorizontalScrollBarVisibility="Disabled"
-                                VerticalScrollBarVisibility="Auto">
+                                VerticalScrollBarVisibility="Auto"
+                                helpers:BubbleMouseWheelBehavior.IsBubblingEnabled="True">
                     <ItemsControl VerticalAlignment="Top"
                                   ItemsSource="{Binding CurrentlyDisplayedCollection}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <!--<WrapPanel Orientation="Horizontal"/>-->
-                                <UniformGrid Columns="6"/>
+                                <UniformGrid Columns="{StaticResource UniformGridColumnCount}"/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
@@ -117,8 +123,8 @@
                     </Grid.RowDefinitions>
                     <!-- Top -->
                     <Button Grid.Row="0"
-                            Width="64"
-                            Height="64"
+                            Width="{StaticResource ButtonSize}"
+                            Height="{StaticResource ButtonSize}"
                             Margin="2"
                             Command="{Binding TopCommand}">
                         <Image Style="{StaticResource AutoDisableImageStyle}"
@@ -126,43 +132,48 @@
                     </Button>
                     <!-- Back -->
                     <Button Grid.Row="1"
-                            Width="64"
-                            Height="64"
+                            Width="{StaticResource ButtonSize}"
+                            Height="{StaticResource ButtonSize}"
                             Margin="2"
                             Command="{Binding BackCommand}">
                         <Image Style="{StaticResource AutoDisableImageStyle}"
                                Source="{StaticResource BackImage}"/>
                     </Button>
                     <!-- +Quantity -->
-                    <StackPanel Grid.Row="2"
-                                Margin="2"
-                                Orientation="Horizontal">
-                        <Button Width="28"
-                                Height="28"
-                                Margin="2"
+                    <Grid Grid.Row="2"
+                          Margin="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0"
+                                HorizontalAlignment="Left"
+                                Width="{StaticResource IncDecButtonSize}"
+                                Height="{StaticResource IncDecButtonSize}"
                                 Command="{Binding IncrementQuantityCommand}">
                             <Image Style="{StaticResource AutoDisableImageStyle}" 
                                Source="{StaticResource PlusImage}"/>
                         </Button>
                         <!-- -Quantity -->
-                        <Button Width="28"
-                                Height="28"
-                                Margin="2"
+                        <Button Grid.Column="1"
+                                HorizontalAlignment="Right"
+                                Width="{StaticResource IncDecButtonSize}"
+                                Height="{StaticResource IncDecButtonSize}"
                                 Command="{Binding DecrementQuantityCommand}">
                             <Image Style="{StaticResource AutoDisableImageStyle}" 
                                Source="{StaticResource MinusImage}"/>
                         </Button>
-                    </StackPanel>
+                    </Grid>
                     <!-- Quantity -->
                     <TextBlock Grid.Row="4"
-                               Width="64"
+                               Width="{StaticResource ButtonSize}"
                                Margin="2"
                                TextAlignment="Center"
                                Text="{Binding Quantity}"/>
                     <!-- Add to shopping cart -->
                     <Button Grid.Row="5"
-                            Width="64"
-                            Height="64"
+                            Width="{StaticResource ButtonSize}"
+                            Height="{StaticResource ButtonSize}"
                             Margin="2"
                             Command="{Binding AddArticleCommand}">
                         <Image Style="{StaticResource AutoDisableImageStyle}"
@@ -173,8 +184,8 @@
 
                     <!-- Edit -->
                     <Button Grid.Row="7"
-                            Width="64"
-                            Height="64"
+                            Width="{StaticResource ButtonSize}"
+                            Height="{StaticResource ButtonSize}"
                             Margin="2"
                             Command="{Binding EditArticleCommand}">
                         <Image Style="{StaticResource AutoDisableImageStyle}"
@@ -183,8 +194,8 @@
 
                     <!-- Create -->
                     <Button Grid.Row="8"
-                            Width="64"
-                            Height="64"
+                            Width="{StaticResource ButtonSize}"
+                            Height="{StaticResource ButtonSize}"
                             Margin="2"
                             Command="{Binding CreateArticleCommand}">
                         <Image Style="{StaticResource AutoDisableImageStyle}"

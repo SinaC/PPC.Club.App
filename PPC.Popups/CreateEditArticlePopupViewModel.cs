@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
+using EasyIoc;
 using EasyMVVM;
 using PPC.Data.Contracts;
 using PPC.Services.Popup;
@@ -14,7 +15,8 @@ namespace PPC.Popups
     [PopupAssociatedView(typeof(CreateEditArticlePopup))]
     public class CreateEditArticlePopupViewModel : ObservableObject
     {
-        private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
+        private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
+
         private readonly Action<CreateEditArticlePopupViewModel> _saveArticleAction;
         private readonly Func<string, IEnumerable<string>> _buildSubCategoriesFunc;
 

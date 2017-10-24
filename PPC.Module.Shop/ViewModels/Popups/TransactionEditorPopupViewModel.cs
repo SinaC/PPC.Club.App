@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using EasyIoc;
 using EasyMVVM;
 using PPC.Data.Contracts;
 using PPC.Module.Shop.Models;
@@ -11,18 +12,21 @@ using PPC.Services.Popup;
 
 namespace PPC.Module.Shop.ViewModels.Popups
 {
-    // TODO: don't pay and delete transaction if each articles has been removed
     [PopupAssociatedView(typeof(TransactionEditorPopup))]
     public class TransactionEditorPopupViewModel : ObservableObject
     {
-        private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
+        private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
+
         private readonly Action<ShopTransactionItem> _saveTransactionAction;
+        private readonly Action<ShopTransactionItem> _deleteTransactionAction;
 
         private readonly ShopTransactionItem _originalTransactionItem;
 
         #region Articles
 
         public decimal Total => Articles.Sum(x => x.Total);
+
+        public bool IsListEmpty => Articles.Count == 0;
 
         private ObservableCollection<ShopArticleItem> _articles;
         public ObservableCollection<ShopArticleItem> Articles
@@ -40,6 +44,7 @@ namespace PPC.Module.Shop.ViewModels.Popups
         {
             Articles.Remove(item);
             RaisePropertyChanged(() => Total);
+            RaisePropertyChanged(() => IsListEmpty);
         }
 
         #endregion
@@ -152,10 +157,19 @@ namespace PPC.Module.Shop.ViewModels.Popups
             PopupService?.Close(this);
         }
 
-        public TransactionEditorPopupViewModel(ShopTransactionItem transactionItem, Action<ShopTransactionItem> saveTransactionAction)
+        private ICommand _deleteCommand;
+        public ICommand DeleteCommand => _deleteCommand = _deleteCommand ?? new RelayCommand(Delete);
+
+        private void Delete()
+        {
+            PopupService.DisplayQuestion("Confirmation", "Are you sure you want to delete this transaction ?", QuestionActionButton.Yes(() => _deleteTransactionAction(_originalTransactionItem)), QuestionActionButton.No());
+        }
+
+        public TransactionEditorPopupViewModel(ShopTransactionItem transactionItem, Action<ShopTransactionItem> saveTransactionAction, Action<ShopTransactionItem> deleteTransactionAction)
         {
             _originalTransactionItem = transactionItem;
             _saveTransactionAction = saveTransactionAction;
+            _deleteTransactionAction = deleteTransactionAction;
             Initialize(transactionItem);
         }
 
@@ -169,6 +183,7 @@ namespace PPC.Module.Shop.ViewModels.Popups
                 Quantity = x.Quantity,
                 Article = x.Article
             }));
+            RaisePropertyChanged(() => IsListEmpty);
         }
     }
 
@@ -212,7 +227,7 @@ namespace PPC.Module.Shop.ViewModels.Popups
                     Quantity = 1,
                 }
             }
-        }, _ => { })
+        }, _ => { }, _ => { })
         {
         }
     }

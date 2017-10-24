@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using EasyIoc;
 using EasyMVVM;
 using PPC.Data.Contracts;
 using PPC.Services.Popup;
@@ -19,7 +20,7 @@ namespace PPC.App.Closure
     [PopupAssociatedView(typeof(ClosurePopup))]
     public class ClosurePopupViewModel : ObservableObject
     {
-        private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
+        private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
 
         private readonly Action _closeAction;
         private readonly Func<CashRegisterClosure, List<SoldCards>, Task> _sendMailsAsyncFunc;
@@ -28,7 +29,7 @@ namespace PPC.App.Closure
         public bool IsWaiting
         {
             get { return _isWaiting; }
-            set { Set(() => IsWaiting, ref _isWaiting, value); }
+            protected set { Set(() => IsWaiting, ref _isWaiting, value); }
         }
 
         private ArticlesViewModel _articlesViewModel;

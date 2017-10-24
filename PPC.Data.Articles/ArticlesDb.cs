@@ -8,9 +8,11 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Xml;
 using EasyDBFParser;
 using PPC.Data.Contracts;
+using PPC.Helpers;
 
 namespace PPC.Data.Articles
 {
@@ -95,6 +97,17 @@ namespace PPC.Data.Articles
             }
         }
 
+        public async Task SaveAsync()
+        {
+            string filename = ConfigurationManager.AppSettings["ArticlesPath"];
+            using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
+            {
+                writer.Formatting = Formatting.Indented;
+                DataContractSerializer serializer = new DataContractSerializer(typeof(List<Article>));
+                await serializer.WriteObjectAsync(writer, Articles);
+            }
+        }
+
         public void Load()
         {
             // Load articles
@@ -106,6 +119,24 @@ namespace PPC.Data.Articles
                 {
                     DataContractSerializer serializer = new DataContractSerializer(typeof(List<Article>));
                     newArticles = (List<Article>)serializer.ReadObject(reader);
+                }
+                _articles = newArticles;
+            }
+            else
+                throw new InvalidOperationException("Article DB not found.");
+        }
+
+        public async Task LoadAsync()
+        {
+            // Load articles
+            string filename = ConfigurationManager.AppSettings["ArticlesPath"];
+            if (File.Exists(filename))
+            {
+                List<Article> newArticles;
+                using (XmlTextReader reader = new XmlTextReader(filename))
+                {
+                    DataContractSerializer serializer = new DataContractSerializer(typeof(List<Article>));
+                    newArticles = (List<Article>)await serializer.ReadObjectAsync(reader);
                 }
                 _articles = newArticles;
             }

@@ -52,6 +52,8 @@
                     </Style>
                 </RowDefinition.Style>
             </RowDefinition>
+            <!--<RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>-->
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
@@ -66,6 +68,7 @@
                   VerticalScrollBarVisibility="Auto"
                   ScrollViewer.CanContentScroll="True"
                   helpers:DataGridHelpers.Autoscroll="True"
+                  helpers:BubbleMouseWheelBehavior.IsBubblingEnabled="True"
                   ItemsSource="{Binding ShoppingCartArticles}">
             <DataGrid.Columns>
                 <DataGridTemplateColumn>

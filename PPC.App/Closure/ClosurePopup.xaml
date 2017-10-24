@@ -55,7 +55,7 @@
                               IsChecked="{Binding IsSoldCardsSelected, Mode=OneWay}"
                               Command="{Binding SwitchToSoldCardsCommand}">
                     <Image Style="{StaticResource AutoDisableImageStyle}"
-                           Source="{StaticResource Cards}"/>
+                           Source="{StaticResource MagicImage}"/>
                 </ToggleButton>
                 <ToggleButton Width="64"
                               Height="64"

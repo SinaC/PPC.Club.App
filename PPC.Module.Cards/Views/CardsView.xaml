@@ -58,7 +58,7 @@
                                         </Grid.RowDefinitions>
                                         <Image Grid.Row="0"
                                        Style="{StaticResource AutoDisableImageStyle}"
-                                       Source="{StaticResource Cards}"/>
+                                       Source="{StaticResource MagicImage}"/>
                                         <TextBlock Grid.Row="1"
                                            HorizontalAlignment="Center"
                                            FontWeight="Bold"
@@ -91,7 +91,7 @@
                 </Style>
             </ContentPresenter.Style>
         </ContentPresenter>
-        <TextBlock VerticalAlignment="Center"
+        <!--<TextBlock VerticalAlignment="Center"
                    HorizontalAlignment="Center"
                    Opacity="0.5"
                    IsHitTestVisible="False"
@@ -104,6 +104,6 @@
                     <RotateTransform.Angle>-45</RotateTransform.Angle>
                 </RotateTransform>
             </TextBlock.RenderTransform>
-        </TextBlock>
+        </TextBlock>-->
     </Grid>
 </UserControl>

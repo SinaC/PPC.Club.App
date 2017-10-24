@@ -12,14 +12,14 @@ namespace PPC.Services.Popup
         public string Summary
         {
             get { return _summary; }
-            set { Set(() => Summary, ref _summary, value); }
+            protected set { Set(() => Summary, ref _summary, value); }
         }
 
         private string _details;
         public string Details
         {
             get { return _details; }
-            set
+            protected set
             {
                 if (Set(() => Details, ref _details, value))
                     RaisePropertyChanged(() => HasDetails);
@@ -28,17 +28,10 @@ namespace PPC.Services.Popup
 
         public bool HasDetails => !string.IsNullOrWhiteSpace(Details);
 
-        private ICommand _clickCommand;
-        public ICommand ClickCommand
-        {
-            get
-            {
-                _clickCommand = _clickCommand ?? new RelayCommand<QuestionPopupAnswerItem>(Click);
-                return _clickCommand;
-            }
-        }
+        private ICommand _okCommand;
+        public ICommand OkCommand => _okCommand = _okCommand ?? new RelayCommand(Ok);
 
-        private void Click(QuestionPopupAnswerItem answer)
+        private void Ok()
         {
             _modalPopupService.Close(this);
         }

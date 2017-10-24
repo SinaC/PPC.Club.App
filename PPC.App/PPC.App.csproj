@@ -53,6 +53,10 @@
     <ApplicationIcon>logo.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.4.10\lib\net45\NLog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Runtime.Serialization" />
@@ -172,6 +176,12 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -180,16 +190,26 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EasyIoc\EasyIoc.csproj">
       <Project>{38d20e7f-9510-4b80-8755-1def2ef07bcf}</Project>
       <Name>EasyIoc</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PPC.Common\PPC.Common.csproj">
+      <Project>{7F9D7666-1A58-4AE1-AD47-AB68A3D4E2FE}</Project>
+      <Name>PPC.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PPC.Helpers\PPC.Helpers.csproj">
       <Project>{3523C53F-4317-4AC6-B077-76544BDD174A}</Project>
       <Name>PPC.Helpers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Log\PPC.Log.csproj">
+      <Project>{BCB79B57-39A1-4714-A728-B09C90BB4B35}</Project>
+      <Name>PPC.Log</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Module.Cards\PPC.Module.Cards.csproj">
       <Project>{464113AF-4BC7-4326-853C-32707A1284E7}</Project>

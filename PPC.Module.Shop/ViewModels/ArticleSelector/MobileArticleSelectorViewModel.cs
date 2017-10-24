@@ -7,6 +7,7 @@ using EasyMVVM;
 using PPC.Data.Articles;
 using PPC.Data.Contracts;
 using PPC.Helpers;
+using PPC.Log;
 using PPC.Popups;
 using PPC.Services.Popup;
 
@@ -22,14 +23,16 @@ namespace PPC.Module.Shop.ViewModels.ArticleSelector
     public class MobileArticleSelectorViewModel : ObservableObject, IArticleSelector
     {
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
+        private ILog Logger => IocContainer.Default.Resolve<ILog>();
+        private IArticleDb ArticlesDb => IocContainer.Default.Resolve<IArticleDb>();
 
         public const bool GoToTopWhenArticleSelected = false; // TODO: config???
 
-        public IEnumerable<Article> Articles => IocContainer.Default.Resolve<IArticleDb>().FilterArticles(SelectedCategory, SelectedSubCategory);
-        public IEnumerable<string> Categories => IocContainer.Default.Resolve<IArticleDb>().Categories;
-        public IEnumerable<string> Producers => IocContainer.Default.Resolve<IArticleDb>().Producers;
+        public IEnumerable<Article> Articles => ArticlesDb.FilterArticles(SelectedCategory, SelectedSubCategory);
+        public IEnumerable<string> Categories => ArticlesDb.Categories;
+        public IEnumerable<string> Producers => ArticlesDb.Producers;
         public IEnumerable<string> SubCategories => BuildSubCategories(SelectedCategory);
-        private Func<string, IEnumerable<string>> BuildSubCategories => IocContainer.Default.Resolve<IArticleDb>().SubCategories;
+        private Func<string, IEnumerable<string>> BuildSubCategories => ArticlesDb.SubCategories;
 
         public string CurrentSelectionPath => SelectedCategory.AppendIfNotEmpty(">").AppendIfNotEmpty(SelectedSubCategory.AppendIfNotEmpty(">")).AppendIfNotEmpty((SelectedArticle?.Description).AppendIfNotEmpty("(").AppendIfNotEmpty(SelectedArticle?.Price.ToString("C")).AppendIfNotEmpty(")"));
 
@@ -75,15 +78,15 @@ namespace PPC.Module.Shop.ViewModels.ArticleSelector
             switch (Mode)
             {
                 case ArticleSelectorModes.ArticleSelection:
-                    // If an article is selected, reset quantity and unselect article
-                    if (SelectedArticle != null)
-                    {
-                        SelectedArticle = null;
-                        Quantity = 1;
-                    }
-                    // Else, go up to subcategory or category
-                    else
-                    {
+                    //// If an article is selected, reset quantity and unselect article
+                    //if (SelectedArticle != null)
+                    //{
+                    //    SelectedArticle = null;
+                    //    Quantity = 1;
+                    //}
+                    //// Else, go up to subcategory or category
+                    //else
+                    //{
                         // if no subcategories, back to category selection
                         if (SubCategories.Any())
                         {
@@ -95,7 +98,7 @@ namespace PPC.Module.Shop.ViewModels.ArticleSelector
                             SelectedCategory = null;
                             Mode = ArticleSelectorModes.CategorySelection;
                         }
-                    }
+                    //}
                     break;
                 case ArticleSelectorModes.SubCategorySelection:
                     SelectedCategory = null;
@@ -209,6 +212,10 @@ namespace PPC.Module.Shop.ViewModels.ArticleSelector
             SelectedArticle = article;
             Quantity = 1;
             RaisePropertyChanged(() => CurrentSelectionPath);
+
+            // when selecting article, we add it to shopping cart
+            if (!GoToTopWhenArticleSelected)
+                AddArticle();
         }
 
         #endregion
@@ -314,10 +321,12 @@ namespace PPC.Module.Shop.ViewModels.ArticleSelector
 
             try
             {
-                IocContainer.Default.Resolve<IArticleDb>().Save();
+                Logger.Info($"Article {article.Description ?? "???"} {article.Price:C} edited.");
+                ArticlesDb.Save();
             }
             catch (Exception ex)
             {
+                Logger.Exception("Error while saving articles DB", ex);
                 PopupService.DisplayError("Error while saving articles DB", ex);
             }
 
@@ -369,10 +378,12 @@ namespace PPC.Module.Shop.ViewModels.ArticleSelector
 
             try
             {
-                IocContainer.Default.Resolve<IArticleDb>().Add(article);
+                Logger.Info($"New article {article.Description ?? "???"} {article.Price:C} created.");
+                ArticlesDb.Add(article);
             }
             catch (Exception ex)
             {
+                Logger.Exception("Error while saving articles DB", ex);
                 PopupService.DisplayError("Error while saving articles DB", ex);
             }
 

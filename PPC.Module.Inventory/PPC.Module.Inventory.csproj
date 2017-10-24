@@ -34,13 +34,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
@@ -90,12 +85,12 @@
       <Name>PPC.Data.Contracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Helpers\PPC.Helpers.csproj">
-      <Project>{3523c53f-4317-4ac6-b077-76544bdd174a}</Project>
+      <Project>{3523C53F-4317-4AC6-B077-76544BDD174A}</Project>
       <Name>PPC.Helpers</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PPC.Messages\PPC.Messages.csproj">
-      <Project>{137ef3d3-e60d-45e9-8a3b-43042fc36105}</Project>
-      <Name>PPC.Messages</Name>
+    <ProjectReference Include="..\PPC.Log\PPC.Log.csproj">
+      <Project>{BCB79B57-39A1-4714-A728-B09C90BB4B35}</Project>
+      <Name>PPC.Log</Name>
     </ProjectReference>
     <ProjectReference Include="..\EasyMVVM\EasyMVVM.csproj">
       <Project>{10833c79-c3fb-4f70-ad1d-7f0173d01966}</Project>

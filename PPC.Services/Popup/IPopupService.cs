@@ -4,20 +4,6 @@ using EasyMVVM;
 
 namespace PPC.Services.Popup
 {
-    public class QuestionActionButton
-    {
-        public string Caption { get; set; }
-        public Action ClickCallback { get; set; }
-        public int Order { get; set; }
-        public bool CloseOnClick { get; set; }
-
-        public QuestionActionButton()
-        {
-            ClickCallback = null;
-            CloseOnClick = true;
-        }
-    }
-
     public interface IPopupService
     {
         void RegisterView<TViewModel, TView>()
@@ -29,8 +15,8 @@ namespace PPC.Services.Popup
 
         void DisplayQuestion(string title, string question, params QuestionActionButton[] buttons);
 
-        void DisplayError(string title, string error);
-        void DisplayError(string title, Exception ex);
+        void DisplayError(string title, string error, Action onCloseAction = null);
+        void DisplayError(string title, Exception ex, Action onCloseAction = null);
 
         void Close(ObservableObject viewModel);
     }

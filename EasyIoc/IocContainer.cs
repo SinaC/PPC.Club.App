@@ -44,12 +44,12 @@ namespace EasyIoc
             Type interfaceType = typeof (TInterface);
 
             if (!interfaceType.IsInterface)
-                throw new ArgumentException("Cannot Register: Only an interface can be registered");
+                throw new ArgumentException("Cannot RegisterType: Only an interface can be registered");
 
             Type implementationType = typeof (TImplementation);
 
             if (implementationType.IsInterface || implementationType.IsAbstract)
-                throw new ArgumentException("Cannot Register: No interface or abstract class is valid as implementation");
+                throw new ArgumentException("Cannot RegisterType: No interface or abstract class is valid as implementation");
 
             if (!interfaceType.IsAssignableFrom(implementationType))
                 throw new ArgumentException($"{interfaceType.FullName} is not assignable from {implementationType.FullName}");
@@ -57,15 +57,15 @@ namespace EasyIoc
             lock (_lockObject)
             {
                 if (_factories.ContainsKey(interfaceType))
-                    throw new ArgumentException("Cannot Register: A factory has already been registered");
+                    throw new ArgumentException("Cannot RegisterType: A factory has already been registered");
 
                 if (_instances.ContainsKey(interfaceType))
-                    throw new ArgumentException("Cannot Register: An instance has already been registered");
+                    throw new ArgumentException("Cannot RegisterType: An instance has already been registered");
 
                 if (_implementations.ContainsKey(interfaceType))
                 {
                     if (_implementations[interfaceType] != implementationType)
-                        throw new ArgumentException($"Cannot Register: An implementation has already been registered for interface {interfaceType.FullName}");
+                        throw new ArgumentException($"Cannot RegisterType: An implementation has already been registered for interface {interfaceType.FullName}");
                 }
                 else
                     _implementations.Add(interfaceType, implementationType);
@@ -116,7 +116,7 @@ namespace EasyIoc
             lock (_lockObject)
             {
                 if (_implementations.ContainsKey(interfaceType))
-                    throw new ArgumentException("Cannot RegisterFactory: An implementation has already been registered");
+                    throw new ArgumentException("Cannot RegisterInstance: An implementation has already been registered");
 
                 if (_factories.ContainsKey(interfaceType))
                     throw new ArgumentException("Cannot RegisterInstance: A factory has already been registered");
@@ -363,7 +363,7 @@ namespace EasyIoc
             }
         }
 
-        private ResolveNodeBase BuildResolveTree(Type interfaceType, List<IParameterValue> userDefinedParameters = null)
+        private ResolveNodeBase BuildResolveTree(Type interfaceType, ICollection<IParameterValue> userDefinedParameters = null)
         {
             List<Type> discoveredTypes = new List<Type>
             {
@@ -372,7 +372,7 @@ namespace EasyIoc
             return InnerBuildResolveTree(interfaceType, discoveredTypes, userDefinedParameters);
         }
 
-        private ResolveNodeBase InnerBuildResolveTree(Type interfaceType, ICollection<Type> discoveredTypes, List<IParameterValue> userDefinedParameters = null)
+        private ResolveNodeBase InnerBuildResolveTree(Type interfaceType, ICollection<Type> discoveredTypes, ICollection<IParameterValue> userDefinedParameters = null)
         {
             // Factory ?
             Func<object> factory;

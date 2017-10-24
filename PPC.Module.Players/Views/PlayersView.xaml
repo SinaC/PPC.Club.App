@@ -7,6 +7,7 @@
              xmlns:models="clr-namespace:PPC.Module.Players.Models" 
              xmlns:sys="clr-namespace:System;assembly=mscorlib" 
              xmlns:converters="clr-namespace:PPC.Module.Players.Converters"
+             xmlns:helpers="clr-namespace:PPC.Helpers;assembly=PPC.Helpers"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance viewModels:PlayersViewModelDesignData, IsDesignTimeCreatable=True}"
              d:DesignHeight="300" d:DesignWidth="800">
@@ -84,6 +85,7 @@
                   ScrollViewer.CanContentScroll="True" 
                   ScrollViewer.VerticalScrollBarVisibility="Auto"
                   ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                  helpers:BubbleMouseWheelBehavior.IsBubblingEnabled="True"
                   CellEditEnding="DataGrid_OnCellEditEnding"
                   BeginningEdit="DataGrid_OnBeginningEdit">
             <DataGrid.Resources>

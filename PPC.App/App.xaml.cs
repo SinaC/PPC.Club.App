@@ -4,7 +4,8 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Media;
-using System.Windows.Threading;
+using EasyIoc;
+using PPC.Log;
 
 namespace PPC.App
 {
@@ -17,12 +18,19 @@ namespace PPC.App
         {
             //ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
-            //AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
             //Dispatcher.CurrentDispatcher.UnhandledException += CurrentDispatcherOnUnhandledException;
             //Dispatcher.UnhandledException += DispatcherOnUnhandledException;
             //Application.Current.DispatcherUnhandledException += CurrentOnDispatcherUnhandledException;
             //TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
             //DispatcherUnhandledException += OnDispatcherUnhandledException;
+
+            Exit += OnExit;
+        }
+
+        private void OnExit(object sender, ExitEventArgs exitEventArgs)
+        {
+            IocContainer.Default.Resolve<ILog>().Info("Application stopped");
         }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -51,26 +59,33 @@ namespace PPC.App
 
         //private void DispatcherOnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs dispatcherUnhandledExceptionEventArgs)
         //{
-        //    Debug.WriteLine("DispatcherOnUnhandledException");
-        //    MessageBox.Show("DispatcherOnUnhandledException");
+        //    IocContainer.Default.Resolve<ILog>().WriteLine(LogLevels.Error, "DispatcherOnUnhandledException");
+        //    //Debug.WriteLine("DispatcherOnUnhandledException");
+        //    //MessageBox.Show("DispatcherOnUnhandledException");
         //}
 
         private void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs unhandledExceptionEventArgs)
         {
+            //IocContainer.Default.Resolve<ILog>().WriteLine(LogLevels.Error, "CurrentDomainOnUnhandledException");
+            IocContainer.Default.Resolve<ILog>().Exception("Unhandled Exception", unhandledExceptionEventArgs.ExceptionObject as Exception);
+
             //Debug.WriteLine("CurrentDomainOnUnhandledException");
             //MessageBox.Show("CurrentDomainOnUnhandledException");
         }
 
-        private void CurrentDispatcherOnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs dispatcherUnhandledExceptionEventArgs)
-        {
-            //Debug.WriteLine("CurrentDispatcherOnUnhandledException");
-            //MessageBox.Show("CurrentDispatcherOnUnhandledException");
+        //private void CurrentDispatcherOnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs dispatcherUnhandledExceptionEventArgs)
+        //{
+        //    IocContainer.Default.Resolve<ILog>().WriteLine(LogLevels.Error, "CurrentDispatcherOnUnhandledException");
+        //    //Debug.WriteLine("CurrentDispatcherOnUnhandledException");
+        //    //MessageBox.Show("CurrentDispatcherOnUnhandledException");
 
-            DisplayErrorMessageBox(dispatcherUnhandledExceptionEventArgs.Exception);
+        //    //IocContainer.Default.Resolve<ILog>().Exception(dispatcherUnhandledExceptionEventArgs.Exception);
 
-            dispatcherUnhandledExceptionEventArgs.Handled = true;
-            Application.Current.Shutdown(0);
-        }
+        //    //DisplayErrorMessageBox(dispatcherUnhandledExceptionEventArgs.Exception);
+
+        //    //dispatcherUnhandledExceptionEventArgs.Handled = true;
+        //    //Application.Current.Shutdown(0);
+        //}
 
         //private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs dispatcherUnhandledExceptionEventArgs)
         //{

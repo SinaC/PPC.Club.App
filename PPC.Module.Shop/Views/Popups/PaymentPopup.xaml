@@ -194,7 +194,6 @@
                        Width="1"
                        Fill="Black"/>
 
-            <!-- TODO: predefined button percentage i.e. 10% -->
             <!-- Discount -->
             <Grid Grid.Row="0"
                   Grid.Column="4"
@@ -219,6 +218,16 @@
                                     ValueChanged="DecimalUpDown_OnValueChanged"
                                     Value="{Binding DiscountPercentage}"/>
             </Grid>
+            <!-- Predefined discount button -->
+            <Button Grid.Row="1"
+                    Grid.Column="4"
+                    Margin="5,2"
+                    HorizontalAlignment="Left"
+                    Command="{Binding SetDiscountCommand}"
+                    CommandParameter="10">
+                <TextBlock Margin="5,2"
+                           Text="10%"/>
+            </Button>
         </Grid>
         <!-- Separator -->
         <Rectangle Grid.Row="3"

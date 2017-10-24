@@ -16,9 +16,9 @@
         WindowStyle="None"
         ResizeMode="CanResizeWithGrip"
         MouseLeftButtonDown="MainWindow_OnMouseLeftButtonDown"
+        MouseWheel="MainWindow_OnMouseWheel"
         Icon="logo.png"
-        Title="PPC Club" Height="640" Width="800"
-        TextElement.FontSize="14">
+        Title="PPC Club" Height="640" Width="800">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -39,6 +39,9 @@
             </DataTemplate>
         </ResourceDictionary>
     </Window.Resources>
+    <!--<Window.RenderTransform>
+        <ScaleTransform x:Name="ApplicationScaleTransform"/>
+    </Window.RenderTransform>-->
     <controls:AdornedControl IsAdornerVisible="{Binding IsWaiting}">
         <controls:AdornedControl.AdornerContent>
             <controls:LoadingWait />
@@ -81,6 +84,15 @@
                               IsEnabled="{Binding ShopViewModel.ClientShoppingCartsViewModel.HasClientShoppingCartsOpened}"
                               IsChecked="{Binding IsClientShoppingCartSelected, Mode=OneWay}"
                               Command="{Binding SwitchToShoppingCartsCommand}">
+                    <!--<ToggleButton.Style>
+                        <Style TargetType="{x:Type ToggleButton}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ShopViewModel.ClientShoppingCartsViewModel.HasUnpaidClientShoppingCards}" Value="True">
+                                    <Setter Property="Background" Value="Red"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ToggleButton.Style>-->
                     <ToggleButton.ToolTip>
                         <StackPanel Orientation="Vertical">
                             <TextBlock Text="Shopping carts"/>
@@ -182,7 +194,7 @@
                               IsChecked="{Binding IsCardsSelected, Mode=OneWay}"
                               Command="{Binding SwitchToCardSellerCommand}">
                     <Image Style="{StaticResource AutoDisableImageStyle}"
-                           Source="{StaticResource Cards}"/>
+                           Source="{StaticResource MagicImage}"/>
                 </ToggleButton>
                 <!-- dummy row 7 -->
                 <!-- Reload -->

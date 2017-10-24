@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:viewModels="clr-namespace:PPC.Module.Shop.ViewModels.Popups"
+             xmlns:helpers="clr-namespace:PPC.Helpers;assembly=PPC.Helpers"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance viewModels:TransactionDeleteConfirmationPopupViewModelDesignData, IsDesignTimeCreatable=True}"
              d:DesignHeight="300" d:DesignWidth="500">
@@ -75,6 +76,7 @@
                       AutoGenerateColumns="False"
                       VerticalScrollBarVisibility="Auto"
                       ScrollViewer.CanContentScroll="True"
+                      helpers:BubbleMouseWheelBehavior.IsBubblingEnabled="True"
                       ItemsSource="{Binding Articles}">
                 <DataGrid.Columns>
                     <DataGridTextColumn IsReadOnly="True"

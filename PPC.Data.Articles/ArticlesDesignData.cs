@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using PPC.Data.Contracts;
 
 namespace PPC.Data.Articles
@@ -69,7 +70,17 @@ namespace PPC.Data.Articles
             throw new NotImplementedException();
         }
 
+        public async Task LoadAsync()
+        {
+            throw new NotImplementedException();
+        }
+
         public void Save()
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task SaveAsync()
         {
             throw new NotImplementedException();
         }

@@ -166,6 +166,7 @@
                   VerticalScrollBarVisibility="Auto"
                   ScrollViewer.CanContentScroll="True"
                   helpers:DataGridHelpers.Autoscroll="True"
+                  helpers:BubbleMouseWheelBehavior.IsBubblingEnabled="True"
                   SelectedItem="{Binding SelectedCard}"
                   ItemsSource="{Binding Items}">
             <DataGrid.Columns>

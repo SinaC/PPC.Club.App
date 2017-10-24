@@ -16,13 +16,13 @@ using PPC.App.Closure;
 using PPC.Data.Articles;
 using PPC.Data.Contracts;
 using PPC.Helpers;
+using PPC.Log;
 using PPC.Messages;
 using PPC.Module.Cards.ViewModels;
 using PPC.Module.Inventory.ViewModels;
 using PPC.Module.Players.ViewModels;
 using PPC.Module.Shop.ViewModels;
 using PPC.Services.Popup;
-using Xceed.Wpf.DataGrid.Automation;
 
 namespace PPC.App
 {
@@ -37,12 +37,13 @@ namespace PPC.App
     public class MainWindowViewModel : ObservableObject
     {
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
+        private ILog Logger => IocContainer.Default.Resolve<ILog>();
 
         private bool _isWaiting;
         public bool IsWaiting
         {
             get { return _isWaiting; }
-            set { Set(() => IsWaiting, ref _isWaiting, value); }
+            protected set { Set(() => IsWaiting, ref _isWaiting, value); }
         }
 
         private PlayersViewModel _playersViewModel;
@@ -79,7 +80,7 @@ namespace PPC.App
         public ApplicationModes ApplicationMode
         {
             get { return _applicationMode; }
-            set { Set(() => ApplicationMode, ref _applicationMode, value); }
+            protected  set { Set(() => ApplicationMode, ref _applicationMode, value); }
         }
 
         public bool IsCashRegisterSelected => ApplicationMode == ApplicationModes.Shop && ShopViewModel.Mode == ShopModes.CashRegister;
@@ -105,7 +106,7 @@ namespace PPC.App
         private void SwitchToCashRegister()
         {
             ApplicationMode = ApplicationModes.Shop;
-            ShopViewModel.ViewCashRegisterCommand.Execute(null);
+            ShopViewModel.ViewCashRegister();
             RaiseSelectedMode();
         }
 
@@ -115,7 +116,7 @@ namespace PPC.App
         private void SwitchToShoppingCarts()
         {
             ApplicationMode = ApplicationModes.Shop;
-            ShopViewModel.ViewShoppingCartsCommand.Execute(null);
+            ShopViewModel.ViewShoppingCarts();
             RaiseSelectedMode();
         }
 
@@ -125,7 +126,7 @@ namespace PPC.App
         private void SwitchToSoldArticles()
         {
             ApplicationMode = ApplicationModes.Shop;
-            ShopViewModel.ViewSoldArticlesCommand.Execute(null);
+            ShopViewModel.ViewSoldArticles();
             RaiseSelectedMode();
         }
 
@@ -135,7 +136,7 @@ namespace PPC.App
         private void AddNewClient()
         {
             ApplicationMode = ApplicationModes.Shop;
-            ShopViewModel.ViewShoppingCartsCommand.Execute(null);
+            ShopViewModel.ViewShoppingCarts();
             ShopViewModel.ClientShoppingCartsViewModel.AddNewClientCommand.Execute(null);
             RaiseSelectedMode();
         }
@@ -177,24 +178,22 @@ namespace PPC.App
 
         private void Reload()
         {
-            PopupService.DisplayQuestion("Reload", "Are you sure you want to reload from backup ?",
-                   new QuestionActionButton
-                   {
-                       Order = 1,
-                       Caption = "Yes",
-                       ClickCallback = ReloadConfirmed
-                   },
-                   new QuestionActionButton
-                   {
-                       Order = 2,
-                       Caption = "No"
-                   });
+            PopupService.DisplayQuestion("Reload", "Are you sure you want to reload from backup ?", QuestionActionButton.Yes(ReloadConfirmed), QuestionActionButton.No());
         }
 
         private void ReloadConfirmed()
         {
+            Logger.Info("Reload started");
+
             ShopViewModel.Reload();
             CardsViewModel.Reload();
+
+            int cartsCount = ShopViewModel.ClientShoppingCartsViewModel.Clients.Count;
+            int cardSellersCount = CardsViewModel.Sellers.Count;
+            int transactionsCount = ShopViewModel.Transactions.Count;
+            PopupService.DisplayQuestion("Reload", $"Reload done. Carts:{cartsCount} Card sellers:{cardSellersCount} Transactions:{transactionsCount}.", QuestionActionButton.Ok());
+
+            Logger.Info($"Reload done. Carts:{cartsCount} Card sellers:{cardSellersCount} Transactions:{transactionsCount}.");
         }
 
         #endregion
@@ -206,44 +205,16 @@ namespace PPC.App
 
         private void Close()
         {
-            PopupService.DisplayQuestion("Close application", "Do you want to perform cash registry closure",
-                new QuestionActionButton
-                {
-                    Caption = "Yes",
-                    Order = 1,
-                    ClickCallback = DisplayClosurePopup
-                },
-                new QuestionActionButton
-                {
-                    Caption = "No",
-                    Order = 2,
-                    ClickCallback = () => Application.Current.Shutdown()
-                },
-                new QuestionActionButton
-                {
-                    Caption = "Cancel",
-                    Order = 3,
-                });
             // TODO: check if players have been saved, check if one or more shopping carts articles still opened: new method string PrepareClose (return null if ready or error message otherwise)
-            // TODO
-            //PopupService.DisplayQuestion("Close application", String.Empty,
-            //    new ActionButton
-            //    {
-            //        Caption = "Perform cash registry closure",
-            //        Order = 1,
-            //        ClickCallback = () => ShopViewModel.PerformClosure(() => Application.Current.Shutdown(0)) // ShopViewModel is not responsible for closing application
-            //    },
-            //    new ActionButton
-            //    {
-            //        Caption = "Exit with closure",
-            //        Order = 2,
-            //        ClickCallback = () => Application.Current.Shutdown(0)
-            //    },
-            //    new ActionButton
-            //    {
-            //        Caption = "Cancel",
-            //        Order = 3,
-            //    });
+            PopupService.DisplayQuestion("Close application", "Do you want to perform cash registry closure", QuestionActionButton.Yes(CheckUnpaidShoppingCarts), QuestionActionButton.No(() => Application.Current.Shutdown()), QuestionActionButton.Cancel());
+        }
+
+        private void CheckUnpaidShoppingCarts()
+        {
+            if (ShopViewModel.ClientShoppingCartsViewModel.HasUnpaidClientShoppingCards)
+                PopupService.DisplayQuestion("Close application", "Closure cannot be performed because one or more shopping cards are not yet paid.", QuestionActionButton.Ok(SwitchToShoppingCarts));
+            else
+                DisplayClosurePopup();
         }
 
         private void DisplayClosurePopup()
@@ -260,6 +231,7 @@ namespace PPC.App
             if (!Directory.Exists(savePath))
                 Directory.CreateDirectory(savePath);
 
+            Logger.Info("Deleting backup files");
             ShopViewModel.DeleteBackupFiles(savePath);
             CardsViewModel.DeleteBackupFiles(savePath);
 
@@ -279,7 +251,7 @@ namespace PPC.App
                     using (XmlTextReader reader = new XmlTextReader(closureConfigFilename))
                     {
                         DataContractSerializer serializer = new DataContractSerializer(typeof(CashRegisterClosureConfig));
-                        closureConfig = (CashRegisterClosureConfig)await serializer.ReadObjectAsync(reader);
+                        closureConfig = (CashRegisterClosureConfig) await serializer.ReadObjectAsync(reader);
                     }
 
                     try
@@ -289,6 +261,7 @@ namespace PPC.App
                     }
                     catch (Exception ex)
                     {
+                        Logger.Exception("Error while sending closure mail", ex);
                         PopupService.DisplayError("Error while sending closure mail", ex);
                     }
 
@@ -300,15 +273,20 @@ namespace PPC.App
                         }
                         catch (Exception ex)
                         {
-                            PopupService.DisplayError($"Error while sending sold cards mail to {cards.SellerName}", ex);
+                            Logger.Exception($"Error while sending sold cards mail to {cards?.SellerName ?? "??"}", ex);
+                            PopupService.DisplayError($"Error while sending sold cards mail to {cards?.SellerName ?? "??"}", ex);
                         }
                     }
                 }
                 else
+                {
+                    Logger.Warning("Cash register closure config file not found -> Cannot send automatically cash register closure mail.");
                     PopupService.DisplayError("Warning", "Cash register closure config file not found -> Cannot send automatically cash register closure mail.");
+                }
             }
             catch (Exception ex)
             {
+                Logger.Exception("Error", ex);
                 PopupService.DisplayError("Error", ex);
             }
             finally
@@ -319,6 +297,8 @@ namespace PPC.App
 
         private async Task SendClosureMailAsync(CashRegisterClosure closure, string senderMail, string senderPassword, string recipientMail)
         {
+            Logger.Info("Sending closure mail.");
+
             MailAddress fromAddress = new MailAddress(senderMail, "From PPC Club");
             MailAddress toAddress = new MailAddress(recipientMail, "To PPC");
             using (SmtpClient client = new SmtpClient
@@ -341,10 +321,14 @@ namespace PPC.App
                     await client.SendMailAsync(message);
                 }
             }
+
+            Logger.Info("Closure mail sent.");
         }
 
         private async Task SendSoldCardsMailAsync(SoldCards soldCards, string senderMail, string senderPassword)
         {
+            Logger.Info($"Sending sold cards mail to {soldCards.Email}.");
+
             MailAddress fromAddress = new MailAddress(senderMail, "From PPC Club");
             MailAddress toAddress = new MailAddress(soldCards.Email, $"To {soldCards.SellerName}");
             using (SmtpClient client = new SmtpClient
@@ -367,6 +351,8 @@ namespace PPC.App
                     await client.SendMailAsync(message);
                 }
             }
+
+            Logger.Info($"Sold cards mail to {soldCards.Email} sent.");
         }
 
         #endregion
@@ -381,7 +367,9 @@ namespace PPC.App
                 }
                 catch (Exception ex)
                 {
-                    PopupService.DisplayError("Error while loading articles DB", ex);
+                    Logger.Exception("Error while loading articles DB", ex);
+                    PopupService.DisplayError("Error while loading articles DB", ex); // --> Popup will never be displayed because MainWindow is still in creation
+                    throw; // ensure application crashes
                 }
             }
 

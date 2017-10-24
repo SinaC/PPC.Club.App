@@ -6,10 +6,7 @@
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" 
              xmlns:popups="clr-namespace:PPC.Popups"
              mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance popups:CreateEditArticlePopupViewModelDesignData, IsDesignTimeCreatable=True}"
-             d:DesignHeight="300" d:DesignWidth="400"
-             Width="500"
-             MaxHeight="300">
+             d:DataContext="{d:DesignInstance popups:CreateEditArticlePopupViewModelDesignData, IsDesignTimeCreatable=True}">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

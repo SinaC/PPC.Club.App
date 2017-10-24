@@ -38,7 +38,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AwaitableRelayCommand.cs" />
     <Compile Include="DesignMode.cs" />
+    <Compile Include="IAsyncCommand.cs" />
     <Compile Include="IMediator.cs" />
     <Compile Include="Mediator.cs" />
     <Compile Include="ObservableObject.cs" />

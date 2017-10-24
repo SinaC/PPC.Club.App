@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using EasyIoc;
 using EasyMVVM;
 using PPC.Module.Cards.Views.Popups;
 using PPC.Services.Popup;
@@ -12,7 +13,7 @@ namespace PPC.Module.Cards.ViewModels.Popups
     [PopupAssociatedView(typeof(AskNameEmailPopup))]
     public class AskNameEmailPopupViewModel : ObservableObject
     {
-        private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
+        private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
 
         private readonly Action<string, string> _okAction;
         private readonly Func<string, string> _searchEmailByNameFunc;

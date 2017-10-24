@@ -10,6 +10,7 @@ using System.Xml;
 using EasyIoc;
 using EasyMVVM;
 using PPC.Data.Contracts;
+using PPC.Log;
 using PPC.Module.Cards.Models;
 using PPC.Services.Popup;
 
@@ -18,6 +19,7 @@ namespace PPC.Module.Cards.ViewModels
     public class CardSellerViewModel : ObservableObject
     {
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
+        private ILog Logger => IocContainer.Default.Resolve<ILog>();
 
         public static string Path => $"{ConfigurationManager.AppSettings["BackupPath"]}cards\\";
         public string Filename => $"{Path}{SellerName}.xml";
@@ -195,7 +197,7 @@ namespace PPC.Module.Cards.ViewModels
         public ObservableCollection<SoldCardItem> Items
         {
             get { return _items; }
-            set { Set(() => Items, ref _items, value); }
+            protected set { Set(() => Items, ref _items, value); }
         }
 
         public void GotFocus()
@@ -270,6 +272,7 @@ namespace PPC.Module.Cards.ViewModels
             }
             catch (Exception ex)
             {
+                Logger.Exception("Error while saving sold cards", ex);
                 PopupService.DisplayError("Error while saving sold cards", ex);
             }
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using PPC.Data.Contracts;
 
 namespace PPC.Data.Articles
@@ -22,6 +23,8 @@ namespace PPC.Data.Articles
         void ImportFromDbf(string filename);
 
         void Load();
+        Task LoadAsync();
         void Save();
+        Task SaveAsync();
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace EasyIoc
 {
-    public class ParameterValue : IParameterValue
+    public sealed class ParameterValue : IParameterValue
     {
         public string Name { get; }
         public object Value { get; }

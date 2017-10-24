@@ -8,6 +8,7 @@ using EasyIoc;
 using EasyMVVM;
 using PPC.Data.Articles;
 using PPC.Data.Contracts;
+using PPC.Log;
 using PPC.Popups;
 using PPC.Services.Popup;
 
@@ -16,12 +17,15 @@ namespace PPC.Module.Shop.ViewModels.ArticleSelector
     public class DesktopArticleSelectorViewModel : ObservableObject, IArticleSelector
     {
         private static readonly string[] EmptyList = { string.Empty };
-        private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
 
-        public IEnumerable<Article> Articles => IocContainer.Default.Resolve<IArticleDb>().FilterArticles(SelectedCategory);
-        public IEnumerable<string> Categories => EmptyList.Concat(IocContainer.Default.Resolve<IArticleDb>().Categories);
-        public IEnumerable<string> Producers => EmptyList.Concat(IocContainer.Default.Resolve<IArticleDb>().Producers);
-        private Func<string, IEnumerable<string>> BuildSubCategories => category => EmptyList.Concat(IocContainer.Default.Resolve<IArticleDb>().SubCategories(category));
+        private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
+        private ILog Logger => IocContainer.Default.Resolve<ILog>();
+        private IArticleDb ArticlesDb => IocContainer.Default.Resolve<IArticleDb>();
+
+        private Func<string, IEnumerable<string>> BuildSubCategories => category => EmptyList.Concat(ArticlesDb.SubCategories(category));
+        public IEnumerable<Article> Articles => ArticlesDb.FilterArticles(SelectedCategory);
+        public IEnumerable<string> Categories => EmptyList.Concat(ArticlesDb.Categories);
+        public IEnumerable<string> Producers => EmptyList.Concat(ArticlesDb.Producers);
 
         #region Ean
 
@@ -38,7 +42,7 @@ namespace PPC.Module.Shop.ViewModels.ArticleSelector
                     {
                         if (_ean.Length == 13)
                         {
-                            Article article = IocContainer.Default.Resolve<IArticleDb>().GetByEan(_ean);
+                            Article article = ArticlesDb.GetByEan(_ean);
                             if (article != null)
                                 SelectedArticle = article;
                             else
@@ -220,10 +224,12 @@ namespace PPC.Module.Shop.ViewModels.ArticleSelector
 
             try
             {
-                IocContainer.Default.Resolve<IArticleDb>().Add(article);
+                Logger.Info($"New article {article.Description ?? "???"} {article.Price:C} created.");
+                ArticlesDb.Add(article);
             }
             catch (Exception ex)
             {
+                Logger.Exception("Error while saving articles DB", ex);
                 PopupService.DisplayError("Error while saving articles DB", ex);
             }
 
@@ -267,22 +273,25 @@ namespace PPC.Module.Shop.ViewModels.ArticleSelector
 
         private void SaveArticle(CreateEditArticlePopupViewModel vm)
         {
-            SelectedArticle.Ean = vm.Ean;
-            SelectedArticle.Description = vm.Description;
-            SelectedArticle.Category = vm.Category;
-            SelectedArticle.SubCategory = vm.SubCategory;
-            SelectedArticle.Producer = vm.Producer;
-            SelectedArticle.SupplierPrice = vm.SupplierPrice;
-            SelectedArticle.Price = vm.Price;
-            SelectedArticle.VatRate = vm.VatRate;
-            SelectedArticle.Stock = vm.Stock;
+            Article article = SelectedArticle;
+            article.Ean = vm.Ean;
+            article.Description = vm.Description;
+            article.Category = vm.Category;
+            article.SubCategory = vm.SubCategory;
+            article.Producer = vm.Producer;
+            article.SupplierPrice = vm.SupplierPrice;
+            article.Price = vm.Price;
+            article.VatRate = vm.VatRate;
+            article.Stock = vm.Stock;
 
             try
             {
-                IocContainer.Default.Resolve<IArticleDb>().Save();
+                Logger.Info($"Article {article.Description ?? "???"} {article.Price:C} edited.");
+                ArticlesDb.Save();
             }
             catch (Exception ex)
             {
+                Logger.Exception("Error while saving articles DB", ex);
                 PopupService.DisplayError("Error while saving articles DB", ex);
             }
 

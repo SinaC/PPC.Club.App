@@ -11,6 +11,7 @@ using EasyMVVM;
 using PPC.Data.Contracts;
 using PPC.Data.Players;
 using PPC.Helpers;
+using PPC.Log;
 using PPC.Messages;
 using PPC.Module.Players.Models;
 using PPC.Services.Popup;
@@ -20,6 +21,8 @@ namespace PPC.Module.Players.ViewModels
     public class PlayersViewModel : ObservableObject
     {
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
+        private ILog Logger => IocContainer.Default.Resolve<ILog>();
+        private IPlayersDb PlayersDb => IocContainer.Default.Resolve<IPlayersDb>();
 
         #region Filtered players
 
@@ -94,7 +97,7 @@ namespace PPC.Module.Players.ViewModels
                 string filename = ConfigurationManager.AppSettings["PlayersPath"];
                 if (onlyIfExists && !File.Exists(filename))
                     return;
-                List<Player> players = IocContainer.Default.Resolve<IPlayersDb>().Load(filename);
+                List<Player> players = PlayersDb.Load(filename);
                 Players = new ObservableCollection<PlayerItem>(players.Select(x => new PlayerItem
                 {
                     DCINumber = x.DCINumber,
@@ -107,6 +110,7 @@ namespace PPC.Module.Players.ViewModels
             }
             catch (Exception ex)
             {
+                Logger.Exception("Error while loading player file", ex);
                 PopupService.DisplayError("Error while loading player file", ex);
             }
         }
@@ -132,11 +136,12 @@ namespace PPC.Module.Players.ViewModels
                     CountryCode = x.CountryCode,
                     IsJudge = x.IsJudge
                 }).ToList();
-                IocContainer.Default.Resolve<IPlayersDb>().Save(ConfigurationManager.AppSettings["PlayersPath"], players);
+                PlayersDb.Save(ConfigurationManager.AppSettings["PlayersPath"], players);
                 Load(false); //TODO crappy workaround to reset row.IsNewItem
             }
             catch (Exception ex)
             {
+                Logger.Exception("Error while saving player file", ex);
                 PopupService.DisplayError("Error while saving player file", ex);
             }
         }

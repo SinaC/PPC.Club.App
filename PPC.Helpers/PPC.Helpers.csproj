@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AttachedFocus.cs" />
+    <Compile Include="BubbleMouseWheelBehavior.cs" />
     <Compile Include="DataContractSerializerExtensions.cs" />
     <Compile Include="DataGridHelpers.cs" />
     <Compile Include="EmptyStringsAreLast.cs" />
@@ -49,6 +50,7 @@
     <Compile Include="StringExtensions.cs" />
     <Compile Include="VisibilityToNullableBooleanConverter.cs" />
     <Compile Include="VisualTreeHelpers.cs" />
+    <Compile Include="WindowHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

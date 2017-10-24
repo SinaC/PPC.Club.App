@@ -13,6 +13,7 @@ using EasyMVVM;
 using PPC.Data.Articles;
 using PPC.Data.Contracts;
 using PPC.Helpers;
+using PPC.Log;
 using PPC.Module.Shop.Models;
 using PPC.Module.Shop.ViewModels.Popups;
 using PPC.Services.Popup;
@@ -31,6 +32,7 @@ namespace PPC.Module.Shop.ViewModels
         private const string ShopFilename = "_shop.xml";
 
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
+        private ILog Logger => IocContainer.Default.Resolve<ILog>();
 
         #region Shop mode
 
@@ -40,30 +42,6 @@ namespace PPC.Module.Shop.ViewModels
             get { return _mode; }
             protected set { Set(() => Mode, ref _mode, value); }
         }
-
-        //TODO: replace command with public method
-        private ICommand _viewCashRegisterCommand;
-        public ICommand ViewCashRegisterCommand => _viewCashRegisterCommand = _viewCashRegisterCommand ?? new RelayCommand(ViewCashRegister);
-
-        private void ViewCashRegister()
-        {
-            Mode = ShopModes.CashRegister;
-            CashRegisterViewModel.ShoppingCart.GotFocus();
-        }
-
-        //TODO: replace command with public method
-        private ICommand _viewShoppingCartsCommand;
-        public ICommand ViewShoppingCartsCommand => _viewShoppingCartsCommand = _viewShoppingCartsCommand ?? new RelayCommand(ViewShoppingCarts);
-
-        private void ViewShoppingCarts()
-        {
-            ClientShoppingCartsViewModel.SelectClientCommand.Execute(null); // unselect client (parameter null)
-            Mode = ShopModes.ClientShoppingCarts;
-        }
-
-        //TODO: replace command with public method
-        private ICommand _viewSoldArticlesCommand;
-        public ICommand ViewSoldArticlesCommand => _viewSoldArticlesCommand = _viewSoldArticlesCommand ?? new RelayCommand(() => Mode = ShopModes.SoldArticles);
 
         #endregion
 
@@ -146,7 +124,7 @@ namespace PPC.Module.Shop.ViewModels
         public ObservableCollection<ShopTransactionItem> Transactions
         {
             get { return _transactions; }
-            set
+            protected set
             {
                 if (Set(() => Transactions, ref _transactions, value))
                 {
@@ -198,6 +176,7 @@ namespace PPC.Module.Shop.ViewModels
             }
             catch (Exception ex)
             {
+                Logger.Exception("Error while saving shop", ex);
                 PopupService.DisplayError("Error while saving shop", ex);
             }
         }
@@ -207,7 +186,7 @@ namespace PPC.Module.Shop.ViewModels
 
         private void EditTransaction(ShopTransactionItem transactionItem)
         {
-            TransactionEditorPopupViewModel vm = new TransactionEditorPopupViewModel(transactionItem, SaveEditedTransaction);
+            TransactionEditorPopupViewModel vm = new TransactionEditorPopupViewModel(transactionItem, SaveEditedTransaction, DeleteTransactionConfirmed);
             PopupService.DisplayModal(vm, "Edit transaction");
         }
 
@@ -247,12 +226,28 @@ namespace PPC.Module.Shop.ViewModels
         public List<ShopTransactionItem> PaidCarts
         {
             get { return _paidCarts; }
-            set { Set(() => PaidCarts, ref _paidCarts, value); }
+            protected set { Set(() => PaidCarts, ref _paidCarts, value); }
         }
 
         public decimal PaidCartsCount => PaidCarts.Count;
 
         #endregion
+
+        public void ViewCashRegister()
+        {
+            Mode = ShopModes.CashRegister;
+            CashRegisterViewModel.ShoppingCart.GotFocus();
+        }
+
+        public void ViewShoppingCarts()
+        {
+            ClientShoppingCartsViewModel.SelectClientCommand.Execute(null); // unselect client (parameter null)
+            Mode = ShopModes.ClientShoppingCarts;
+        }
+        public void ViewSoldArticles()
+        {
+            Mode = ShopModes.SoldArticles;
+        }
 
         public void Reload()
         {
@@ -278,6 +273,7 @@ namespace PPC.Module.Shop.ViewModels
 
                     if (unknownArticleFound)
                     {
+                        Logger.Warning("Unknown articles have been found and removed!");
                         PopupService.DisplayError("Warning", "Unknown articles have been found and removed!");
                         // TODO: 
                         // recompute transaction cash/bank if possible
@@ -285,19 +281,16 @@ namespace PPC.Module.Shop.ViewModels
                     }
 
                     RefreshSoldArticles();
-
-                    PopupService.DisplayQuestion("Reload", "Reload done", new QuestionActionButton
-                    {
-                        Caption = "Ok"
-                    });
                 }
                 catch (Exception ex)
                 {
+                    Logger.Exception("Error while loading shop", ex);
                     PopupService.DisplayError("Error while loading shop", ex);
                 }
             }
             else
             {
+                Logger.Error("Error while loading shop: Backup path not found");
                 PopupService.DisplayError("Error while loading shop", "Backup path not found");
             }
         }
@@ -352,6 +345,7 @@ namespace PPC.Module.Shop.ViewModels
             }
             catch (Exception ex)
             {
+                Logger.Exception("Error", ex);
                 PopupService.DisplayError("Error", ex);
             }
             //  xml
@@ -369,6 +363,7 @@ namespace PPC.Module.Shop.ViewModels
             }
             catch (Exception ex)
             {
+                Logger.Exception("Error", ex);
                 PopupService.DisplayError("Error", ex);
             }
             return closure;
@@ -388,6 +383,7 @@ namespace PPC.Module.Shop.ViewModels
             }
             catch (Exception ex)
             {
+                Logger.Exception("Error", ex);
                 PopupService.DisplayError("Error", ex);
             }
         }
@@ -510,11 +506,13 @@ namespace PPC.Module.Shop.ViewModels
                 }
                 catch (Exception ex)
                 {
+                    Logger.Exception("Error while loading shop", ex);
                     PopupService.DisplayError("Error while loading shop", ex);
                 }
             }
             else
             {
+                Logger.Error("Error while loading shop: Shop file not found");
                 PopupService.DisplayError("Error while loading shop", "Shop file not found");
             }
         }

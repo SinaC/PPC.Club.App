@@ -5,8 +5,10 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
+using EasyIoc;
 using EasyMVVM;
 using PPC.Data.Contracts;
+using PPC.Log;
 using PPC.Services.Popup;
 
 namespace PPC.App.Closure
@@ -55,7 +57,9 @@ namespace PPC.App.Closure
 
     public class CashCountViewModel : ObservableObject
     {
-        private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
+        private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
+        private ILog Logger => IocContainer.Default.Resolve<ILog>();
+
 
         protected decimal[] Keys = {500, 200, 100, 50, 20, 10, 5, 2, 1, 0.5m, 0.2m, 0.1m, 0.05m, 0.02m, 0.01m};
 
@@ -90,7 +94,8 @@ namespace PPC.App.Closure
             }
             catch (Exception ex)
             {
-                PopupService.DisplayError("Error reading cash register count file", ex);
+                Logger.Exception("Error loading cash register count file", ex);
+                PopupService.DisplayError("Error loading cash register count file", ex);
             }
             Counts = Keys.Select(x => new CashCountItem(x >= 5 ? CountCategories.Figures : CountCategories.Coins, x, countData?.GetCount(x) ?? 0, RefreshCurrentTotal)
             {
@@ -102,24 +107,34 @@ namespace PPC.App.Closure
 
         private void Save()
         {
-            CashRegisterCount countData = new CashRegisterCount
+            try
             {
-                Entries = Counts.Select(x => new CashRegisterCountEntry
+
+                CashRegisterCount countData = new CashRegisterCount
                 {
-                    Value = x.Value,
-                    Count = x.Reference
-                }).ToList()
-            };
-            string filename = ConfigurationManager.AppSettings["CashRegisterCountPath"];
-            using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
+                    Entries = Counts.Select(x => new CashRegisterCountEntry
+                    {
+                        Value = x.Value,
+                        Count = x.Reference
+                    }).ToList()
+                };
+                string filename = ConfigurationManager.AppSettings["CashRegisterCountPath"];
+                using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
+                {
+                    writer.Formatting = Formatting.Indented;
+                    DataContractSerializer serializer = new DataContractSerializer(typeof(CashRegisterCount));
+                    serializer.WriteObject(writer, countData);
+                }
+            }
+            catch(Exception ex)
             {
-                writer.Formatting = Formatting.Indented;
-                DataContractSerializer serializer = new DataContractSerializer(typeof(CashRegisterCount));
-                serializer.WriteObject(writer, countData);
+                Logger.Exception("Error saving cash register count file", ex);
+                PopupService.DisplayError("Error saving cash register count file", ex);
             }
         }
 
-        private void RefreshCurrentTotal()
+        private
+            void RefreshCurrentTotal()
         {
             RaisePropertyChanged(() => CurrentTotal);
             RaisePropertyChanged(() => DifferenceTotal);

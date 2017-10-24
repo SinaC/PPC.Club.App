@@ -11,6 +11,7 @@ using EasyMVVM;
 using PPC.Data.Articles;
 using PPC.Data.Contracts;
 using PPC.Helpers;
+using PPC.Log;
 using PPC.Module.Shop.Models;
 using PPC.Services.Popup;
 
@@ -25,6 +26,7 @@ namespace PPC.Module.Shop.ViewModels
     public class ClientShoppingCartViewModel : ObservableObject
     {
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
+        private ILog Logger => IocContainer.Default.Resolve<ILog>();
 
         private Action<decimal, decimal, decimal> _cartPaidAction;
         private Action _cartReopenedAction;
@@ -222,6 +224,7 @@ namespace PPC.Module.Shop.ViewModels
             }
             catch (Exception ex)
             {
+                Logger.Exception("Error while saving client cart", ex);
                 PopupService.DisplayError("Error while saving client cart", ex);
             }
         }

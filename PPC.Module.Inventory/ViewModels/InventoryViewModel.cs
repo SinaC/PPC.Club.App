@@ -7,6 +7,7 @@ using EasyIoc;
 using EasyMVVM;
 using PPC.Data.Articles;
 using PPC.Data.Contracts;
+using PPC.Log;
 using PPC.Popups;
 using PPC.Services.IO;
 using PPC.Services.Popup;
@@ -17,11 +18,13 @@ namespace PPC.Module.Inventory.ViewModels
     {
         private static readonly string[] EmptyList = { string.Empty };
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
+        private ILog Logger => IocContainer.Default.Resolve<ILog>();
+        private IArticleDb ArticlesDb => IocContainer.Default.Resolve<IArticleDb>();
 
-        public IEnumerable<Article> Articles => IocContainer.Default.Resolve<IArticleDb>().Articles;
-        public IEnumerable<string> Categories => EmptyList.Concat(IocContainer.Default.Resolve<IArticleDb>().Categories);
-        public IEnumerable<string> Producers => EmptyList.Concat(IocContainer.Default.Resolve<IArticleDb>().Producers);
-        private Func<string, IEnumerable<string>> BuildSubCategories => category => EmptyList.Concat(IocContainer.Default.Resolve<IArticleDb>().SubCategories(category));
+        public IEnumerable<Article> Articles => ArticlesDb.Articles;
+        public IEnumerable<string> Categories => EmptyList.Concat(ArticlesDb.Categories);
+        public IEnumerable<string> Producers => EmptyList.Concat(ArticlesDb.Producers);
+        private Func<string, IEnumerable<string>> BuildSubCategories => category => EmptyList.Concat(ArticlesDb.SubCategories(category));
 
         #region Selected article
 
@@ -43,17 +46,14 @@ namespace PPC.Module.Inventory.ViewModels
         {
             try
             {
-                IocContainer.Default.Resolve<IArticleDb>().Load();
+                ArticlesDb.Load();
                 RaisePropertyChanged(() => Articles);
-                PopupService.DisplayQuestion("Load", "Articles successfully loaded.", new QuestionActionButton
-                {
-                    Caption = "Ok",
-                    Order = 1
-                });
+                PopupService.DisplayQuestion("Load", "Articles successfully loaded.", QuestionActionButton.Ok());
             }
             catch (Exception ex)
             {
-                PopupService.DisplayError("Load error", ex);
+                Logger.Exception("Error while loading articles DB", ex);
+                PopupService.DisplayError("Error while loading articles DB", ex);
             }
         }
 
@@ -68,16 +68,15 @@ namespace PPC.Module.Inventory.ViewModels
         {
             try
             {
-                IocContainer.Default.Resolve<IArticleDb>().Save();
-                PopupService.DisplayQuestion("Save", "Articles successfully saved.", new QuestionActionButton
-                {
-                    Caption = "Ok",
-                    Order = 1
-                });
+                Logger.Info("Saving articles DB.");
+                ArticlesDb.Save();
+                PopupService.DisplayQuestion("Save", "Articles successfully saved.", QuestionActionButton.Ok());
+                Logger.Info("Articles DB saved.");
             }
             catch (Exception ex)
             {
-                PopupService.DisplayError("Save error", ex);
+                Logger.Exception("Error while saving articles DB", ex);
+                PopupService.DisplayError("Error while saving articles DB", ex);
             }
         }
 
@@ -98,22 +97,20 @@ namespace PPC.Module.Inventory.ViewModels
             {
                 try
                 {
-                    IocContainer.Default.Resolve<IArticleDb>().ImportFromDbf(filename);
+                    Logger.Info("Importing articles DB.");
+                    ArticlesDb.ImportFromDbf(filename);
                     RaisePropertyChanged(() => Articles);
-                    PopupService.DisplayQuestion("Import", $"{Articles.Count()} articles successfully imported. Don't forget to click on 'Save' button to save imported articles.",
-                        new QuestionActionButton
-                        {
-                            Caption = "Ok",
-                            Order = 1
-                        });
+                    PopupService.DisplayQuestion("Import", $"{Articles.Count()} articles successfully imported. Don't forget to click on 'Save' button to save imported articles.", QuestionActionButton.Ok());
                     //!! after import -> every article guid are modified -> shopping carts and backup files are invalid
                     // TODO: 
                     //  import button must be disabled once a shopping cart/transaction has been created
                     //  backup files must be deleted once import is performed
+                    Logger.Info("Articles DB imported.");
                 }
                 catch (Exception ex)
                 {
-                    PopupService.DisplayError("Import error", ex);
+                    Logger.Exception("Error while importing articles", ex);
+                    PopupService.DisplayError("Error while importing articles", ex);
                 }
             }
         }
@@ -155,10 +152,12 @@ namespace PPC.Module.Inventory.ViewModels
 
             try
             {
-                IocContainer.Default.Resolve<IArticleDb>().Add(article);
+                Logger.Info($"New article {article.Description ?? "???"} {article.Price:C} created.");
+                ArticlesDb.Add(article);
             }
             catch (Exception ex)
             {
+                Logger.Exception("Error while saving articles DB", ex);
                 PopupService.DisplayError("Error while saving articles DB", ex);
             }
         }
@@ -193,25 +192,28 @@ namespace PPC.Module.Inventory.ViewModels
 
         private void SaveArticle(CreateEditArticlePopupViewModel vm)
         {
-            SelectedArticle.Ean = vm.Ean;
-            SelectedArticle.Description = vm.Description;
-            SelectedArticle.Category = vm.Category;
-            SelectedArticle.SubCategory = vm.SubCategory;
-            SelectedArticle.Producer = vm.Producer;
-            SelectedArticle.SupplierPrice = vm.SupplierPrice;
-            SelectedArticle.Price = vm.Price;
-            SelectedArticle.VatRate = vm.VatRate;
-            SelectedArticle.Stock = vm.Stock;
+            Article article = SelectedArticle;
+            article.Ean = vm.Ean;
+            article.Description = vm.Description;
+            article.Category = vm.Category;
+            article.SubCategory = vm.SubCategory;
+            article.Producer = vm.Producer;
+            article.SupplierPrice = vm.SupplierPrice;
+            article.Price = vm.Price;
+            article.VatRate = vm.VatRate;
+            article.Stock = vm.Stock;
 
             RaisePropertyChanged(() => Articles);
             RaisePropertyChanged(() => Categories);
 
             try
             {
-                IocContainer.Default.Resolve<IArticleDb>().Save();
+                Logger.Info($"Article {article.Description ?? "???"} {article.Price:C} edited.");
+                ArticlesDb.Save();
             }
             catch (Exception ex)
             {
+                Logger.Exception("Error while saving articles DB", ex);
                 PopupService.DisplayError("Error while saving articles DB", ex);
             }
         }

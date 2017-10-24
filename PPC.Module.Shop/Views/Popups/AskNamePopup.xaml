@@ -6,10 +6,7 @@
              xmlns:popups="clr-namespace:PPC.Module.Shop.ViewModels.Popups"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance popups:AskNamePopupViewModelDesignData, IsDesignTimeCreatable=True}"
-             d:DesignWidth="300"
-             Width="300"
-             MaxWidth="500"
-             MaxHeight="100">
+             MinWidth="300">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

@@ -34,11 +34,8 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -52,13 +49,13 @@
       <Project>{e85892e8-7837-483d-b20d-dfe6a89d8330}</Project>
       <Name>EasyDBFParser</Name>
     </ProjectReference>
-    <ProjectReference Include="..\EasyIoc\EasyIoc.csproj">
-      <Project>{38d20e7f-9510-4b80-8755-1def2ef07bcf}</Project>
-      <Name>EasyIoc</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PPC.Data.Contracts\PPC.Data.Contracts.csproj">
       <Project>{73f28b1d-02d3-4bdf-891a-df4ee2248353}</Project>
       <Name>PPC.Data.Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Helpers\PPC.Helpers.csproj">
+      <Project>{3523c53f-4317-4ac6-b077-76544bdd174a}</Project>
+      <Name>PPC.Helpers</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

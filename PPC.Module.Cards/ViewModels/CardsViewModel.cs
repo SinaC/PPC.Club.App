@@ -9,8 +9,10 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Windows.Input;
 using System.Xml;
+using EasyIoc;
 using EasyMVVM;
 using PPC.Data.Contracts;
+using PPC.Log;
 using PPC.Module.Cards.ViewModels.Popups;
 using PPC.Services.Popup;
 
@@ -24,7 +26,9 @@ namespace PPC.Module.Cards.ViewModels
 
     public class CardsViewModel : ObservableObject
     {
-        private IPopupService PopupService => EasyIoc.IocContainer.Default.Resolve<IPopupService>();
+        private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
+        private ILog Logger => IocContainer.Default.Resolve<ILog>();
+
         private CardSellers _cardSellers;
 
         private Func<string,string> SearchEmailByName => name => _cardSellers?.Sellers.FirstOrDefault(x => CultureInfo.CurrentCulture.CompareInfo.IndexOf(x.Name, name, CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreCase) >= 0)?.Email;
@@ -67,7 +71,7 @@ namespace PPC.Module.Cards.ViewModels
         public CardSellersModes Mode
         {
             get { return _mode; }
-            set { Set(() => Mode, ref _mode, value); }
+            protected set { Set(() => Mode, ref _mode, value); }
         }
 
         #endregion
@@ -92,9 +96,14 @@ namespace PPC.Module.Cards.ViewModels
 
         private void AddNewSellerNameSelected(string name, string email)
         {
-            if (Sellers.Any(x => x.SellerName == name))
+            CardSellerViewModel alreadyExisingSeller = Sellers.FirstOrDefault(x => String.Equals(x.SellerName, name, StringComparison.InvariantCultureIgnoreCase));
+            if (alreadyExisingSeller != null)
             {
-                PopupService.DisplayError("Error", "A seller with than name has already been opened!");
+                Logger.Warning($"A seller with than name '{name}' has already been opened!");
+                PopupService.DisplayError(
+                    "Warning",
+                    $"A seller with than name '{name}' has already been opened! Switching to {name}",
+                    () => SelectedSeller = alreadyExisingSeller);
             }
             else
             {
@@ -134,7 +143,8 @@ namespace PPC.Module.Cards.ViewModels
                     }
                     catch (Exception ex)
                     {
-                        PopupService.DisplayError($"Error while loading {filename} seller", ex);
+                        Logger.Exception($"Error while loading {filename ?? "??"} seller", ex);
+                        PopupService.DisplayError($"Error while loading {filename ?? "??"} seller", ex);
                     }
                 }
             }
@@ -169,6 +179,7 @@ namespace PPC.Module.Cards.ViewModels
             }
             catch (Exception ex)
             {
+                Logger.Exception("Error", ex);
                 PopupService.DisplayError("Error", ex);
             }
         }
@@ -198,7 +209,8 @@ namespace PPC.Module.Cards.ViewModels
             }
             catch (Exception ex)
             {
-                PopupService.DisplayError("Error reading card sellers file", ex);
+                Logger.Exception("Error loading card sellers file", ex);
+                PopupService.DisplayError("Error loading card sellers file", ex);
             }
         }
 
@@ -216,7 +228,8 @@ namespace PPC.Module.Cards.ViewModels
             }
             catch (Exception ex)
             {
-                PopupService.DisplayError("Error reading card sellers file", ex);
+                Logger.Exception("Error saving card sellers file", ex);
+                PopupService.DisplayError("Error saving card sellers file", ex);
             }
         }
     }

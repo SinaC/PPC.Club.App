@@ -37,11 +37,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
     <Reference Include="Xceed.Wpf.AvalonDock, Version=3.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
@@ -102,9 +97,9 @@
       <Project>{3523c53f-4317-4ac6-b077-76544bdd174a}</Project>
       <Name>PPC.Helpers</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PPC.Popups\PPC.Popups.csproj">
-      <Project>{C06F804C-58A5-48EA-A3B4-935470804B05}</Project>
-      <Name>PPC.Popups</Name>
+    <ProjectReference Include="..\PPC.Log\PPC.Log.csproj">
+      <Project>{BCB79B57-39A1-4714-A728-B09C90BB4B35}</Project>
+      <Name>PPC.Log</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Services\PPC.Services.csproj">
       <Project>{DAAB6105-1A4D-4AF9-9CAE-B76204B411D0}</Project>

@@ -5,6 +5,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using PPC.Helpers;
 
 namespace PPC.Services.Popup
 {
@@ -46,7 +47,7 @@ namespace PPC.Services.Popup
 
         private void SetFocusOnFirstButton()
         {
-            var firstButton = FindVisualChild<Button>(AnswerButtons.ItemContainerGenerator.ContainerFromIndex(0));
+            var firstButton = VisualTreeHelpers.FindVisualChild<Button>(AnswerButtons.ItemContainerGenerator.ContainerFromIndex(0));
             if (firstButton != null)
             {
                 FocusManager.SetFocusedElement(AnswerButtons, firstButton);
@@ -56,23 +57,6 @@ namespace PPC.Services.Popup
                     Keyboard.Focus(firstButton);
                 }, DispatcherPriority.Input);
             }
-        }
-
-        private static T FindVisualChild<T>(DependencyObject depObj)
-            where T : DependencyObject
-        {
-            if (depObj != null)
-                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
-                {
-                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
-                    var visualChild = child as T;
-                    if (visualChild != null)
-                        return visualChild;
-                    T childItem = FindVisualChild<T>(child);
-                    if (childItem != null)
-                        return childItem;
-                }
-            return null;
         }
     }
 }
