@@ -19,8 +19,18 @@ namespace PPC.Common
             set { _connectionStrings = value; }
         }
 
+        public static string LogPath => AppSettings["logpath"];
+        public static string PlayersPath => AppSettings["PlayersPath"];
+        public static string BackupPath => AppSettings["BackupPath"];
+        public static string ArticlesPath => AppSettings["ArticlesPath"];
+        public static string CashRegisterClosurePath => AppSettings["CashRegisterClosurePath"];
+        public static string CashRegisterClosureConfigPath => AppSettings["CashRegisterClosureConfigPath"];
+        public static string CashRegisterCountPath => AppSettings["CashRegisterCountPath"];
+        public static string CardSellersPath => AppSettings["CardSellersPath"];
+
         private static double? _fontSize;
-        public static double? FontSize {
+        public static double? FontSize
+        {
             get { return _fontSize ?? SaveConvertToDecimal(AppSettings["FontSize"]); }
             set { _fontSize = value; }
         }

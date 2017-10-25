@@ -1,3 +1,4 @@
+Business Layer to abstract Data access + add Mail sending, file save, ... within
 add informative logging
 AskNameEmailPopup: check email validity
 article refund (client doesn't want anymore an already paid article !! only for cash payment)

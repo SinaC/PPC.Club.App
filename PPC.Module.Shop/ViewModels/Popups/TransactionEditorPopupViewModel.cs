@@ -5,7 +5,7 @@ using System.Linq;
 using System.Windows.Input;
 using EasyIoc;
 using EasyMVVM;
-using PPC.Data.Contracts;
+using PPC.Domain;
 using PPC.Module.Shop.Models;
 using PPC.Module.Shop.Views.Popups;
 using PPC.Services.Popup;

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -9,7 +8,8 @@ using System.Windows.Input;
 using System.Xml;
 using EasyIoc;
 using EasyMVVM;
-using PPC.Data.Contracts;
+using PPC.Common;
+using PPC.Domain;
 using PPC.Log;
 using PPC.Module.Cards.Models;
 using PPC.Services.Popup;
@@ -21,7 +21,7 @@ namespace PPC.Module.Cards.ViewModels
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
         private ILog Logger => IocContainer.Default.Resolve<ILog>();
 
-        public static string Path => $"{ConfigurationManager.AppSettings["BackupPath"]}cards\\";
+        public static string Path => $"{PPCConfigurationManager.BackupPath}cards\\";
         public string Filename => $"{Path}{SellerName}.xml";
 
         #region Seller info

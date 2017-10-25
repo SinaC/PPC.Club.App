@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:viewModels="clr-namespace:PPC.Module.Shop.ViewModels.ArticleSelector"
-             xmlns:contracts="clr-namespace:PPC.Data.Contracts;assembly=PPC.Data.Contracts"
+             xmlns:contracts="clr-namespace:PPC.Domain;assembly=PPC.Domain"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:helpers="clr-namespace:PPC.Helpers;assembly=PPC.Helpers"
              mc:Ignorable="d" 

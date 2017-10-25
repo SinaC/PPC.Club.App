@@ -64,17 +64,21 @@
       <Project>{38d20e7f-9510-4b80-8755-1def2ef07bcf}</Project>
       <Name>EasyIoc</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PPC.Data.Players\PPC.Data.Players.csproj">
-      <Project>{a639d237-42cb-45b7-a987-3fcd8c3203ae}</Project>
-      <Name>PPC.Data.Players</Name>
+    <ProjectReference Include="..\PPC.Common\PPC.Common.csproj">
+      <Project>{7F9D7666-1A58-4AE1-AD47-AB68A3D4E2FE}</Project>
+      <Name>PPC.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PPC.Data.Contracts\PPC.Data.Contracts.csproj">
-      <Project>{73F28B1D-02D3-4BDF-891A-DF4EE2248353}</Project>
-      <Name>PPC.Data.Contracts</Name>
+    <ProjectReference Include="..\PPC.Domain\PPC.Domain.csproj">
+      <Project>{11AA6511-78E6-408F-8894-811989851F04}</Project>
+      <Name>PPC.Domain</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Helpers\PPC.Helpers.csproj">
       <Project>{3523c53f-4317-4ac6-b077-76544bdd174a}</Project>
       <Name>PPC.Helpers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.IDataAccess\PPC.IDataAccess.csproj">
+      <Project>{10da16f1-f77e-4b88-9151-2d0f358b4908}</Project>
+      <Name>PPC.IDataAccess</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Log\PPC.Log.csproj">
       <Project>{BCB79B57-39A1-4714-A728-B09C90BB4B35}</Project>

@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:viewModels="clr-namespace:PPC.App.Closure"
-             xmlns:contracts="clr-namespace:PPC.Data.Contracts;assembly=PPC.Data.Contracts"
+             xmlns:contracts="clr-namespace:PPC.Domain;assembly=PPC.Domain"
              xmlns:helpers="clr-namespace:PPC.Helpers;assembly=PPC.Helpers"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance viewModels:SoldCardsViewModelDesignData, IsDesignTimeCreatable=True}"

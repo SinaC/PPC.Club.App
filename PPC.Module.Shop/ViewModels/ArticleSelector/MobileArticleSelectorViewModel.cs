@@ -4,9 +4,9 @@ using System.Linq;
 using System.Windows.Input;
 using EasyIoc;
 using EasyMVVM;
-using PPC.Data.Articles;
-using PPC.Data.Contracts;
+using PPC.Domain;
 using PPC.Helpers;
+using PPC.IDataAccess;
 using PPC.Log;
 using PPC.Popups;
 using PPC.Services.Popup;
@@ -24,7 +24,7 @@ namespace PPC.Module.Shop.ViewModels.ArticleSelector
     {
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
         private ILog Logger => IocContainer.Default.Resolve<ILog>();
-        private IArticleDb ArticlesDb => IocContainer.Default.Resolve<IArticleDb>();
+        private IArticleDL ArticlesDb => IocContainer.Default.Resolve<IArticleDL>();
 
         public const bool GoToTopWhenArticleSelected = false; // TODO: config???
 
@@ -322,7 +322,7 @@ namespace PPC.Module.Shop.ViewModels.ArticleSelector
             try
             {
                 Logger.Info($"Article {article.Description ?? "???"} {article.Price:C} edited.");
-                ArticlesDb.Save();
+                ArticlesDb.SaveArticle(article);
             }
             catch (Exception ex)
             {
@@ -379,7 +379,7 @@ namespace PPC.Module.Shop.ViewModels.ArticleSelector
             try
             {
                 Logger.Info($"New article {article.Description ?? "???"} {article.Price:C} created.");
-                ArticlesDb.Add(article);
+                ArticlesDb.AddArticle(article);
             }
             catch (Exception ex)
             {
@@ -435,8 +435,8 @@ namespace PPC.Module.Shop.ViewModels.ArticleSelector
     {
         public MobileArticleSelectorViewModelDesignData()
         {
-            IocContainer.Default.Unregister<IArticleDb>();
-            IocContainer.Default.RegisterInstance<IArticleDb>(new ArticlesDesignData(new List<Article>
+            IocContainer.Default.Unregister<IArticleDL>();
+            IocContainer.Default.RegisterInstance<IArticleDL>(new DataAccess.DesignMode.ArticleDL(new List<Article>
             {
                 new Article
                 {

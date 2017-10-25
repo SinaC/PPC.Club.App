@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using EasyMVVM;
-using PPC.Data.Contracts;
+using PPC.Domain;
 
 namespace PPC.App.Closure
 {

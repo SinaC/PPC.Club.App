@@ -82,13 +82,13 @@
       <Project>{38d20e7f-9510-4b80-8755-1def2ef07bcf}</Project>
       <Name>EasyIoc</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PPC.Data.Contracts\PPC.Data.Contracts.csproj">
-      <Project>{73F28B1D-02D3-4BDF-891A-DF4EE2248353}</Project>
-      <Name>PPC.Data.Contracts</Name>
-    </ProjectReference>
     <ProjectReference Include="..\EasyMVVM\EasyMVVM.csproj">
       <Project>{10833c79-c3fb-4f70-ad1d-7f0173d01966}</Project>
       <Name>EasyMVVM</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Domain\PPC.Domain.csproj">
+      <Project>{11AA6511-78E6-408F-8894-811989851F04}</Project>
+      <Name>PPC.Domain</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Services\PPC.Services.csproj">
       <Project>{DAAB6105-1A4D-4AF9-9CAE-B76204B411D0}</Project>

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Windows.Input;
 using EasyIoc;
 using EasyMVVM;
-using PPC.Data.Articles;
-using PPC.Data.Contracts;
+using PPC.Common;
+using PPC.Domain;
+using PPC.IDataAccess;
 using PPC.Log;
 using PPC.Popups;
 using PPC.Services.IO;
@@ -19,7 +19,7 @@ namespace PPC.Module.Inventory.ViewModels
         private static readonly string[] EmptyList = { string.Empty };
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
         private ILog Logger => IocContainer.Default.Resolve<ILog>();
-        private IArticleDb ArticlesDb => IocContainer.Default.Resolve<IArticleDb>();
+        private IArticleDL ArticlesDb => IocContainer.Default.Resolve<IArticleDL>();
 
         public IEnumerable<Article> Articles => ArticlesDb.Articles;
         public IEnumerable<string> Categories => EmptyList.Concat(ArticlesDb.Categories);
@@ -46,7 +46,7 @@ namespace PPC.Module.Inventory.ViewModels
         {
             try
             {
-                ArticlesDb.Load();
+                throw new NotImplementedException("Load is not anymore available");//ArticlesDb.Load();
                 RaisePropertyChanged(() => Articles);
                 PopupService.DisplayQuestion("Load", "Articles successfully loaded.", QuestionActionButton.Ok());
             }
@@ -69,7 +69,7 @@ namespace PPC.Module.Inventory.ViewModels
             try
             {
                 Logger.Info("Saving articles DB.");
-                ArticlesDb.Save();
+                throw new NotImplementedException("Save is not anymore available");//ArticlesDb.Save();
                 PopupService.DisplayQuestion("Save", "Articles successfully saved.", QuestionActionButton.Ok());
                 Logger.Info("Articles DB saved.");
             }
@@ -89,7 +89,7 @@ namespace PPC.Module.Inventory.ViewModels
 
         private void Import()
         {
-            string path = System.IO.Path.GetDirectoryName(ConfigurationManager.AppSettings["ArticlesPath"]);
+            string path = System.IO.Path.GetDirectoryName(PPCConfigurationManager.ArticlesPath);
 
             IIOService ioService = new IOService();
             string filename = ioService.OpenFileDialog(path, ".dbf", "DBase VII documents (.dbf)|*.dbf");
@@ -98,7 +98,7 @@ namespace PPC.Module.Inventory.ViewModels
                 try
                 {
                     Logger.Info("Importing articles DB.");
-                    ArticlesDb.ImportFromDbf(filename);
+                    throw new NotImplementedException("Import from dbf is not anymore available");//ArticlesDb.ImportFromDbf(filename);
                     RaisePropertyChanged(() => Articles);
                     PopupService.DisplayQuestion("Import", $"{Articles.Count()} articles successfully imported. Don't forget to click on 'Save' button to save imported articles.", QuestionActionButton.Ok());
                     //!! after import -> every article guid are modified -> shopping carts and backup files are invalid
@@ -153,7 +153,7 @@ namespace PPC.Module.Inventory.ViewModels
             try
             {
                 Logger.Info($"New article {article.Description ?? "???"} {article.Price:C} created.");
-                ArticlesDb.Add(article);
+                ArticlesDb.AddArticle(article);
             }
             catch (Exception ex)
             {
@@ -209,7 +209,7 @@ namespace PPC.Module.Inventory.ViewModels
             try
             {
                 Logger.Info($"Article {article.Description ?? "???"} {article.Price:C} edited.");
-                ArticlesDb.Save();
+                ArticlesDb.SaveArticle(article);
             }
             catch (Exception ex)
             {
@@ -225,8 +225,8 @@ namespace PPC.Module.Inventory.ViewModels
     {
         public InventoryViewModelDesignData()
         {
-            IocContainer.Default.Unregister<IArticleDb>();
-            IocContainer.Default.RegisterInstance<IArticleDb>(new ArticlesDesignData(new List<Article>
+            IocContainer.Default.Unregister<IArticleDL>();
+            IocContainer.Default.RegisterInstance<IArticleDL>(new DataAccess.DesignMode.ArticleDL(new List<Article>
             {
                 new Article
                 {

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
 using EasyIoc;
 using EasyMVVM;
-using PPC.Data.Contracts;
+using PPC.Common;
+using PPC.Domain;
 using PPC.Helpers;
 using PPC.Log;
 using PPC.Messages;
@@ -176,7 +176,7 @@ namespace PPC.Module.Shop.ViewModels
             SelectedClient = null;
             Clients.Clear();
             //  add backup clients
-            string path = ConfigurationManager.AppSettings["BackupPath"];
+            string path = PPCConfigurationManager.BackupPath;
             if (Directory.Exists(path))
             {
                 foreach (string filename in Directory.EnumerateFiles(path, "*.xml", SearchOption.TopDirectoryOnly).Where(x => !x.Contains(shopFilename)))

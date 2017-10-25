@@ -203,9 +203,21 @@
       <Project>{7F9D7666-1A58-4AE1-AD47-AB68A3D4E2FE}</Project>
       <Name>PPC.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PPC.DataAccess.FileBased\PPC.DataAccess.FileBased.csproj">
+      <Project>{B5893212-FCF0-4A0B-B0EA-4908F5235E39}</Project>
+      <Name>PPC.DataAccess.FileBased</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Domain\PPC.Domain.csproj">
+      <Project>{11aa6511-78e6-408f-8894-811989851f04}</Project>
+      <Name>PPC.Domain</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PPC.Helpers\PPC.Helpers.csproj">
       <Project>{3523C53F-4317-4AC6-B077-76544BDD174A}</Project>
       <Name>PPC.Helpers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.IDataAccess\PPC.IDataAccess.csproj">
+      <Project>{10DA16F1-F77E-4B88-9151-2D0F358B4908}</Project>
+      <Name>PPC.IDataAccess</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Log\PPC.Log.csproj">
       <Project>{BCB79B57-39A1-4714-A728-B09C90BB4B35}</Project>
@@ -218,18 +230,6 @@
     <ProjectReference Include="..\PPC.Controls\PPC.Controls.csproj">
       <Project>{04cd3c36-e320-4a14-952b-1e09340e9b58}</Project>
       <Name>PPC.Controls</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PPC.Data.Articles\PPC.Data.Articles.csproj">
-      <Project>{99b36c5f-3b72-4e79-b34c-29f3a8a4cc99}</Project>
-      <Name>PPC.Data.Articles</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PPC.Data.Contracts\PPC.Data.Contracts.csproj">
-      <Project>{73f28b1d-02d3-4bdf-891a-df4ee2248353}</Project>
-      <Name>PPC.Data.Contracts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PPC.Data.Players\PPC.Data.Players.csproj">
-      <Project>{A639D237-42CB-45B7-A987-3FCD8C3203AE}</Project>
-      <Name>PPC.Data.Players</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Module.Inventory\PPC.Module.Inventory.csproj">
       <Project>{e734f70a-12e8-46bb-857d-35d606169a11}</Project>

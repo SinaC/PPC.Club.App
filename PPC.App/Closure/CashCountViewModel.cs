@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
 using EasyIoc;
 using EasyMVVM;
-using PPC.Data.Contracts;
+using PPC.Common;
+using PPC.Domain;
 using PPC.Log;
 using PPC.Services.Popup;
 
@@ -85,7 +85,7 @@ namespace PPC.App.Closure
             CashRegisterCount countData = null;
             try
             {
-                string filename = ConfigurationManager.AppSettings["CashRegisterCountPath"];
+                string filename = PPCConfigurationManager.CashRegisterCountPath;
                 using (XmlTextReader reader = new XmlTextReader(filename))
                 {
                     DataContractSerializer serializer = new DataContractSerializer(typeof(CashRegisterCount));
@@ -118,7 +118,7 @@ namespace PPC.App.Closure
                         Count = x.Reference
                     }).ToList()
                 };
-                string filename = ConfigurationManager.AppSettings["CashRegisterCountPath"];
+                string filename = PPCConfigurationManager.CashRegisterCountPath;
                 using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
                 {
                     writer.Formatting = Formatting.Indented;

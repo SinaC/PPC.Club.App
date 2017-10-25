@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -11,7 +10,8 @@ using System.Windows.Input;
 using System.Xml;
 using EasyIoc;
 using EasyMVVM;
-using PPC.Data.Contracts;
+using PPC.Common;
+using PPC.Domain;
 using PPC.Log;
 using PPC.Module.Cards.ViewModels.Popups;
 using PPC.Services.Popup;
@@ -197,7 +197,7 @@ namespace PPC.Module.Cards.ViewModels
         {
             try
             {
-                string filename = ConfigurationManager.AppSettings["CardSellersPath"];
+                string filename = PPCConfigurationManager.CardSellersPath;
                 if (File.Exists(filename))
                 {
                     using (XmlTextReader reader = new XmlTextReader(filename))
@@ -218,7 +218,7 @@ namespace PPC.Module.Cards.ViewModels
         {
             try
             {
-                string filename = ConfigurationManager.AppSettings["CardSellersPath"];
+                string filename = PPCConfigurationManager.CardSellersPath;
                 using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
                 {
                     writer.Formatting = Formatting.Indented;

@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Configuration;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using EasyIoc;
 using PPC.Common;
-using PPC.Data.Articles;
-using PPC.Data.Players;
 using PPC.Log;
 using PPC.Services.Popup;
+using PPC.IDataAccess;
 
 namespace PPC.App
 {
@@ -24,12 +22,12 @@ namespace PPC.App
 
             // Singletons
             IocContainer.Default.RegisterInstance<ILog>(new NLogger());
-            IocContainer.Default.RegisterInstance<IArticleDb>(new ArticlesDb());
-            IocContainer.Default.RegisterInstance<IPlayersDb>(new PlayersDb());
             IocContainer.Default.RegisterInstance<IPopupService>(new PopupService(this));
+            IocContainer.Default.RegisterInstance<IArticleDL>(new DataAccess.FileBased.ArticleDL());
+            IocContainer.Default.RegisterInstance<IPlayerDL>(new DataAccess.FileBased.PlayerDL());
 
             // Initialize log
-            IocContainer.Default.Resolve<ILog>().Initialize(ConfigurationManager.AppSettings["logpath"], "${shortdate}.log");
+            IocContainer.Default.Resolve<ILog>().Initialize(PPCConfigurationManager.LogPath, "${shortdate}.log");
             IocContainer.Default.Resolve<ILog>().Info("Application started");
 
             //Loaded += OnLoaded;

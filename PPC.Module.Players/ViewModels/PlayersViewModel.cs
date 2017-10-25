@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
 using EasyIoc;
 using EasyMVVM;
-using PPC.Data.Contracts;
-using PPC.Data.Players;
+using PPC.Common;
+using PPC.Domain;
 using PPC.Helpers;
+using PPC.IDataAccess;
 using PPC.Log;
 using PPC.Messages;
 using PPC.Module.Players.Models;
@@ -22,7 +22,7 @@ namespace PPC.Module.Players.ViewModels
     {
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
         private ILog Logger => IocContainer.Default.Resolve<ILog>();
-        private IPlayersDb PlayersDb => IocContainer.Default.Resolve<IPlayersDb>();
+        private IPlayerDL PlayersDb => IocContainer.Default.Resolve<IPlayerDL>();
 
         #region Filtered players
 
@@ -94,7 +94,7 @@ namespace PPC.Module.Players.ViewModels
         {
             try
             {
-                string filename = ConfigurationManager.AppSettings["PlayersPath"];
+                string filename = PPCConfigurationManager.PlayersPath;
                 if (onlyIfExists && !File.Exists(filename))
                     return;
                 List<Player> players = PlayersDb.Load(filename);
@@ -136,7 +136,7 @@ namespace PPC.Module.Players.ViewModels
                     CountryCode = x.CountryCode,
                     IsJudge = x.IsJudge
                 }).ToList();
-                PlayersDb.Save(ConfigurationManager.AppSettings["PlayersPath"], players);
+                PlayersDb.Save(PPCConfigurationManager.PlayersPath, players);
                 Load(false); //TODO crappy workaround to reset row.IsNewItem
             }
             catch (Exception ex)

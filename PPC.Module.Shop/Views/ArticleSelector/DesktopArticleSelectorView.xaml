@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:contracts="clr-namespace:PPC.Data.Contracts;assembly=PPC.Data.Contracts"
+             xmlns:contracts="clr-namespace:PPC.Domain;assembly=PPC.Domain"
              xmlns:controls="clr-namespace:PPC.Controls;assembly=PPC.Controls"
              xmlns:helpers="clr-namespace:PPC.Helpers;assembly=PPC.Helpers"
              xmlns:viewModels="clr-namespace:PPC.Module.Shop.ViewModels.ArticleSelector"

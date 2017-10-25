@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Windows.Input;
 using EasyIoc;
 using EasyMVVM;
-using PPC.Data.Contracts;
+using PPC.Domain;
 using PPC.Services.Popup;
 
 namespace PPC.Popups

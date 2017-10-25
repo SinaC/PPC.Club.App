@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using EasyIoc;
 using EasyMVVM;
-using PPC.Data.Contracts;
+using PPC.Domain;
 using PPC.Services.Popup;
 
 namespace PPC.App.Closure

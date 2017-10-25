@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -13,9 +12,10 @@ using System.Xml;
 using EasyIoc;
 using EasyMVVM;
 using PPC.App.Closure;
-using PPC.Data.Articles;
-using PPC.Data.Contracts;
+using PPC.Common;
+using PPC.Domain;
 using PPC.Helpers;
+using PPC.IDataAccess;
 using PPC.Log;
 using PPC.Messages;
 using PPC.Module.Cards.ViewModels;
@@ -227,7 +227,7 @@ namespace PPC.App
 
         private void CloseApplicationAfterClosurePopup()
         {
-            string savePath = ConfigurationManager.AppSettings["BackupPath"] + $"{DateTime.Now:yyyy-MM-dd hh-mm-ss}\\";
+            string savePath = PPCConfigurationManager.BackupPath + $"{DateTime.Now:yyyy-MM-dd hh-mm-ss}\\";
             if (!Directory.Exists(savePath))
                 Directory.CreateDirectory(savePath);
 
@@ -243,7 +243,7 @@ namespace PPC.App
             IsWaiting = true;
             try
             {
-                string closureConfigFilename = ConfigurationManager.AppSettings["CashRegisterClosureConfigPath"];
+                string closureConfigFilename = PPCConfigurationManager.CashRegisterClosureConfigPath;
                 if (File.Exists(closureConfigFilename))
                 {
                     // Read closure config
@@ -363,7 +363,7 @@ namespace PPC.App
             {
                 try
                 {
-                    IocContainer.Default.Resolve<IArticleDb>().Load();
+                    IocContainer.Default.Resolve<IArticleDL>().Categories.ToList(); // make a call to DL to check if DB exists
                 }
                 catch (Exception ex)
                 {

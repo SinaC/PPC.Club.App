@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -8,9 +7,10 @@ using System.Windows.Input;
 using System.Xml;
 using EasyIoc;
 using EasyMVVM;
-using PPC.Data.Articles;
-using PPC.Data.Contracts;
+using PPC.Common;
+using PPC.Domain;
 using PPC.Helpers;
+using PPC.IDataAccess;
 using PPC.Log;
 using PPC.Module.Shop.Models;
 using PPC.Services.Popup;
@@ -31,7 +31,7 @@ namespace PPC.Module.Shop.ViewModels
         private Action<decimal, decimal, decimal> _cartPaidAction;
         private Action _cartReopenedAction;
 
-        public string Filename => $"{ConfigurationManager.AppSettings["BackupPath"]}{(HasFullPlayerInfos ? DciNumber : ClientName.ToLowerInvariant())}.xml";
+        public string Filename => $"{PPCConfigurationManager.BackupPath}{(HasFullPlayerInfos ? DciNumber : ClientName.ToLowerInvariant())}.xml";
 
         public DateTime PaymentTimestamp { get; private set; }
 
@@ -184,7 +184,7 @@ namespace PPC.Module.Shop.ViewModels
             ShoppingCart.ShoppingCartArticles.Clear();
             ShoppingCart.ShoppingCartArticles.AddRange(cart.Articles.Select(x => new ShopArticleItem
             {
-                Article = IocContainer.Default.Resolve<IArticleDb>().GetById(x.Guid),
+                Article = IocContainer.Default.Resolve<IArticleDL>().GetById(x.Guid),
                 Quantity = x.Quantity
             }));
 
@@ -195,8 +195,8 @@ namespace PPC.Module.Shop.ViewModels
         {
             try
             {
-                if (!Directory.Exists(ConfigurationManager.AppSettings["BackupPath"]))
-                    Directory.CreateDirectory(ConfigurationManager.AppSettings["BackupPath"]);
+                if (!Directory.Exists(PPCConfigurationManager.BackupPath))
+                    Directory.CreateDirectory(PPCConfigurationManager.BackupPath);
                 ClientCart cart = new ClientCart
                 {
                     ClientName = ClientName,

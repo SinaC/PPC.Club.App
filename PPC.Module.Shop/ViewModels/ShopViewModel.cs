@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -10,9 +9,10 @@ using System.Windows.Input;
 using System.Xml;
 using EasyIoc;
 using EasyMVVM;
-using PPC.Data.Articles;
-using PPC.Data.Contracts;
+using PPC.Common;
+using PPC.Domain;
 using PPC.Helpers;
+using PPC.IDataAccess;
 using PPC.Log;
 using PPC.Module.Shop.Models;
 using PPC.Module.Shop.ViewModels.Popups;
@@ -149,9 +149,9 @@ namespace PPC.Module.Shop.ViewModels
         {
             try
             {
-                if (!Directory.Exists(ConfigurationManager.AppSettings["BackupPath"]))
-                    Directory.CreateDirectory(ConfigurationManager.AppSettings["BackupPath"]);
-                Data.Contracts.Shop shop = new Data.Contracts.Shop
+                if (!Directory.Exists(PPCConfigurationManager.BackupPath))
+                    Directory.CreateDirectory(PPCConfigurationManager.BackupPath);
+                Domain.Shop shop = new Domain.Shop
                 {
                     Transactions = Transactions.Select(t => new ShopTransaction
                     {
@@ -166,11 +166,11 @@ namespace PPC.Module.Shop.ViewModels
                         DiscountPercentage = t.DiscountPercentage
                     }).ToList(),
                 };
-                string filename = $"{ConfigurationManager.AppSettings["BackupPath"]}{ShopFilename}";
+                string filename = $"{PPCConfigurationManager.BackupPath}{ShopFilename}";
                 using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
                 {
                     writer.Formatting = Formatting.Indented;
-                    DataContractSerializer serializer = new DataContractSerializer(typeof(Data.Contracts.Shop));
+                    DataContractSerializer serializer = new DataContractSerializer(typeof(Domain.Shop));
                     serializer.WriteObject(writer, shop);
                 }
             }
@@ -251,7 +251,7 @@ namespace PPC.Module.Shop.ViewModels
 
         public void Reload()
         {
-            if (Directory.Exists(ConfigurationManager.AppSettings["BackupPath"]))
+            if (Directory.Exists(PPCConfigurationManager.BackupPath))
             {
                 try
                 {
@@ -338,9 +338,9 @@ namespace PPC.Module.Shop.ViewModels
             //  txt
             try
             {
-                if (!Directory.Exists(ConfigurationManager.AppSettings["CashRegisterClosurePath"]))
-                    Directory.CreateDirectory(ConfigurationManager.AppSettings["CashRegisterClosurePath"]);
-                string filename = $"{ConfigurationManager.AppSettings["CashRegisterClosurePath"]}CashRegister_{now:yyyy-MM-dd_HH-mm-ss}.txt";
+                if (!Directory.Exists(PPCConfigurationManager.CashRegisterClosurePath))
+                    Directory.CreateDirectory(PPCConfigurationManager.CashRegisterClosurePath);
+                string filename = $"{PPCConfigurationManager.CashRegisterClosurePath}CashRegister_{now:yyyy-MM-dd_HH-mm-ss}.txt";
                 File.WriteAllText(filename, closure.ToString());
             }
             catch (Exception ex)
@@ -351,9 +351,9 @@ namespace PPC.Module.Shop.ViewModels
             //  xml
             try
             {
-                if (!Directory.Exists(ConfigurationManager.AppSettings["CashRegisterClosurePath"]))
-                    Directory.CreateDirectory(ConfigurationManager.AppSettings["CashRegisterClosurePath"]);
-                string filename = $"{ConfigurationManager.AppSettings["CashRegisterClosurePath"]}CashRegister_{now:yyyy-MM-dd_HH-mm-ss}.xml";
+                if (!Directory.Exists(PPCConfigurationManager.CashRegisterClosurePath))
+                    Directory.CreateDirectory(PPCConfigurationManager.CashRegisterClosurePath);
+                string filename = $"{PPCConfigurationManager.CashRegisterClosurePath}CashRegister_{now:yyyy-MM-dd_HH-mm-ss}.xml";
                 using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
                 {
                     writer.Formatting = Formatting.Indented;
@@ -374,7 +374,7 @@ namespace PPC.Module.Shop.ViewModels
             // Move backup files into save folder
             try
             {
-                string backupPath = ConfigurationManager.AppSettings["BackupPath"];
+                string backupPath = PPCConfigurationManager.BackupPath;
                 foreach (string file in Directory.EnumerateFiles(backupPath))
                 {
                     string saveFilename = savePath + Path.GetFileName(file);
@@ -480,16 +480,16 @@ namespace PPC.Module.Shop.ViewModels
 
         private void LoadTransactions()
         {
-            string filename = $"{ConfigurationManager.AppSettings["BackupPath"]}{ShopFilename}";
+            string filename = $"{PPCConfigurationManager.BackupPath}{ShopFilename}";
             if (File.Exists(filename))
             {
                 try
                 {
-                    Data.Contracts.Shop shop;
+                    Domain.Shop shop;
                     using (XmlTextReader reader = new XmlTextReader(filename))
                     {
-                        DataContractSerializer serializer = new DataContractSerializer(typeof(Data.Contracts.Shop));
-                        shop = (Data.Contracts.Shop)serializer.ReadObject(reader);
+                        DataContractSerializer serializer = new DataContractSerializer(typeof(Domain.Shop));
+                        shop = (Domain.Shop)serializer.ReadObject(reader);
                     }
                     Transactions = new ObservableCollection<ShopTransactionItem>(shop.Transactions.Select(t => new ShopTransactionItem
                     {
@@ -497,7 +497,7 @@ namespace PPC.Module.Shop.ViewModels
                         Timestamp = t.Timestamp,
                         Articles = t.Articles.Select(a => new ShopArticleItem
                         {
-                            Article = IocContainer.Default.Resolve<IArticleDb>().GetById(a.Guid),
+                            Article = IocContainer.Default.Resolve<IArticleDL>().GetById(a.Guid),
                             Quantity = a.Quantity
                         }).ToList(),
                         Cash = t.Cash,

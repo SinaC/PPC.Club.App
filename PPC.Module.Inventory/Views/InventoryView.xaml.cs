@@ -1,7 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using PPC.Helpers;
+﻿using System.Windows.Controls;
 
 namespace PPC.Module.Inventory.Views
 {

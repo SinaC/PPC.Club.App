@@ -1,5 +1,5 @@
 ﻿using EasyMVVM;
-using PPC.Data.Contracts;
+using PPC.Domain;
 
 namespace PPC.Module.Shop.Models
 {

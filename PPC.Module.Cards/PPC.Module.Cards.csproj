@@ -89,9 +89,13 @@
       <Project>{10833c79-c3fb-4f70-ad1d-7f0173d01966}</Project>
       <Name>EasyMVVM</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PPC.Data.Contracts\PPC.Data.Contracts.csproj">
-      <Project>{73F28B1D-02D3-4BDF-891A-DF4EE2248353}</Project>
-      <Name>PPC.Data.Contracts</Name>
+    <ProjectReference Include="..\PPC.Common\PPC.Common.csproj">
+      <Project>{7F9D7666-1A58-4AE1-AD47-AB68A3D4E2FE}</Project>
+      <Name>PPC.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Domain\PPC.Domain.csproj">
+      <Project>{11AA6511-78E6-408F-8894-811989851F04}</Project>
+      <Name>PPC.Domain</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Helpers\PPC.Helpers.csproj">
       <Project>{3523c53f-4317-4ac6-b077-76544bdd174a}</Project>
