@@ -9,6 +9,7 @@
         xmlns:shopViews="clr-namespace:PPC.Module.Shop.Views;assembly=PPC.Module.Shop"
         xmlns:inventoryViews="clr-namespace:PPC.Module.Inventory.Views;assembly=PPC.Module.Inventory"
         xmlns:cardsViews="clr-namespace:PPC.Module.Cards.Views;assembly=PPC.Module.Cards"
+        xmlns:notesViews="clr-namespace:PPC.Module.Notes.Views;assembly=PPC.Module.Notes"
         x:Name="AppMainWindow"
         mc:Ignorable="d"
         SnapsToDevicePixels="True"
@@ -36,6 +37,9 @@
             </DataTemplate>
             <DataTemplate DataType="{x:Type app:MainWindowViewModel}" x:Key="CardsTemplate">
                 <cardsViews:CardsView DataContext="{Binding CardsViewModel}"/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type app:MainWindowViewModel}" x:Key="NotesTemplate">
+                <notesViews:NotesView DataContext="{Binding NotesViewModel}"/>
             </DataTemplate>
         </ResourceDictionary>
     </Window.Resources>
@@ -187,7 +191,8 @@
                     <Image Style="{StaticResource AutoDisableImageStyle}"
                            Source="{StaticResource ListImage}"/>
                 </ToggleButton>
-                <ToggleButton Grid.Row="6"
+                <!-- Cards -->
+                <!--<ToggleButton Grid.Row="6"
                               Width="64"
                               Margin="2"
                               ToolTip="Cards seller"
@@ -195,6 +200,16 @@
                               Command="{Binding SwitchToCardSellerCommand}">
                     <Image Style="{StaticResource AutoDisableImageStyle}"
                            Source="{StaticResource MagicImage}"/>
+                </ToggleButton>-->
+                <!-- Reminder -->
+                <ToggleButton Grid.Row="6"
+                              Width="64"
+                              Margin="2"
+                              ToolTip="Remarks/Reminder"
+                              IsChecked="{Binding IsReminderSelected, Mode=OneWay}"
+                              Command="{Binding SwitchToReminderCommand}">
+                    <Image Style="{StaticResource AutoDisableImageStyle}"
+                           Source="{StaticResource NotesImage}"/>
                 </ToggleButton>
                 <!-- dummy row 7 -->
                 <!-- Reload -->
@@ -241,6 +256,9 @@
                             </DataTrigger>
                             <DataTrigger Binding="{Binding ApplicationMode}" Value="{x:Static app:ApplicationModes.Cards}">
                                 <Setter Property="ContentTemplate" Value="{StaticResource CardsTemplate}"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding ApplicationMode}" Value="{x:Static app:ApplicationModes.Notes}">
+                                <Setter Property="ContentTemplate" Value="{StaticResource NotesTemplate}"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>

@@ -21,6 +21,7 @@
     <BitmapImage UriSource="Images/mail.png" x:Key="MailImage"/>
     <BitmapImage UriSource="Images/minus-round.png" x:Key="MinusImage"/>
     <BitmapImage UriSource="Images/mobile.png" x:Key="MobileImage"/>
+    <BitmapImage UriSource="Images/notes.png" x:Key="NotesImage"/>
     <BitmapImage UriSource="Images/people.png" x:Key="PlayersImage"/>
     <BitmapImage UriSource="Images/plus-round.png" x:Key="PlusImage"/>
     <BitmapImage UriSource="Images/power.png" x:Key="PowerImage"/>

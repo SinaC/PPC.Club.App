@@ -20,6 +20,7 @@ using PPC.Log;
 using PPC.Messages;
 using PPC.Module.Cards.ViewModels;
 using PPC.Module.Inventory.ViewModels;
+using PPC.Module.Notes.ViewModels;
 using PPC.Module.Players.ViewModels;
 using PPC.Module.Shop.ViewModels;
 using PPC.Services.Popup;
@@ -32,6 +33,7 @@ namespace PPC.App
         Players,
         Inventory,
         Cards,
+        Notes,
     }
 
     public class MainWindowViewModel : ObservableObject
@@ -74,13 +76,30 @@ namespace PPC.App
             protected set { Set(() => CardsViewModel, ref _cardsViewModel, value); }
         }
 
+        private NotesViewModel _notesViewModel;
+        public NotesViewModel NotesViewModel
+        {
+            get { return _notesViewModel; }
+            protected set { Set(() => NotesViewModel, ref _notesViewModel, value); }
+        }
+
         #region Buttons + application mode
 
         private ApplicationModes _applicationMode;
         public ApplicationModes ApplicationMode
         {
             get { return _applicationMode; }
-            protected  set { Set(() => ApplicationMode, ref _applicationMode, value); }
+            protected set
+            {
+                Set(() => ApplicationMode, ref _applicationMode, value);
+                RaisePropertyChanged(() => IsCashRegisterSelected);
+                RaisePropertyChanged(() => IsClientShoppingCartSelected);
+                RaisePropertyChanged(() => IsSoldArticlesSelected);
+                RaisePropertyChanged(() => IsPlayersSelected);
+                RaisePropertyChanged(() => IsInventorySelected);
+                RaisePropertyChanged(() => IsCardsSelected);
+                RaisePropertyChanged(() => IsReminderSelected);
+            }
         }
 
         public bool IsCashRegisterSelected => ApplicationMode == ApplicationModes.Shop && ShopViewModel.Mode == ShopModes.CashRegister;
@@ -89,25 +108,15 @@ namespace PPC.App
         public bool IsPlayersSelected => ApplicationMode == ApplicationModes.Players;
         public bool IsInventorySelected => ApplicationMode == ApplicationModes.Inventory;
         public bool IsCardsSelected => ApplicationMode == ApplicationModes.Cards;
-
-        private void RaiseSelectedMode()
-        {
-            RaisePropertyChanged(() => IsCashRegisterSelected);
-            RaisePropertyChanged(() => IsClientShoppingCartSelected);
-            RaisePropertyChanged(() => IsSoldArticlesSelected);
-            RaisePropertyChanged(() => IsPlayersSelected);
-            RaisePropertyChanged(() => IsInventorySelected);
-            RaisePropertyChanged(() => IsCardsSelected);
-        }
+        public bool IsReminderSelected => ApplicationMode == ApplicationModes.Notes;
 
         private ICommand _switchToCashRegisterCommand;
         public ICommand SwitchToCashRegisterCommand => _switchToCashRegisterCommand = _switchToCashRegisterCommand ?? new RelayCommand(SwitchToCashRegister);
 
         private void SwitchToCashRegister()
         {
-            ApplicationMode = ApplicationModes.Shop;
             ShopViewModel.ViewCashRegister();
-            RaiseSelectedMode();
+            ApplicationMode = ApplicationModes.Shop;
         }
 
         private ICommand _switchToShoppingCartsCommand;
@@ -115,9 +124,8 @@ namespace PPC.App
 
         private void SwitchToShoppingCarts()
         {
-            ApplicationMode = ApplicationModes.Shop;
             ShopViewModel.ViewShoppingCarts();
-            RaiseSelectedMode();
+            ApplicationMode = ApplicationModes.Shop;
         }
 
         private ICommand _switchToSoldArticlesCommand;
@@ -125,9 +133,8 @@ namespace PPC.App
 
         private void SwitchToSoldArticles()
         {
-            ApplicationMode = ApplicationModes.Shop;
             ShopViewModel.ViewSoldArticles();
-            RaiseSelectedMode();
+            ApplicationMode = ApplicationModes.Shop;
         }
 
         private ICommand _addNewClientCommand;
@@ -135,10 +142,9 @@ namespace PPC.App
 
         private void AddNewClient()
         {
-            ApplicationMode = ApplicationModes.Shop;
             ShopViewModel.ViewShoppingCarts();
+            ApplicationMode = ApplicationModes.Shop;
             ShopViewModel.ClientShoppingCartsViewModel.AddNewClientCommand.Execute(null);
-            RaiseSelectedMode();
         }
 
         private ICommand _switchToPlayersCommand;
@@ -147,7 +153,6 @@ namespace PPC.App
         private void SwitchToPlayers()
         {
             ApplicationMode = ApplicationModes.Players;
-            RaiseSelectedMode();
         }
 
         private ICommand _switchToInventoryCommand;
@@ -156,7 +161,6 @@ namespace PPC.App
         private void SwitchToInventory()
         {
             ApplicationMode = ApplicationModes.Inventory;
-            RaiseSelectedMode();
         }
 
         private ICommand _switchToCardSellerCommand;
@@ -164,9 +168,17 @@ namespace PPC.App
 
         private void SwitchToCardSeller()
         {
-            ApplicationMode = ApplicationModes.Cards;
             CardsViewModel.SelectedSeller = null; // unselect currently selected if any and switch to list mode
-            RaiseSelectedMode();
+            ApplicationMode = ApplicationModes.Cards;
+        }
+
+        private ICommand _switchToReminderCommand;
+        public ICommand SwitchToReminderCommand => _switchToReminderCommand = _switchToReminderCommand ?? new RelayCommand(SwitchToReminder);
+
+        private void SwitchToReminder()
+        {
+            ApplicationMode = ApplicationModes.Notes;
+            NotesViewModel.GotFocus();
         }
 
         #endregion
@@ -232,7 +244,7 @@ namespace PPC.App
         {
             CashRegisterClosure closureData = ShopViewModel.PrepareClosure();
             List<SoldCards> soldCards = CardsViewModel.PrepareClosure();
-            ClosurePopupViewModel vm = new ClosurePopupViewModel(CloseApplicationAfterClosurePopup, closureData, soldCards, SendMailsAsync);
+            ClosurePopupViewModel vm = new ClosurePopupViewModel(NotesViewModel, CloseApplicationAfterClosurePopup, closureData, soldCards, SendMailsAsync);
             PopupService.DisplayModal(vm, "Cash register closure", 640, 480);
         }
 
@@ -322,7 +334,6 @@ namespace PPC.App
                 Credentials = new NetworkCredential(fromAddress.Address, senderPassword)
             })
             {
-
                 using (var message = new MailMessage(fromAddress, toAddress)
                 {
                     Subject = $"Cloture caisse du club (date {DateTime.Now:F})",
@@ -388,6 +399,7 @@ namespace PPC.App
             ShopViewModel = new ShopViewModel();
             InventoryViewModel = new InventoryViewModel();
             CardsViewModel = new CardsViewModel();
+            NotesViewModel = new NotesViewModel();
 
             ApplicationMode = ApplicationModes.Shop;
 
@@ -415,6 +427,7 @@ namespace PPC.App
             ShopViewModel = new ShopViewModelDesignData();
             InventoryViewModel = new InventoryViewModelDesignData();
             CardsViewModel = new CardsViewModelDesignData();
+            NotesViewModel = new NotesViewModelDesignData();
 
             ApplicationMode = ApplicationModes.Shop;
 

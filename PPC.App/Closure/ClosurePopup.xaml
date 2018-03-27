@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:viewModels="clr-namespace:PPC.App.Closure"
+             xmlns:notesViews="clr-namespace:PPC.Module.Notes.Views;assembly=PPC.Module.Notes"
              xmlns:views="clr-namespace:PPC.App.Closure"
              xmlns:controls="clr-namespace:PPC.Controls;assembly=PPC.Controls"
              mc:Ignorable="d"
@@ -24,6 +25,9 @@
             <DataTemplate DataType="{x:Type viewModels:ClosurePopupViewModel}" x:Key="CashCountTemplate">
                 <views:CashCountView DataContext="{Binding CashCountViewModel}"/>
             </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:ClosurePopupViewModel}" x:Key="NotesTemplate">
+                <notesViews:NotesView DataContext="{Binding NotesViewModel}"/>
+            </DataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
     <controls:AdornedControl IsAdornerVisible="{Binding IsWaiting}">
@@ -39,6 +43,7 @@
             </Grid.RowDefinitions>
             <UniformGrid Grid.Row="0"
                          Rows="1">
+                <!-- Articles -->
                 <ToggleButton Width="64"
                               Height="64"
                               Margin="5,2"
@@ -48,7 +53,8 @@
                     <Image Style="{StaticResource AutoDisableImageStyle}"
                            Source="{StaticResource TransactionsImage}"/>
                 </ToggleButton>
-                <ToggleButton Width="64"
+                <!-- Cards -->
+                <!--<ToggleButton Width="64"
                               Height="64"
                               Margin="5,2"
                               ToolTip="Sold cards"
@@ -56,7 +62,18 @@
                               Command="{Binding SwitchToSoldCardsCommand}">
                     <Image Style="{StaticResource AutoDisableImageStyle}"
                            Source="{StaticResource MagicImage}"/>
+                </ToggleButton>-->
+                <!-- Notes -->
+                <ToggleButton Width="64"
+                              Height="64"
+                              Margin="5,2"
+                              ToolTip="Sold cards"
+                              IsChecked="{Binding IsNotesSelected, Mode=OneWay}"
+                              Command="{Binding SwitchToNotesCommand}">
+                    <Image Style="{StaticResource AutoDisableImageStyle}"
+                           Source="{StaticResource NotesImage}"/>
                 </ToggleButton>
+                <!-- Cash count -->
                 <ToggleButton Width="64"
                               Height="64"
                               Margin="5,2"
@@ -84,6 +101,9 @@
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Mode}" Value="{x:Static viewModels:ClosureDisplayModes.CashCount}">
                                 <Setter Property="ContentTemplate" Value="{StaticResource CashCountTemplate}"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Mode}" Value="{x:Static viewModels:ClosureDisplayModes.Notes}">
+                                <Setter Property="ContentTemplate" Value="{StaticResource NotesTemplate}"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>

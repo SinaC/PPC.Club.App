@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance viewModels:PaymentPopupViewModelDesignData, IsDesignTimeCreatable=True}"
              d:DesignWidth="500"
-             Width="500"
+             MinWidth="500"
              MaxHeight="300">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -218,16 +218,24 @@
                                     ValueChanged="DecimalUpDown_OnValueChanged"
                                     Value="{Binding DiscountPercentage}"/>
             </Grid>
-            <!-- Predefined discount button -->
-            <Button Grid.Row="1"
-                    Grid.Column="4"
-                    Margin="5,2"
-                    HorizontalAlignment="Left"
-                    Command="{Binding SetDiscountCommand}"
-                    CommandParameter="10">
-                <TextBlock Margin="5,2"
-                           Text="10%"/>
-            </Button>
+            <!-- Predefined discount buttons -->
+            <UniformGrid Grid.Row="1"
+                         Grid.Column="4"
+                         Rows="1">
+                <Button Margin="5,2"
+                        Command="{Binding SetDiscountCommand}"
+                        CommandParameter="10">
+                    <TextBlock Margin="5,2"
+                               Text="10%"/>
+                </Button>
+
+                <Button Margin="5,2"
+                        Command="{Binding SetDiscountCommand}"
+                        CommandParameter="30">
+                    <TextBlock Margin="5,2"
+                               Text="30%"/>
+                </Button>
+            </UniformGrid>
         </Grid>
         <!-- Separator -->
         <Rectangle Grid.Row="3"

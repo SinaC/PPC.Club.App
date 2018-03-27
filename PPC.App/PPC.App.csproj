@@ -247,6 +247,10 @@
       <Project>{e48a0ab3-a906-4909-b965-c6286b01d3e9}</Project>
       <Name>PPC.Module.Players</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PPC.Module.Notes\PPC.Module.Notes.csproj">
+      <Project>{62AB5298-6D6E-4A43-9CE7-4E1541A1BC21}</Project>
+      <Name>PPC.Module.Notes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PPC.Popups\PPC.Popups.csproj">
       <Project>{c06f804c-58a5-48ea-a3b4-935470804b05}</Project>
       <Name>PPC.Popups</Name>

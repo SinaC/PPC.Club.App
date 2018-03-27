@@ -6,6 +6,7 @@ using System.Windows.Input;
 using EasyIoc;
 using EasyMVVM;
 using PPC.Domain;
+using PPC.Module.Notes.ViewModels;
 using PPC.Services.Popup;
 
 namespace PPC.App.Closure
@@ -15,6 +16,7 @@ namespace PPC.App.Closure
         Articles,
         SoldCards,
         CashCount,
+        Notes,
     }
 
     [PopupAssociatedView(typeof(ClosurePopup))]
@@ -53,6 +55,9 @@ namespace PPC.App.Closure
             protected set { Set(() => CashCountViewModel, ref _cashcountViewModel, value); }
         }
 
+        // Will reuse MainViewModel.NotesViewModel
+        public NotesViewModel NotesViewModel { get; protected set; }
+
         private ClosureDisplayModes _mode;
         public ClosureDisplayModes Mode
         {
@@ -64,6 +69,7 @@ namespace PPC.App.Closure
                     RaisePropertyChanged(() => IsArticlesSelected);
                     RaisePropertyChanged(() => IsSoldCardsSelected);
                     RaisePropertyChanged(() => IsCashCountSelected);
+                    RaisePropertyChanged(() => IsNotesSelected);
                 }
             }
         }
@@ -71,6 +77,7 @@ namespace PPC.App.Closure
         public bool IsArticlesSelected => Mode == ClosureDisplayModes.Articles;
         public bool IsSoldCardsSelected => Mode == ClosureDisplayModes.SoldCards;
         public bool IsCashCountSelected => Mode == ClosureDisplayModes.CashCount;
+        public bool IsNotesSelected => Mode == ClosureDisplayModes.Notes;
 
         private ICommand _okCommand;
         public ICommand OkCommand => _okCommand = _okCommand ?? new RelayCommand(Ok);
@@ -86,7 +93,9 @@ namespace PPC.App.Closure
         private async Task SendMails()
         {
             IsWaiting = true;
-            await _sendMailsAsyncFunc(ArticlesViewModel.ClosureData, SoldCardsViewModel.SoldCards);
+            CashRegisterClosure closure = ArticlesViewModel.ClosureData;
+            closure.Notes = NotesViewModel.Note;
+            await _sendMailsAsyncFunc(closure, SoldCardsViewModel.SoldCards);
             IsWaiting = false;
         }
 
@@ -99,8 +108,12 @@ namespace PPC.App.Closure
         private ICommand _switchToCashCountCommand;
         public ICommand SwitchToCashCountCommand => _switchToCashCountCommand = _switchToCashCountCommand ?? new RelayCommand(() => Mode = ClosureDisplayModes.CashCount);
 
+        private ICommand _switchToNotesCommand;
+        public ICommand SwitchToNotesCommand => _switchToNotesCommand = _switchToNotesCommand ?? new RelayCommand(() => Mode = ClosureDisplayModes.Notes);
+        
+
         //http://stackoverflow.com/questions/12466049/passing-an-awaitable-anonymous-function-as-a-parameter
-        public ClosurePopupViewModel(Action closeAction, CashRegisterClosure cashRegisterClosure, List<SoldCards> soldCards, Func<CashRegisterClosure, List<SoldCards>, Task> sendMailsAsyncFunc)
+        public ClosurePopupViewModel(NotesViewModel notesViewModel, Action closeAction, CashRegisterClosure cashRegisterClosure, List<SoldCards> soldCards, Func<CashRegisterClosure, List<SoldCards>, Task> sendMailsAsyncFunc)
         {
             Mode = ClosureDisplayModes.Articles;
 
@@ -110,16 +123,18 @@ namespace PPC.App.Closure
             ArticlesViewModel = new ArticlesViewModel(cashRegisterClosure);
             SoldCardsViewModel = new SoldCardsViewModel(soldCards);
             CashCountViewModel = new CashCountViewModel();
+            NotesViewModel = notesViewModel;
         }
     }
 
     public class ClosurePopupViewModelDesignData : ClosurePopupViewModel
     {
-        public ClosurePopupViewModelDesignData() : base(() => { }, new CashRegisterClosure(), Enumerable.Empty<SoldCards>().ToList(), null)
+        public ClosurePopupViewModelDesignData() : base(null, () => { }, new CashRegisterClosure(), Enumerable.Empty<SoldCards>().ToList(), null)
         {
             ArticlesViewModel = new ArticlesViewModelDesignData();
             SoldCardsViewModel = new SoldCardsViewModelDesignData();
             CashCountViewModel = new CashCountViewModelDesignData();
+            NotesViewModel = new NotesViewModelDesignData();
         }
     }
 }
