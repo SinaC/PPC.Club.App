@@ -20,15 +20,8 @@ namespace PPC.App
         {
             InitializeComponent();
 
-            // Singletons
-            IocContainer.Default.RegisterInstance<ILog>(new NLogger());
+            // Register popup service
             IocContainer.Default.RegisterInstance<IPopupService>(new PopupService(this));
-            IocContainer.Default.RegisterInstance<IArticleDL>(new DataAccess.FileBased.ArticleDL());
-            IocContainer.Default.RegisterInstance<IPlayerDL>(new DataAccess.FileBased.PlayerDL());
-
-            // Initialize log
-            IocContainer.Default.Resolve<ILog>().Initialize(PPCConfigurationManager.LogPath, "${shortdate}.log");
-            IocContainer.Default.Resolve<ILog>().Info("Application started");
 
             //Loaded += OnLoaded;
 

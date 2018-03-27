@@ -52,6 +52,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.DataAccess.DesignMode",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.Module.Notes", "PPC.Module.Notes\PPC.Module.Notes.csproj", "{62AB5298-6D6E-4A43-9CE7-4E1541A1BC21}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.DataAccess.MongoDB", "PPC.DataAccess.MongoDB\PPC.DataAccess.MongoDB.csproj", "{B1D67C07-2F49-4536-A1B6-D31A86A834E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PPC.ConsoleApp", "PPC.ConsoleApp\PPC.ConsoleApp.csproj", "{1CB26598-1A0C-4BEA-BAB4-35E730C22FB0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -142,6 +146,14 @@ Global
 		{62AB5298-6D6E-4A43-9CE7-4E1541A1BC21}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{62AB5298-6D6E-4A43-9CE7-4E1541A1BC21}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{62AB5298-6D6E-4A43-9CE7-4E1541A1BC21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1D67C07-2F49-4536-A1B6-D31A86A834E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1D67C07-2F49-4536-A1B6-D31A86A834E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1D67C07-2F49-4536-A1B6-D31A86A834E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1D67C07-2F49-4536-A1B6-D31A86A834E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CB26598-1A0C-4BEA-BAB4-35E730C22FB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CB26598-1A0C-4BEA-BAB4-35E730C22FB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CB26598-1A0C-4BEA-BAB4-35E730C22FB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CB26598-1A0C-4BEA-BAB4-35E730C22FB0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

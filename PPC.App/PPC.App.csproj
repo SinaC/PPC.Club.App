@@ -207,6 +207,10 @@
       <Project>{B5893212-FCF0-4A0B-B0EA-4908F5235E39}</Project>
       <Name>PPC.DataAccess.FileBased</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PPC.DataAccess.MongoDB\PPC.DataAccess.MongoDB.csproj">
+      <Project>{b1d67c07-2f49-4536-a1b6-d31a86a834e8}</Project>
+      <Name>PPC.DataAccess.MongoDB</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PPC.Domain\PPC.Domain.csproj">
       <Project>{11aa6511-78e6-408f-8894-811989851f04}</Project>
       <Name>PPC.Domain</Name>

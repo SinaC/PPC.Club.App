@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace PPC.Domain
 {
     [DataContract(Namespace = "")]
     public class Article
     {
+        [BsonId]
         [DataMember]
         public Guid Guid { get; set; } // Grrrr
         [DataMember]

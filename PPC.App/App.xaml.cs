@@ -5,6 +5,8 @@ using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Media;
 using EasyIoc;
+using PPC.Common;
+using PPC.IDataAccess;
 using PPC.Log;
 
 namespace PPC.App
@@ -14,9 +16,23 @@ namespace PPC.App
     /// </summary>
     public partial class App : Application
     {
+        private ILog Logger => EasyIoc.IocContainer.Default.Resolve<ILog>();
+
         public App()
         {
             //ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
+            // Initialize log
+            IocContainer.Default.RegisterInstance<ILog>(new NLogger());
+            Logger.Initialize(PPCConfigurationManager.LogPath, "${shortdate}.log");
+            Logger.Info("Application started");
+
+            // Register instances
+            if (PPCConfigurationManager.UseMongo == true)
+                IocContainer.Default.RegisterInstance<IArticleDL>(new DataAccess.MongoDB.ArticleDL());
+            else
+                IocContainer.Default.RegisterInstance<IArticleDL>(new DataAccess.FileBased.ArticleDL());
+            IocContainer.Default.RegisterInstance<IPlayerDL>(new DataAccess.FileBased.PlayerDL());
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
             //Dispatcher.CurrentDispatcher.UnhandledException += CurrentDispatcherOnUnhandledException;
@@ -30,7 +46,7 @@ namespace PPC.App
 
         private void OnExit(object sender, ExitEventArgs exitEventArgs)
         {
-            IocContainer.Default.Resolve<ILog>().Info("Application stopped");
+           Logger.Info("Application stopped");
         }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -67,7 +83,7 @@ namespace PPC.App
         private void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs unhandledExceptionEventArgs)
         {
             //IocContainer.Default.Resolve<ILog>().WriteLine(LogLevels.Error, "CurrentDomainOnUnhandledException");
-            IocContainer.Default.Resolve<ILog>().Exception("Unhandled Exception", unhandledExceptionEventArgs.ExceptionObject as Exception);
+            Logger.Exception("Unhandled Exception", unhandledExceptionEventArgs.ExceptionObject as Exception);
 
             //Debug.WriteLine("CurrentDomainOnUnhandledException");
             //MessageBox.Show("CurrentDomainOnUnhandledException");

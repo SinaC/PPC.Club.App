@@ -1,18 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{11AA6511-78E6-408F-8894-811989851F04}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{1CB26598-1A0C-4BEA-BAB4-35E730C22FB0}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PPC.Domain</RootNamespace>
-    <AssemblyName>PPC.Domain</AssemblyName>
+    <RootNamespace>PPC.ConsoleApp</RootNamespace>
+    <AssemblyName>PPC.ConsoleApp</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,6 +24,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -30,12 +33,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MongoDB.Bson">
-      <HintPath>..\packages\MongoDB.Bson.2.5.0\lib\net45\MongoDB.Bson.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,24 +43,36 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Article.cs" />
-    <Compile Include="CardSeller.cs" />
-    <Compile Include="CardSellers.cs" />
-    <Compile Include="CashRegisterClosure.cs" />
-    <Compile Include="CashRegisterClosureConfig.cs" />
-    <Compile Include="CashRegisterCount.cs" />
-    <Compile Include="CashRegisterCountEntry.cs" />
-    <Compile Include="ClientCart.cs" />
-    <Compile Include="FullArticle.cs" />
-    <Compile Include="Item.cs" />
-    <Compile Include="Player.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Shop.cs" />
-    <Compile Include="ShopTransaction.cs" />
-    <Compile Include="SoldCard.cs" />
-    <Compile Include="SoldCards.cs" />
-    <Compile Include="TransactionFullArticle.cs" />
-    <Compile Include="VatRates.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PPC.DataAccess.FileBased\PPC.DataAccess.FileBased.csproj">
+      <Project>{b5893212-fcf0-4a0b-b0ea-4908f5235e39}</Project>
+      <Name>PPC.DataAccess.FileBased</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.DataAccess.MongoDB\PPC.DataAccess.MongoDB.csproj">
+      <Project>{b1d67c07-2f49-4536-a1b6-d31a86a834e8}</Project>
+      <Name>PPC.DataAccess.MongoDB</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Domain\PPC.Domain.csproj">
+      <Project>{11aa6511-78e6-408f-8894-811989851f04}</Project>
+      <Name>PPC.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.IDataAccess\PPC.IDataAccess.csproj">
+      <Project>{10da16f1-f77e-4b88-9151-2d0f358b4908}</Project>
+      <Name>PPC.IDataAccess</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
 </Project>

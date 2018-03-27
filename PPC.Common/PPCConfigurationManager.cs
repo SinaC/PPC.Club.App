@@ -27,6 +27,7 @@ namespace PPC.Common
         public static string CashRegisterClosureConfigPath => AppSettings["CashRegisterClosureConfigPath"];
         public static string CashRegisterCountPath => AppSettings["CashRegisterCountPath"];
         public static string CardSellersPath => AppSettings["CardSellersPath"];
+        public static bool? UseMongo => SaveConvertToBool(AppSettings["UseMongo"]);
 
         private static double? _fontSize;
         public static double? FontSize
@@ -41,6 +42,16 @@ namespace PPC.Common
             if (double.TryParse(s, out d))
                 return d;
             return null;
+        }
+
+        private static bool? SaveConvertToBool(string s)
+        {
+            if (string.IsNullOrWhiteSpace(s))
+                return null;
+            bool b;
+            if (bool.TryParse(s, out b))
+                return b;
+            return false;
         }
     }
 }

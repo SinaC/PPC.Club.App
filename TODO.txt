@@ -2,7 +2,6 @@ Business Layer to abstract Data access + add Mail sending, file save, ... within
 add informative logging
 AskNameEmailPopup: check email validity
 article refund (client doesn't want anymore an already paid article !! only for cash payment)
-article DB (real DB instead of xml file)
 PlayersDb: store the list of players (similar to ArticlesDb + call load from MainViewModel)
 Players -> remove save button, save automatically once a modification has been done
 BubbleMouseWheelBehavior:
@@ -36,3 +35,7 @@ http://www.flaticon.com/packs/black-friday-7
 http://www.flaticon.com/packs/black-friday-8
 http://www.flaticon.com/packs/black-friday-9
 http://www.flaticon.com/packs/black-friday-10
+
+mongo:
+http://mongodb.github.io/mongo-csharp-driver/2.0/getting_started/quick_tour/
+http://stackoverflow.com/questions/26573668/set-mongodb-to-serialize-a-class-as-bsondocument
