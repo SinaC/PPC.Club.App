@@ -51,219 +51,237 @@
             <controls:LoadingWait />
         </controls:AdornedControl.AdornerContent>
         <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="2"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <!-- Main application -->
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="2"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-            <!-- Header -->
-            <Grid Grid.Column="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <!-- Go to cash register -->
-                <ToggleButton Grid.Row="0"
-                              Width="64"
-                              Margin="2"
-                              ToolTip="Cash register"
-                              IsChecked="{Binding IsCashRegisterSelected, Mode=OneWay}"
-                              Command="{Binding SwitchToCashRegisterCommand}">
-                    <Image Style="{StaticResource AutoDisableImageStyle}"
-                           Source="{StaticResource CashRegisterImage}"/>
-                </ToggleButton>
-                <!-- Go to shopping carts -->
-                <ToggleButton Grid.Row="1"
-                              Width="64"
-                              Margin="2"
-                              IsEnabled="{Binding ShopViewModel.ClientShoppingCartsViewModel.HasClientShoppingCartsOpened}"
-                              IsChecked="{Binding IsClientShoppingCartSelected, Mode=OneWay}"
-                              Command="{Binding SwitchToShoppingCartsCommand}">
-                    <!--<ToggleButton.Style>
-                        <Style TargetType="{x:Type ToggleButton}">
+                <!-- Header -->
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <!-- Go to cash register -->
+                    <ToggleButton Grid.Row="0"
+                                  Width="64"
+                                  Margin="2"
+                                  ToolTip="Cash register"
+                                  IsChecked="{Binding IsCashRegisterSelected, Mode=OneWay}"
+                                  Command="{Binding SwitchToCashRegisterCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="{StaticResource CashRegisterImage}"/>
+                    </ToggleButton>
+                    <!-- Go to shopping carts -->
+                    <ToggleButton Grid.Row="1"
+                                  Width="64"
+                                  Margin="2"
+                                  IsEnabled="{Binding ShopViewModel.ClientShoppingCartsViewModel.HasClientShoppingCartsOpened}"
+                                  IsChecked="{Binding IsClientShoppingCartSelected, Mode=OneWay}"
+                                  Command="{Binding SwitchToShoppingCartsCommand}">
+                        <!--<ToggleButton.Style>
+                            <Style TargetType="{x:Type ToggleButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ShopViewModel.ClientShoppingCartsViewModel.HasUnpaidClientShoppingCards}" Value="True">
+                                        <Setter Property="Background" Value="Red"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>-->
+                        <ToggleButton.ToolTip>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="Shopping carts"/>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} shopping cart(s) for a total of {1:C}">
+                                            <Binding Path="ShopViewModel.ClientShoppingCartsViewModel.ClientShoppingCartsCount"/>
+                                            <Binding Path="ShopViewModel.ClientShoppingCartsViewModel.ClientShoppingCartsTotal"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} unpaid shopping cart(s) for a total of {1:C}">
+                                            <Binding Path="ShopViewModel.ClientShoppingCartsViewModel.UnpaidClientShoppingCartsCount"/>
+                                            <Binding Path="ShopViewModel.ClientShoppingCartsViewModel.UnpaidClientShoppingCartsTotal"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} paid shopping cart(s) for a total of {1:C}">
+                                            <Binding Path="ShopViewModel.ClientShoppingCartsViewModel.PaidClientShoppingCartsCount"/>
+                                            <Binding Path="ShopViewModel.ClientShoppingCartsViewModel.PaidClientShoppingCartsTotal"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </StackPanel>
+                        </ToggleButton.ToolTip>
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="{StaticResource ShopImage}"/>
+                    </ToggleButton>
+                    <!-- Create new client -->
+                    <Button Grid.Row="2"
+                            Width="64"
+                            Margin="2"
+                            ToolTip="Add new client shopping cart"
+                            Command="{Binding AddNewClientCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="{StaticResource PlusImage}"/>
+                    </Button>
+                    <!-- Go to sold articles -->
+                    <ToggleButton Grid.Row="3"
+                                  Width="64"
+                                  Margin="2"
+                                  IsChecked="{Binding IsSoldArticlesSelected, Mode=OneWay}"
+                                  Command="{Binding SwitchToSoldArticlesCommand}">
+                        <ToggleButton.ToolTip>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="Sold articles and transactions"/>
+                                <TextBlock Text="{Binding ShopViewModel.SoldArticlesTotalCash, StringFormat={}Cash: {0:C}}"/>
+                                <TextBlock Text="{Binding ShopViewModel.SoldArticlesTotalBankCard, StringFormat={}Bank card: {0:C}}"/>
+                                <TextBlock Text="{Binding ShopViewModel.SoldArticlesTotal, StringFormat={}Total: {0:C}}"/>
+                            </StackPanel>
+                        </ToggleButton.ToolTip>
+                        <Grid>
+                            <Image Style="{StaticResource AutoDisableImageStyle}"
+                                   Source="{StaticResource TransactionsImage}"/>
+                            <!--<StackPanel Orientation="Vertical"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center">
+                                <StackPanel.Resources>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Setter Property="Opacity" Value="0.8"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="Foreground" Value="CornflowerBlue"/>
+                                    </Style>
+                                </StackPanel.Resources>
+                                <TextBlock Text="{Binding ShopViewModel.SoldArticlesTotalCash, StringFormat=C}"/>
+                                <TextBlock Text="{Binding ShopViewModel.SoldArticlesTotalBankCard, StringFormat=C}"/>
+                                <TextBlock Text="{Binding ShopViewModel.SoldArticlesTotal, StringFormat=C}"/>
+                            </StackPanel>-->
+                        </Grid>
+                    </ToggleButton>
+                    <!-- Players -->
+                    <ToggleButton Grid.Row="4"
+                                  Width="64"
+                                  Margin="2"
+                                  ToolTip="Players"
+                                  IsChecked="{Binding IsPlayersSelected, Mode=OneWay}"
+                                  Command="{Binding SwitchToPlayersCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="{StaticResource PlayersImage}"/>
+                    </ToggleButton>
+                    <!-- Inventory -->
+                    <ToggleButton Grid.Row="5"
+                            Width="64"
+                            Margin="2"
+                            ToolTip="Inventory/Stock"
+                            IsChecked="{Binding IsInventorySelected, Mode=OneWay}"
+                            Command="{Binding SwitchToInventoryCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="{StaticResource ListImage}"/>
+                    </ToggleButton>
+                    <!-- Cards -->
+                    <!--<ToggleButton Grid.Row="6"
+                                  Width="64"
+                                  Margin="2"
+                                  ToolTip="Cards seller"
+                                  IsChecked="{Binding IsCardsSelected, Mode=OneWay}"
+                                  Command="{Binding SwitchToCardSellerCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="{StaticResource MagicImage}"/>
+                    </ToggleButton>-->
+                    <!-- Reminder -->
+                    <ToggleButton Grid.Row="6"
+                                  Width="64"
+                                  Margin="2"
+                                  ToolTip="Remarks/Reminder"
+                                  IsChecked="{Binding IsReminderSelected, Mode=OneWay}"
+                                  Command="{Binding SwitchToReminderCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="{StaticResource NotesImage}"/>
+                    </ToggleButton>
+                    <!-- dummy row 7 -->
+                    <!-- Reload -->
+                    <Button Grid.Row="8"
+                            Width="64"
+                            Margin="2"
+                            ToolTip="Load previous session"
+                            Command="{Binding ReloadCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="{StaticResource RefreshImage}"/>
+                    </Button>
+                    <!-- Shutdown -->
+                    <Button Grid.Row="9"
+                            Width="64"
+                            Margin="2"
+                            ToolTip="Cash registry closure"
+                            Command="{Binding CloseCommand}">
+                        <Image Style="{StaticResource AutoDisableImageStyle}"
+                               Source="{StaticResource PowerImage}"/>
+                    </Button>
+                </Grid>
+                
+                <!-- Vertical separator -->
+                <Separator Grid.Column="1"
+                           Margin="0,2"
+                           Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+
+                <!-- Content -->
+                <ContentControl Grid.Column="2"
+                                Margin="3"
+                                Content="{Binding}">
+                    <ContentControl.Style>
+                        <Style TargetType="{x:Type ContentControl}">
+                            <!-- ContentTemplate is not set at design time if ApplicationMode is Shop -->
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding ShopViewModel.ClientShoppingCartsViewModel.HasUnpaidClientShoppingCards}" Value="True">
-                                    <Setter Property="Background" Value="Red"/>
+                                <DataTrigger Binding="{Binding ApplicationMode}" Value="{x:Static app:ApplicationModes.Shop}">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource ShopTemplate}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ApplicationMode}" Value="{x:Static app:ApplicationModes.Players}">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource PlayersTemplate}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ApplicationMode}" Value="{x:Static app:ApplicationModes.Inventory}">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource InventoryTemplate}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ApplicationMode}" Value="{x:Static app:ApplicationModes.Cards}">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource CardsTemplate}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ApplicationMode}" Value="{x:Static app:ApplicationModes.Notes}">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource NotesTemplate}"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                    </ToggleButton.Style>-->
-                    <ToggleButton.ToolTip>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="Shopping carts"/>
-                            <TextBlock>
-                                <TextBlock.Text>
-                                    <MultiBinding StringFormat="{}{0} shopping cart(s) for a total of {1:C}">
-                                        <Binding Path="ShopViewModel.ClientShoppingCartsViewModel.ClientShoppingCartsCount"/>
-                                        <Binding Path="ShopViewModel.ClientShoppingCartsViewModel.ClientShoppingCartsTotal"/>
-                                    </MultiBinding>
-                                </TextBlock.Text>
-                            </TextBlock>
-                            <TextBlock>
-                                <TextBlock.Text>
-                                    <MultiBinding StringFormat="{}{0} unpaid shopping cart(s) for a total of {1:C}">
-                                        <Binding Path="ShopViewModel.ClientShoppingCartsViewModel.UnpaidClientShoppingCartsCount"/>
-                                        <Binding Path="ShopViewModel.ClientShoppingCartsViewModel.UnpaidClientShoppingCartsTotal"/>
-                                    </MultiBinding>
-                                </TextBlock.Text>
-                            </TextBlock>
-                            <TextBlock>
-                                <TextBlock.Text>
-                                    <MultiBinding StringFormat="{}{0} paid shopping cart(s) for a total of {1:C}">
-                                        <Binding Path="ShopViewModel.ClientShoppingCartsViewModel.PaidClientShoppingCartsCount"/>
-                                        <Binding Path="ShopViewModel.ClientShoppingCartsViewModel.PaidClientShoppingCartsTotal"/>
-                                    </MultiBinding>
-                                </TextBlock.Text>
-                            </TextBlock>
-                        </StackPanel>
-                    </ToggleButton.ToolTip>
-                    <Image Style="{StaticResource AutoDisableImageStyle}"
-                           Source="{StaticResource ShopImage}"/>
-                </ToggleButton>
-                <!-- Create new client -->
-                <Button Grid.Row="2"
-                        Width="64"
-                        Margin="2"
-                        ToolTip="Add new client shopping cart"
-                        Command="{Binding AddNewClientCommand}">
-                    <Image Style="{StaticResource AutoDisableImageStyle}"
-                           Source="{StaticResource PlusImage}"/>
-                </Button>
-                <!-- Go to sold articles -->
-                <ToggleButton Grid.Row="3"
-                              Width="64"
-                              Margin="2"
-                              IsChecked="{Binding IsSoldArticlesSelected, Mode=OneWay}"
-                              Command="{Binding SwitchToSoldArticlesCommand}">
-                    <ToggleButton.ToolTip>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="Sold articles and transactions"/>
-                            <TextBlock Text="{Binding ShopViewModel.SoldArticlesTotalCash, StringFormat={}Cash: {0:C}}"/>
-                            <TextBlock Text="{Binding ShopViewModel.SoldArticlesTotalBankCard, StringFormat={}Bank card: {0:C}}"/>
-                            <TextBlock Text="{Binding ShopViewModel.SoldArticlesTotal, StringFormat={}Total: {0:C}}"/>
-                        </StackPanel>
-                    </ToggleButton.ToolTip>
-                    <Grid>
-                        <Image Style="{StaticResource AutoDisableImageStyle}"
-                               Source="{StaticResource TransactionsImage}"/>
-                        <!--<StackPanel Orientation="Vertical"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center">
-                            <StackPanel.Resources>
-                                <Style TargetType="{x:Type TextBlock}">
-                                    <Setter Property="Opacity" Value="0.8"/>
-                                    <Setter Property="FontWeight" Value="Bold"/>
-                                    <Setter Property="Foreground" Value="CornflowerBlue"/>
-                                </Style>
-                            </StackPanel.Resources>
-                            <TextBlock Text="{Binding ShopViewModel.SoldArticlesTotalCash, StringFormat=C}"/>
-                            <TextBlock Text="{Binding ShopViewModel.SoldArticlesTotalBankCard, StringFormat=C}"/>
-                            <TextBlock Text="{Binding ShopViewModel.SoldArticlesTotal, StringFormat=C}"/>
-                        </StackPanel>-->
-                    </Grid>
-                </ToggleButton>
-                <!-- Players -->
-                <ToggleButton Grid.Row="4"
-                              Width="64"
-                              Margin="2"
-                              ToolTip="Players"
-                              IsChecked="{Binding IsPlayersSelected, Mode=OneWay}"
-                              Command="{Binding SwitchToPlayersCommand}">
-                    <Image Style="{StaticResource AutoDisableImageStyle}"
-                           Source="{StaticResource PlayersImage}"/>
-                </ToggleButton>
-                <!-- Inventory -->
-                <ToggleButton Grid.Row="5"
-                        Width="64"
-                        Margin="2"
-                        ToolTip="Inventory/Stock"
-                        IsChecked="{Binding IsInventorySelected, Mode=OneWay}"
-                        Command="{Binding SwitchToInventoryCommand}">
-                    <Image Style="{StaticResource AutoDisableImageStyle}"
-                           Source="{StaticResource ListImage}"/>
-                </ToggleButton>
-                <!-- Cards -->
-                <!--<ToggleButton Grid.Row="6"
-                              Width="64"
-                              Margin="2"
-                              ToolTip="Cards seller"
-                              IsChecked="{Binding IsCardsSelected, Mode=OneWay}"
-                              Command="{Binding SwitchToCardSellerCommand}">
-                    <Image Style="{StaticResource AutoDisableImageStyle}"
-                           Source="{StaticResource MagicImage}"/>
-                </ToggleButton>-->
-                <!-- Reminder -->
-                <ToggleButton Grid.Row="6"
-                              Width="64"
-                              Margin="2"
-                              ToolTip="Remarks/Reminder"
-                              IsChecked="{Binding IsReminderSelected, Mode=OneWay}"
-                              Command="{Binding SwitchToReminderCommand}">
-                    <Image Style="{StaticResource AutoDisableImageStyle}"
-                           Source="{StaticResource NotesImage}"/>
-                </ToggleButton>
-                <!-- dummy row 7 -->
-                <!-- Reload -->
-                <Button Grid.Row="8"
-                        Width="64"
-                        Margin="2"
-                        ToolTip="Load previous session"
-                        Command="{Binding ReloadCommand}">
-                    <Image Style="{StaticResource AutoDisableImageStyle}"
-                           Source="{StaticResource RefreshImage}"/>
-                </Button>
-                <!-- Shutdown -->
-                <Button Grid.Row="9"
-                        Width="64"
-                        Margin="2"
-                        ToolTip="{Binding CloseTooltip}"
-                        Command="{Binding CloseCommand}">
-                    <Image Style="{StaticResource AutoDisableImageStyle}"
-                           Source="{StaticResource PowerImage}"/>
-                </Button>
+                    </ContentControl.Style>
+                </ContentControl>
             </Grid>
-                
-            <!-- Vertical separator -->
-            <Separator Grid.Column="1"
-                       Margin="0,2"
-                       Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
-
-            <!-- Content -->
-            <ContentControl Grid.Column="2"
-                            Margin="3"
-                            Content="{Binding}">
-                <ContentControl.Style>
-                    <Style TargetType="{x:Type ContentControl}">
-                        <!-- ContentTemplate is not set at design time if ApplicationMode is Shop -->
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding ApplicationMode}" Value="{x:Static app:ApplicationModes.Shop}">
-                                <Setter Property="ContentTemplate" Value="{StaticResource ShopTemplate}"/>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding ApplicationMode}" Value="{x:Static app:ApplicationModes.Players}">
-                                <Setter Property="ContentTemplate" Value="{StaticResource PlayersTemplate}"/>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding ApplicationMode}" Value="{x:Static app:ApplicationModes.Inventory}">
-                                <Setter Property="ContentTemplate" Value="{StaticResource InventoryTemplate}"/>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding ApplicationMode}" Value="{x:Static app:ApplicationModes.Cards}">
-                                <Setter Property="ContentTemplate" Value="{StaticResource CardsTemplate}"/>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding ApplicationMode}" Value="{x:Static app:ApplicationModes.Notes}">
-                                <Setter Property="ContentTemplate" Value="{StaticResource NotesTemplate}"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ContentControl.Style>
-            </ContentControl>
+            <!-- Footer -->
+            <TextBlock Grid.Row="1"
+                       Margin="10,0,0,0"
+                       HorizontalAlignment="Left"
+                       FontSize="8"
+                       Text="PPC Club by SinaC"/>
+            <TextBlock Grid.Row="1"
+                       Margin="0,0,10,0"
+                       HorizontalAlignment="Right"
+                       FontSize="8"
+                       Text="{Binding ApplicationVersion}"/>
         </Grid>
     </controls:AdornedControl>
 </Window>

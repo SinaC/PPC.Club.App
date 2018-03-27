@@ -212,17 +212,6 @@ namespace PPC.App
 
         #region Close
 
-        //public string CloseTooltip => "Cash registry closure (v" + Assembly.GetExecutingAssembly().GetName().Version + ")";
-        public string CloseTooltip
-        {
-            get
-            {
-                Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                DateTime buildDate = new DateTime(2000, 1, 1).AddDays(version.Build).AddSeconds(version.Revision * 2);
-                return "Cash registry closure"+Environment.NewLine+ $"[v{version} ({buildDate})]";
-            }
-        }
-
         private ICommand _closeCommand;
         public ICommand CloseCommand => _closeCommand = _closeCommand ?? new RelayCommand(Close);
 
@@ -379,6 +368,16 @@ namespace PPC.App
 
         #endregion
 
+        public string ApplicationVersion
+        {
+            get
+            {
+                Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+                DateTime buildDate = new DateTime(2000, 1, 1).AddDays(version.Build).AddSeconds(version.Revision * 2);
+                return $"v{version} ({buildDate})";
+            }
+        }
+
         public MainWindowViewModel()
         {
             if (!DesignMode.IsInDesignModeStatic)
@@ -429,7 +428,7 @@ namespace PPC.App
             CardsViewModel = new CardsViewModelDesignData();
             NotesViewModel = new NotesViewModelDesignData();
 
-            ApplicationMode = ApplicationModes.Shop;
+            ApplicationMode = ApplicationModes.Notes;
 
             IsWaiting = false;
         }
