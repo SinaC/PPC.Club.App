@@ -210,7 +210,7 @@
                 <Button Grid.Row="9"
                         Width="64"
                         Margin="2"
-                        ToolTip="Cash registry closure"
+                        ToolTip="{Binding CloseTooltip}"
                         Command="{Binding CloseCommand}">
                     <Image Style="{StaticResource AutoDisableImageStyle}"
                            Source="{StaticResource PowerImage}"/>

@@ -204,7 +204,7 @@
                 </Grid>
             </Grid>
         </Grid>
-        <TextBlock VerticalAlignment="Center"
+        <!--<TextBlock VerticalAlignment="Center"
                    HorizontalAlignment="Center"
                    Opacity="0.5"
                    IsHitTestVisible="False"
@@ -217,6 +217,6 @@
                     <RotateTransform.Angle>-45</RotateTransform.Angle>
                 </RotateTransform>
             </TextBlock.RenderTransform>
-        </TextBlock>
+        </TextBlock>-->
     </Grid>
 </UserControl>

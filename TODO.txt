@@ -10,6 +10,8 @@ BubbleMouseWheelBehavior:
 	window title is not zoomed
 finish mobile article selector view
 
+Add comment textbox in PopupClosure to inform Store
+
 popup style
 
 inventory:
