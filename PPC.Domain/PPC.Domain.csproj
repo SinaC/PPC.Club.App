@@ -52,6 +52,7 @@
     <Compile Include="CashRegisterCount.cs" />
     <Compile Include="CashRegisterCountEntry.cs" />
     <Compile Include="ClientCart.cs" />
+    <Compile Include="Closure.cs" />
     <Compile Include="FullArticle.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="Player.cs" />

@@ -332,40 +332,6 @@ namespace PPC.Module.Shop.ViewModels
                 BankCard = SoldArticlesTotalBankCard,
                 Transactions = transactions
             };
-
-            // Dump cash register closure file
-            DateTime now = DateTime.Now;
-            //  txt
-            try
-            {
-                if (!Directory.Exists(PPCConfigurationManager.CashRegisterClosurePath))
-                    Directory.CreateDirectory(PPCConfigurationManager.CashRegisterClosurePath);
-                string filename = $"{PPCConfigurationManager.CashRegisterClosurePath}CashRegister_{now:yyyy-MM-dd_HH-mm-ss}.txt";
-                File.WriteAllText(filename, closure.ToString());
-            }
-            catch (Exception ex)
-            {
-                Logger.Exception("Error", ex);
-                PopupService.DisplayError("Error", ex);
-            }
-            //  xml
-            try
-            {
-                if (!Directory.Exists(PPCConfigurationManager.CashRegisterClosurePath))
-                    Directory.CreateDirectory(PPCConfigurationManager.CashRegisterClosurePath);
-                string filename = $"{PPCConfigurationManager.CashRegisterClosurePath}CashRegister_{now:yyyy-MM-dd_HH-mm-ss}.xml";
-                using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
-                {
-                    writer.Formatting = Formatting.Indented;
-                    DataContractSerializer serializer = new DataContractSerializer(typeof(CashRegisterClosure));
-                    serializer.WriteObject(writer, closure);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Exception("Error", ex);
-                PopupService.DisplayError("Error", ex);
-            }
             return closure;
         }
 

@@ -25,7 +25,7 @@ namespace PPC.App.Closure
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
 
         private readonly Action _closeAction;
-        private readonly Func<CashRegisterClosure, List<SoldCards>, Task> _sendMailsAsyncFunc;
+        private readonly Func<Domain.Closure, List<SoldCards>, Task> _sendMailsAsyncFunc;
 
         private bool _isWaiting;
         public bool IsWaiting
@@ -93,8 +93,12 @@ namespace PPC.App.Closure
         private async Task SendMails()
         {
             IsWaiting = true;
-            CashRegisterClosure closure = ArticlesViewModel.ClosureData;
-            closure.Notes = NotesViewModel.Note;
+            CashRegisterClosure cashRegisterClosure = ArticlesViewModel.ClosureData;
+            Domain.Closure closure = new Domain.Closure
+            {
+                Notes = NotesViewModel.Note,
+                CashRegisterClosure = cashRegisterClosure
+            };
             await _sendMailsAsyncFunc(closure, SoldCardsViewModel.SoldCards);
             IsWaiting = false;
         }
@@ -113,7 +117,7 @@ namespace PPC.App.Closure
         
 
         //http://stackoverflow.com/questions/12466049/passing-an-awaitable-anonymous-function-as-a-parameter
-        public ClosurePopupViewModel(NotesViewModel notesViewModel, Action closeAction, CashRegisterClosure cashRegisterClosure, List<SoldCards> soldCards, Func<CashRegisterClosure, List<SoldCards>, Task> sendMailsAsyncFunc)
+        public ClosurePopupViewModel(NotesViewModel notesViewModel, Action closeAction, CashRegisterClosure cashRegisterClosure, List<SoldCards> soldCards, Func<Domain.Closure, List<SoldCards>, Task> sendMailsAsyncFunc)
         {
             Mode = ClosureDisplayModes.Articles;
 

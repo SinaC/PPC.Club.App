@@ -17,22 +17,12 @@ namespace PPC.Domain
         public decimal BankCard { get; set; }
         [DataMember]
         public List<TransactionFullArticle> Transactions { get; set; }
-        [DataMember]
-        public string Notes { get; set; }
 
         public decimal Total => Cash + BankCard;
 
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"Cloture de la caisse du club (date: {DateTime.Now:F})");
-            sb.AppendLine("**********************");
-            if (!string.IsNullOrWhiteSpace(Notes))
-            {
-                sb.AppendLine("Remarques:");
-                sb.AppendLine(Notes);
-                sb.AppendLine("**********************");
-            }
             sb.AppendLine($"Cash: {Cash:C}");
             sb.AppendLine($"Bancontact: {BankCard:C}");
             sb.AppendLine("**********************");

@@ -1,3 +1,8 @@
+Add methods in DataAccess to save current shop, carts (load/save/backup)
+Remove players and cards module
+
+IModule: with method GotFocus
+
 Business Layer to abstract Data access + add Mail sending, file save, ... within
 add informative logging
 AskNameEmailPopup: check email validity
@@ -11,7 +16,14 @@ finish mobile article selector view
 
 rename PPC.Popups in PPC.Module.Common
 
+when starting: detect if a backup files exists -> if true, propose to reload (if no reload, delete backup files with confirmation popup)
+
 popup style
+
+Reload: notes
+Closure: Domain.Closure should be saved on disk instead of CashRegisterClosure
+
+Transaction edition: we should save original transaction in transaction
 
 inventory:
 !! after import -> every article guid are modified -> shopping carts and backup files are invalid

@@ -134,6 +134,7 @@ namespace PPC.Module.Shop.ViewModels.Popups
 
         private void PaymentDone(decimal cash, decimal bankCard, decimal discountPercentage)
         {
+            // Create a new transaction using original id
             ShopTransactionItem transactionItem = new ShopTransactionItem
             {
                 Id = _originalTransactionItem.Id,
