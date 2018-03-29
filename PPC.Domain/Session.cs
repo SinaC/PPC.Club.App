@@ -26,5 +26,8 @@ namespace PPC.Domain
 
         [DataMember]
         public List<ClientCart> ClientCarts { get; set; }
+
+        [DataMember]
+        public string Notes { get; set; }
     }
 }

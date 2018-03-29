@@ -1,4 +1,8 @@
+Rethink ClientCart, Transactions, Closure
+
 Remove players and cards module
+
+Session should contain a different kind of ShopTransaction storing whole article data (allow price change tracking, can use session even article doesn't exist anymore)
 
 When starting: detect if a backup files exists -> if true, propose to reload (if no reload, delete backup files with confirmation popup)
   already exists but not yet used (SessionDL.HasActiveSession)

@@ -152,6 +152,7 @@ namespace PPC.Module.Shop.ViewModels
             {
                 List<ShopTransaction> transactions = Transactions.Select(t => new ShopTransaction
                 {
+                    Guid = t.Id,
                     Timestamp = t.Timestamp,
                     Articles = t.Articles.Select(a => new Item
                     {
@@ -528,7 +529,7 @@ namespace PPC.Module.Shop.ViewModels
 
                 Transactions = new ObservableCollection<ShopTransactionItem>(transactions.Select(t => new ShopTransactionItem
                 {
-                    Id = Guid.NewGuid(),
+                    Id = t.Guid,
                     Timestamp = t.Timestamp,
                     Articles = t.Articles.Select(a => new ShopArticleItem
                     {

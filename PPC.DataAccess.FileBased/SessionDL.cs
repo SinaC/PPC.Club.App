@@ -48,14 +48,17 @@ namespace PPC.DataAccess.FileBased
 
         public void UpdateTransaction(ShopTransaction transaction)
         {
-            // TODO: without Id transaction cannot be updated nor deleted
-            throw new NotImplementedException();
+            List<ShopTransaction> transactions = GetTransactions();
+            transactions.RemoveAll(x => x.Guid == transaction.Guid);
+            transactions.Add(transaction);
+            SaveTransactions(transactions);
         }
 
         public void DeleteTransaction(ShopTransaction transaction)
         {
-            // TODO: without Id transaction cannot be updated nor deleted
-            throw new NotImplementedException();
+            List<ShopTransaction> transactions = GetTransactions();
+            transactions.RemoveAll(x => x.Guid == transaction.Guid);
+            SaveTransactions(transactions);
         }
 
         public void SaveTransactions(IEnumerable<ShopTransaction> transactions)
@@ -131,7 +134,6 @@ namespace PPC.DataAccess.FileBased
             }
             return cart;
         }
-
 
         #endregion
 

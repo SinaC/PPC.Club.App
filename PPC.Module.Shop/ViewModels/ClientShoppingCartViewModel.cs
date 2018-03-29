@@ -39,6 +39,13 @@ namespace PPC.Module.Shop.ViewModels
 
         #region Client Info
 
+        private Guid _clientGuid;
+        public Guid ClientGuid
+        {
+            get { return _clientGuid; }
+            set { Set(() => ClientGuid, ref _clientGuid, value); }
+        }
+
         private string _clientName;
         public string ClientName
         {
@@ -135,6 +142,8 @@ namespace PPC.Module.Shop.ViewModels
 
         public ClientShoppingCartViewModel(Action<decimal, decimal, decimal> cartPaidAction, Action cartReopenedAction)
         {
+            ClientGuid = Guid.NewGuid();
+
             _cartPaidAction = cartPaidAction;
             _cartReopenedAction = cartReopenedAction;
 
@@ -184,6 +193,7 @@ namespace PPC.Module.Shop.ViewModels
 
         private void InitializeFromCart(ClientCart cart)
         {
+            ClientGuid = cart.Guid;
             ClientName = cart.ClientName;
             ClientFirstName = cart.ClientFirstName;
             ClientLastName = cart.ClientLastName;
@@ -211,6 +221,7 @@ namespace PPC.Module.Shop.ViewModels
             {
                 ClientCart cart = new ClientCart
                 {
+                    Guid = ClientGuid,
                     ClientName = ClientName,
                     ClientFirstName = ClientFirstName,
                     ClientLastName = ClientLastName,

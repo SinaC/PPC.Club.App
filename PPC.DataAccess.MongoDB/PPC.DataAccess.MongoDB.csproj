@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="ArticleDL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SessionDL.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
