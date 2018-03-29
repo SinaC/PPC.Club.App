@@ -69,12 +69,12 @@ namespace PPC.DataAccess.MongoDB
             return query;
         }
 
-        public void SaveArticle(Article article)
+        public void Update(Article article)
         {
             ArticleCollection.FindOneAndReplace(x => x.Guid == article.Guid, article);
         }
 
-        public void AddArticle(Article article)
+        public void Insert(Article article)
         {
             ArticleCollection.InsertOne(article);
         }

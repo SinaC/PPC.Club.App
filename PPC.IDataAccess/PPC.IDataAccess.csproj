@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="IArticleDL.cs" />
     <Compile Include="IPlayerDL.cs" />
+    <Compile Include="ISessionDL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -29,7 +29,7 @@ namespace PPC.DataAccess.FileBased
             }
         }
 
-        public void AddArticle(Article article)
+        public void Insert(Article article)
         {
             Load(); // Load if needed
 
@@ -37,7 +37,7 @@ namespace PPC.DataAccess.FileBased
             Save();
         }
 
-        public void SaveArticle(Article article)
+        public void Update(Article article)
         {
             Save();
         }

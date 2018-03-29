@@ -27,6 +27,7 @@ namespace PPC.Module.Shop.ViewModels
     {
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
         private ILog Logger => IocContainer.Default.Resolve<ILog>();
+        private IArticleDL ArticlesDL => IocContainer.Default.Resolve<IArticleDL>();
 
         private Action<decimal, decimal, decimal> _cartPaidAction;
         private Action _cartReopenedAction;
@@ -184,7 +185,7 @@ namespace PPC.Module.Shop.ViewModels
             ShoppingCart.ShoppingCartArticles.Clear();
             ShoppingCart.ShoppingCartArticles.AddRange(cart.Articles.Select(x => new ShopArticleItem
             {
-                Article = IocContainer.Default.Resolve<IArticleDL>().GetById(x.Guid),
+                Article = ArticlesDL.GetById(x.Guid),
                 Quantity = x.Quantity
             }));
 

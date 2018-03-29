@@ -225,7 +225,7 @@ namespace PPC.Module.Shop.ViewModels.ArticleSelector
             try
             {
                 Logger.Info($"New article {article.Description ?? "???"} {article.Price:C} created.");
-                ArticlesDb.AddArticle(article);
+                ArticlesDb.Insert(article);
             }
             catch (Exception ex)
             {
@@ -287,7 +287,7 @@ namespace PPC.Module.Shop.ViewModels.ArticleSelector
             try
             {
                 Logger.Info($"Article {article.Description ?? "???"} {article.Price:C} edited.");
-                ArticlesDb.SaveArticle(article);
+                ArticlesDb.Update(article);
             }
             catch (Exception ex)
             {

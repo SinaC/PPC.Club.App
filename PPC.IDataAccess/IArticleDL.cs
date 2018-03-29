@@ -8,8 +8,8 @@ namespace PPC.IDataAccess
     {
         IEnumerable<Article> Articles { get; }
 
-        void AddArticle(Article article);
-        void SaveArticle(Article article);
+        void Insert(Article article);
+        void Update(Article article);
 
         Article GetByEan(string ean);
         Article GetById(Guid guid);

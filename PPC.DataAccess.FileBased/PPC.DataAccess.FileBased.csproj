@@ -53,6 +53,7 @@
     </Compile>
     <Compile Include="PlayerDL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SessionDL.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PPC.Common\PPC.Common.csproj">

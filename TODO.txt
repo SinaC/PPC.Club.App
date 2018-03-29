@@ -25,6 +25,8 @@ Closure: Domain.Closure should be saved on disk instead of CashRegisterClosure
 
 Transaction edition: we should save original transaction in transaction
 
+ShopTransaction should contain an Id (BSonId)
+
 inventory:
 !! after import -> every article guid are modified -> shopping carts and backup files are invalid
 

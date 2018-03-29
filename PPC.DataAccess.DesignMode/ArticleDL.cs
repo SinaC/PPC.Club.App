@@ -45,12 +45,12 @@ namespace PPC.DataAccess.DesignMode
             _articles = articles.ToList();
         }
 
-        public void AddArticle(Article article)
+        public void Insert(Article article)
         {
             throw new NotImplementedException();
         }
-
-        public void SaveArticle(Article article)
+        
+        public void Update(Article article)
         {
             throw new NotImplementedException();
         }
