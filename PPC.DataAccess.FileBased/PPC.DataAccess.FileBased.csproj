@@ -43,19 +43,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArticleDL.cs" />
-    <Compile Include="LocalPlayers.cs">
-      <DependentUpon>LocalPlayers.xsd</DependentUpon>
-    </Compile>
-    <Compile Include="LocalPlayers.Designer.cs">
-      <DependentUpon>LocalPlayers.xsd</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <Compile Include="PlayerDL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SessionDL.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EasyDBFParser\EasyDBFParser.csproj">
+      <Project>{E85892E8-7837-483D-B20D-DFE6A89D8330}</Project>
+      <Name>EasyDBFParser</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PPC.Common\PPC.Common.csproj">
       <Project>{7F9D7666-1A58-4AE1-AD47-AB68A3D4E2FE}</Project>
       <Name>PPC.Common</Name>
@@ -72,19 +67,6 @@
       <Project>{10DA16F1-F77E-4B88-9151-2D0F358B4908}</Project>
       <Name>PPC.IDataAccess</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="LocalPlayers.xsc">
-      <DependentUpon>LocalPlayers.xsd</DependentUpon>
-    </None>
-    <None Include="LocalPlayers.xsd">
-      <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>LocalPlayers.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="LocalPlayers.xss">
-      <DependentUpon>LocalPlayers.xsd</DependentUpon>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

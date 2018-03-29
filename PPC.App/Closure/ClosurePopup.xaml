@@ -19,9 +19,6 @@
             <DataTemplate DataType="{x:Type viewModels:ClosurePopupViewModel}" x:Key="ArticlesTemplate">
                 <views:ArticlesView DataContext="{Binding ArticlesViewModel}"/>
             </DataTemplate>
-            <DataTemplate DataType="{x:Type viewModels:ClosurePopupViewModel}" x:Key="SoldCardsTemplate">
-                <views:SoldCardsView DataContext="{Binding SoldCardsViewModel}"/>
-            </DataTemplate>
             <DataTemplate DataType="{x:Type viewModels:ClosurePopupViewModel}" x:Key="CashCountTemplate">
                 <views:CashCountView DataContext="{Binding CashCountViewModel}"/>
             </DataTemplate>
@@ -53,16 +50,6 @@
                     <Image Style="{StaticResource AutoDisableImageStyle}"
                            Source="{StaticResource TransactionsImage}"/>
                 </ToggleButton>
-                <!-- Cards -->
-                <!--<ToggleButton Width="64"
-                              Height="64"
-                              Margin="5,2"
-                              ToolTip="Sold cards"
-                              IsChecked="{Binding IsSoldCardsSelected, Mode=OneWay}"
-                              Command="{Binding SwitchToSoldCardsCommand}">
-                    <Image Style="{StaticResource AutoDisableImageStyle}"
-                           Source="{StaticResource MagicImage}"/>
-                </ToggleButton>-->
                 <!-- Notes -->
                 <ToggleButton Width="64"
                               Height="64"
@@ -95,9 +82,6 @@
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Mode}" Value="{x:Static viewModels:ClosureDisplayModes.Articles}">
                                 <Setter Property="ContentTemplate" Value="{StaticResource ArticlesTemplate}"/>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Mode}" Value="{x:Static viewModels:ClosureDisplayModes.SoldCards}">
-                                <Setter Property="ContentTemplate" Value="{StaticResource SoldCardsTemplate}"/>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Mode}" Value="{x:Static viewModels:ClosureDisplayModes.CashCount}">
                                 <Setter Property="ContentTemplate" Value="{StaticResource CashCountTemplate}"/>

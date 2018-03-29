@@ -32,7 +32,6 @@ namespace PPC.App
                 IocContainer.Default.RegisterInstance<IArticleDL>(new DataAccess.MongoDB.ArticleDL());
             else
                 IocContainer.Default.RegisterInstance<IArticleDL>(new DataAccess.FileBased.ArticleDL());
-            IocContainer.Default.RegisterInstance<IPlayerDL>(new DataAccess.FileBased.PlayerDL());
             IocContainer.Default.RegisterInstance<ISessionDL>(new DataAccess.FileBased.SessionDL());
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;

@@ -136,10 +136,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Closure\SoldCardsView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainWindowViewModel.cs" />
@@ -155,10 +151,6 @@
       <DependentUpon>ClosurePopup.xaml</DependentUpon>
     </Compile>
     <Compile Include="Closure\ClosurePopupViewModel.cs" />
-    <Compile Include="Closure\SoldCardsView.xaml.cs">
-      <DependentUpon>SoldCardsView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Closure\SoldCardsViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -227,10 +219,6 @@
       <Project>{BCB79B57-39A1-4714-A728-B09C90BB4B35}</Project>
       <Name>PPC.Log</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PPC.Module.Cards\PPC.Module.Cards.csproj">
-      <Project>{464113AF-4BC7-4326-853C-32707A1284E7}</Project>
-      <Name>PPC.Module.Cards</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PPC.Controls\PPC.Controls.csproj">
       <Project>{04cd3c36-e320-4a14-952b-1e09340e9b58}</Project>
       <Name>PPC.Controls</Name>
@@ -246,10 +234,6 @@
     <ProjectReference Include="..\EasyMVVM\EasyMVVM.csproj">
       <Project>{10833c79-c3fb-4f70-ad1d-7f0173d01966}</Project>
       <Name>EasyMVVM</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PPC.Module.Players\PPC.Module.Players.csproj">
-      <Project>{e48a0ab3-a906-4909-b965-c6286b01d3e9}</Project>
-      <Name>PPC.Module.Players</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Module.Notes\PPC.Module.Notes.csproj">
       <Project>{62AB5298-6D6E-4A43-9CE7-4E1541A1BC21}</Project>

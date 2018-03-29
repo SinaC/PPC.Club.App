@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using EasyDBFParser;
 using PPC.Common;
 using PPC.Domain;
 using PPC.Helpers;
@@ -143,5 +145,42 @@ namespace PPC.DataAccess.FileBased
             else
                 throw new InvalidOperationException("Article DB not found.");
         }
+
+        /* Import from DBF
+        private void ImportFromDbf(string filename)
+        {
+            // Extract articles from DBF
+            DBFParser parser = new DBFParser();
+            parser.Parse(filename);
+
+            _articles = parser.DataTable.AsEnumerable().Select(row => new Article
+            {
+                Guid = Guid.NewGuid(),
+                Ean = row.Field<string>("CODE_ART"),
+                Description = row.Field<string>("NOM_ART"),
+                Category = row.Field<string>("CATEGORIE"),
+                SubCategory = row.Field<string>("CATEGORIE2"),
+                Stock = ConvertFromDoubleToInt(row.Field<double>("QTE_STOCK")),
+                SupplierPrice = ConvertFromDoubleToDecimal(row.Field<double>("PRIX_ACHAT")),
+                Price = ConvertFromDoubleToDecimal(row.Field<double>("PX_VTE_TC")),
+                Producer = row.Field<string>("NOM_FOU"),
+                VatRate = row.Field<int>("CODE_TVA") == 2 ? VatRates.FoodDrink : VatRates.Other
+            }).ToList();
+        }
+
+        private static decimal ConvertFromDoubleToDecimal(double d)
+        {
+            if (double.IsInfinity(d) || double.IsNaN(d) || double.IsNegativeInfinity(d) || double.IsPositiveInfinity(d))
+                return 0;
+            return (decimal)d;
+        }
+
+        private static int ConvertFromDoubleToInt(double d)
+        {
+            if (double.IsInfinity(d) || double.IsNaN(d) || double.IsNegativeInfinity(d) || double.IsPositiveInfinity(d))
+                return 0;
+            return (int)d;
+        }
+        */
     }
 }

@@ -5,10 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:app="clr-namespace:PPC.App"
         xmlns:controls="clr-namespace:PPC.Controls;assembly=PPC.Controls"
-        xmlns:playersViews="clr-namespace:PPC.Module.Players.Views;assembly=PPC.Module.Players"
         xmlns:shopViews="clr-namespace:PPC.Module.Shop.Views;assembly=PPC.Module.Shop"
         xmlns:inventoryViews="clr-namespace:PPC.Module.Inventory.Views;assembly=PPC.Module.Inventory"
-        xmlns:cardsViews="clr-namespace:PPC.Module.Cards.Views;assembly=PPC.Module.Cards"
         xmlns:notesViews="clr-namespace:PPC.Module.Notes.Views;assembly=PPC.Module.Notes"
         x:Name="AppMainWindow"
         mc:Ignorable="d"
@@ -29,14 +27,8 @@
             <DataTemplate DataType="{x:Type app:MainWindowViewModel}" x:Key="ShopTemplate">
                 <shopViews:ShopView DataContext="{Binding ShopViewModel}"/>
             </DataTemplate>
-            <DataTemplate DataType="{x:Type app:MainWindowViewModel}" x:Key="PlayersTemplate">
-                <playersViews:PlayersView DataContext="{Binding PlayersViewModel}"/>
-            </DataTemplate>
             <DataTemplate DataType="{x:Type app:MainWindowViewModel}" x:Key="InventoryTemplate">
                 <inventoryViews:InventoryView DataContext="{Binding InventoryViewModel}"/>
-            </DataTemplate>
-            <DataTemplate DataType="{x:Type app:MainWindowViewModel}" x:Key="CardsTemplate">
-                <cardsViews:CardsView DataContext="{Binding CardsViewModel}"/>
             </DataTemplate>
             <DataTemplate DataType="{x:Type app:MainWindowViewModel}" x:Key="NotesTemplate">
                 <notesViews:NotesView DataContext="{Binding NotesViewModel}"/>
@@ -66,7 +58,6 @@
                 <!-- Header -->
                 <Grid Grid.Column="0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -177,18 +168,8 @@
                             </StackPanel>-->
                         </Grid>
                     </ToggleButton>
-                    <!-- Players -->
-                    <ToggleButton Grid.Row="4"
-                                  Width="64"
-                                  Margin="2"
-                                  ToolTip="Players"
-                                  IsChecked="{Binding IsPlayersSelected, Mode=OneWay}"
-                                  Command="{Binding SwitchToPlayersCommand}">
-                        <Image Style="{StaticResource AutoDisableImageStyle}"
-                               Source="{StaticResource PlayersImage}"/>
-                    </ToggleButton>
                     <!-- Inventory -->
-                    <ToggleButton Grid.Row="5"
+                    <ToggleButton Grid.Row="4"
                             Width="64"
                             Margin="2"
                             ToolTip="Inventory/Stock"
@@ -197,18 +178,8 @@
                         <Image Style="{StaticResource AutoDisableImageStyle}"
                                Source="{StaticResource ListImage}"/>
                     </ToggleButton>
-                    <!-- Cards -->
-                    <!--<ToggleButton Grid.Row="6"
-                                  Width="64"
-                                  Margin="2"
-                                  ToolTip="Cards seller"
-                                  IsChecked="{Binding IsCardsSelected, Mode=OneWay}"
-                                  Command="{Binding SwitchToCardSellerCommand}">
-                        <Image Style="{StaticResource AutoDisableImageStyle}"
-                               Source="{StaticResource MagicImage}"/>
-                    </ToggleButton>-->
                     <!-- Reminder -->
-                    <ToggleButton Grid.Row="6"
+                    <ToggleButton Grid.Row="5"
                                   Width="64"
                                   Margin="2"
                                   ToolTip="Remarks/Reminder"
@@ -217,9 +188,9 @@
                         <Image Style="{StaticResource AutoDisableImageStyle}"
                                Source="{StaticResource NotesImage}"/>
                     </ToggleButton>
-                    <!-- dummy row 7 -->
+                    <!-- dummy row 6 -->
                     <!-- Reload -->
-                    <Button Grid.Row="8"
+                    <Button Grid.Row="7"
                             Width="64"
                             Margin="2"
                             ToolTip="Load previous session"
@@ -228,7 +199,7 @@
                                Source="{StaticResource RefreshImage}"/>
                     </Button>
                     <!-- Shutdown -->
-                    <Button Grid.Row="9"
+                    <Button Grid.Row="8"
                             Width="64"
                             Margin="2"
                             ToolTip="Cash registry closure"
@@ -254,14 +225,8 @@
                                 <DataTrigger Binding="{Binding ApplicationMode}" Value="{x:Static app:ApplicationModes.Shop}">
                                     <Setter Property="ContentTemplate" Value="{StaticResource ShopTemplate}"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding ApplicationMode}" Value="{x:Static app:ApplicationModes.Players}">
-                                    <Setter Property="ContentTemplate" Value="{StaticResource PlayersTemplate}"/>
-                                </DataTrigger>
                                 <DataTrigger Binding="{Binding ApplicationMode}" Value="{x:Static app:ApplicationModes.Inventory}">
                                     <Setter Property="ContentTemplate" Value="{StaticResource InventoryTemplate}"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding ApplicationMode}" Value="{x:Static app:ApplicationModes.Cards}">
-                                    <Setter Property="ContentTemplate" Value="{StaticResource CardsTemplate}"/>
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding ApplicationMode}" Value="{x:Static app:ApplicationModes.Notes}">
                                     <Setter Property="ContentTemplate" Value="{StaticResource NotesTemplate}"/>

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -19,10 +18,8 @@ using PPC.Helpers;
 using PPC.IDataAccess;
 using PPC.Log;
 using PPC.Messages;
-using PPC.Module.Cards.ViewModels;
 using PPC.Module.Inventory.ViewModels;
 using PPC.Module.Notes.ViewModels;
-using PPC.Module.Players.ViewModels;
 using PPC.Module.Shop.ViewModels;
 using PPC.Services.Popup;
 
@@ -31,10 +28,8 @@ namespace PPC.App
     public enum ApplicationModes
     {
         Shop,
-        Players,
         Inventory,
-        Cards,
-        Notes,
+        Notes
     }
 
     public class MainWindowViewModel : ObservableObject
@@ -49,13 +44,6 @@ namespace PPC.App
             protected set { Set(() => IsWaiting, ref _isWaiting, value); }
         }
 
-        private PlayersViewModel _playersViewModel;
-        public PlayersViewModel PlayersViewModel
-        {
-            get { return _playersViewModel; }
-            protected set { Set(() => PlayersViewModel, ref _playersViewModel, value); }
-        }
-
         private ShopViewModel _shopViewModel;
         public ShopViewModel ShopViewModel
         {
@@ -68,13 +56,6 @@ namespace PPC.App
         {
             get { return _inventoryViewModel; }
             protected set { Set(() => InventoryViewModel, ref _inventoryViewModel, value); }
-        }
-
-        private CardsViewModel _cardsViewModel;
-        public CardsViewModel CardsViewModel
-        {
-            get { return _cardsViewModel; }
-            protected set { Set(() => CardsViewModel, ref _cardsViewModel, value); }
         }
 
         private NotesViewModel _notesViewModel;
@@ -96,9 +77,7 @@ namespace PPC.App
                 RaisePropertyChanged(() => IsCashRegisterSelected);
                 RaisePropertyChanged(() => IsClientShoppingCartSelected);
                 RaisePropertyChanged(() => IsSoldArticlesSelected);
-                RaisePropertyChanged(() => IsPlayersSelected);
                 RaisePropertyChanged(() => IsInventorySelected);
-                RaisePropertyChanged(() => IsCardsSelected);
                 RaisePropertyChanged(() => IsReminderSelected);
             }
         }
@@ -106,9 +85,7 @@ namespace PPC.App
         public bool IsCashRegisterSelected => ApplicationMode == ApplicationModes.Shop && ShopViewModel.Mode == ShopModes.CashRegister;
         public bool IsClientShoppingCartSelected => ApplicationMode == ApplicationModes.Shop && ShopViewModel.Mode == ShopModes.ClientShoppingCarts;
         public bool IsSoldArticlesSelected => ApplicationMode == ApplicationModes.Shop && ShopViewModel.Mode == ShopModes.SoldArticles;
-        public bool IsPlayersSelected => ApplicationMode == ApplicationModes.Players;
         public bool IsInventorySelected => ApplicationMode == ApplicationModes.Inventory;
-        public bool IsCardsSelected => ApplicationMode == ApplicationModes.Cards;
         public bool IsReminderSelected => ApplicationMode == ApplicationModes.Notes;
 
         private ICommand _switchToCashRegisterCommand;
@@ -148,29 +125,12 @@ namespace PPC.App
             ShopViewModel.ClientShoppingCartsViewModel.AddNewClientCommand.Execute(null);
         }
 
-        private ICommand _switchToPlayersCommand;
-        public ICommand SwitchToPlayersCommand => _switchToPlayersCommand = _switchToPlayersCommand ?? new RelayCommand(SwitchToPlayers);
-
-        private void SwitchToPlayers()
-        {
-            ApplicationMode = ApplicationModes.Players;
-        }
-
         private ICommand _switchToInventoryCommand;
         public ICommand SwitchToInventoryCommand => _switchToInventoryCommand = _switchToInventoryCommand ?? new RelayCommand(SwitchToInventory);
 
         private void SwitchToInventory()
         {
             ApplicationMode = ApplicationModes.Inventory;
-        }
-
-        private ICommand _switchToCardSellerCommand;
-        public ICommand SwitchToCardSellerCommand => _switchToCardSellerCommand = _switchToCardSellerCommand ?? new RelayCommand(SwitchToCardSeller);
-
-        private void SwitchToCardSeller()
-        {
-            CardsViewModel.SelectedSeller = null; // unselect currently selected if any and switch to list mode
-            ApplicationMode = ApplicationModes.Cards;
         }
 
         private ICommand _switchToReminderCommand;
@@ -201,15 +161,13 @@ namespace PPC.App
             // TODO: if (SessionDL.HasActiveSession())
 
             ShopViewModel.Reload();
-            CardsViewModel.Reload();
             NotesViewModel.Reload();
 
             int cartsCount = ShopViewModel.ClientShoppingCartsViewModel.Clients.Count;
-            int cardSellersCount = CardsViewModel.Sellers.Count;
             int transactionsCount = ShopViewModel.Transactions.Count;
-            PopupService.DisplayQuestion("Reload", $"Reload done. Carts:{cartsCount} Card sellers:{cardSellersCount} Transactions:{transactionsCount}.", QuestionActionButton.Ok());
+            PopupService.DisplayQuestion("Reload", $"Reload done. Carts:{cartsCount} Transactions:{transactionsCount}.", QuestionActionButton.Ok());
 
-            Logger.Info($"Reload done. Carts:{cartsCount} Card sellers:{cardSellersCount} Transactions:{transactionsCount}.");
+            Logger.Info($"Reload done. Carts:{cartsCount} Transactions:{transactionsCount}.");
         }
 
         #endregion
@@ -236,8 +194,7 @@ namespace PPC.App
         private void DisplayClosurePopup()
         {
             CashRegisterClosure cashClosure = PrepareCashRegisterClosure();
-            List<SoldCards> soldCards = CardsViewModel.PrepareClosure();
-            ClosurePopupViewModel vm = new ClosurePopupViewModel(NotesViewModel, CloseApplicationAfterClosurePopup, cashClosure, soldCards, SendMailsAsync);
+            ClosurePopupViewModel vm = new ClosurePopupViewModel(NotesViewModel, CloseApplicationAfterClosurePopup, cashClosure, SendMailsAsync);
             PopupService.DisplayModal(vm, "Cash register closure", 640, 480);
         }
 
@@ -290,12 +247,11 @@ namespace PPC.App
 
             Logger.Info("Deleting backup files");
             ShopViewModel.DeleteBackupFiles(savePath);
-            CardsViewModel.DeleteBackupFiles(savePath);
 
             Application.Current.Shutdown();
         }
 
-        private async Task SendMailsAsync(Domain.Closure closure, List<SoldCards> soldCards)
+        private async Task SendMailsAsync(Domain.Closure closure)
         {
             IsWaiting = true;
             try
@@ -320,19 +276,6 @@ namespace PPC.App
                     {
                         Logger.Exception("Error while sending closure mail", ex);
                         PopupService.DisplayError("Error while sending closure mail", ex);
-                    }
-
-                    foreach (SoldCards cards in soldCards.Where(x => !string.IsNullOrWhiteSpace(x.Email) && x.Email.Contains('@')))
-                    {
-                        try
-                        {
-                            await SendSoldCardsMailAsync(cards, closureConfig.SenderMail, closureConfig.SenderPassword);
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Exception($"Error while sending sold cards mail to {cards?.SellerName ?? "??"}", ex);
-                            PopupService.DisplayError($"Error while sending sold cards mail to {cards?.SellerName ?? "??"}", ex);
-                        }
                     }
                 }
                 else
@@ -381,36 +324,6 @@ namespace PPC.App
             Logger.Info("Closure mail sent.");
         }
 
-        private async Task SendSoldCardsMailAsync(SoldCards soldCards, string senderMail, string senderPassword)
-        {
-            Logger.Info($"Sending sold cards mail to {soldCards.Email}.");
-
-            MailAddress fromAddress = new MailAddress(senderMail, "From PPC Club");
-            MailAddress toAddress = new MailAddress(soldCards.Email, $"To {soldCards.SellerName}");
-            using (SmtpClient client = new SmtpClient
-            {
-                Host = "smtp.gmail.com",
-                Port = 587,
-                EnableSsl = true,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(fromAddress.Address, senderPassword)
-            })
-            {
-
-                using (var message = new MailMessage(fromAddress, toAddress)
-                {
-                    Subject = $"Vente de carte à la pièce au club (date {DateTime.Now:F})",
-                    Body = soldCards.ToString()
-                })
-                {
-                    await client.SendMailAsync(message);
-                }
-            }
-
-            Logger.Info($"Sold cards mail to {soldCards.Email} sent.");
-        }
-
         #endregion
 
         public string ApplicationVersion
@@ -439,10 +352,8 @@ namespace PPC.App
                 }
             }
 
-            PlayersViewModel = new PlayersViewModel();
             ShopViewModel = new ShopViewModel();
             InventoryViewModel = new InventoryViewModel();
-            CardsViewModel = new CardsViewModel();
             NotesViewModel = new NotesViewModel();
 
             ApplicationMode = ApplicationModes.Shop;
@@ -467,10 +378,8 @@ namespace PPC.App
     {
         public MainWindowViewModelDesignData()
         {
-            PlayersViewModel = new PlayersViewModelDesignData();
             ShopViewModel = new ShopViewModelDesignData();
             InventoryViewModel = new InventoryViewModelDesignData();
-            CardsViewModel = new CardsViewModelDesignData();
             NotesViewModel = new NotesViewModelDesignData();
 
             ApplicationMode = ApplicationModes.Notes;
