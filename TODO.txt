@@ -1,5 +1,14 @@
-Add methods in DataAccess to save current shop, carts (load/save/backup)
 Remove players and cards module
+
+When starting: detect if a backup files exists -> if true, propose to reload (if no reload, delete backup files with confirmation popup)
+  already exists but not yet used (SessionDL.HasActiveSession)
+
+Implement ISessionDL in Mongo
+Closure: Domain.Closure should be saved on disk instead of CashRegisterClosure
+Transaction edition: we should save original transaction in transaction
+ShopTransaction should contain an Id (BSonId)
+
+Localization
 
 IModule: with method GotFocus
 
@@ -16,16 +25,7 @@ finish mobile article selector view
 
 rename PPC.Popups in PPC.Module.Common
 
-when starting: detect if a backup files exists -> if true, propose to reload (if no reload, delete backup files with confirmation popup)
-
 popup style
-
-Reload: notes
-Closure: Domain.Closure should be saved on disk instead of CashRegisterClosure
-
-Transaction edition: we should save original transaction in transaction
-
-ShopTransaction should contain an Id (BSonId)
 
 inventory:
 !! after import -> every article guid are modified -> shopping carts and backup files are invalid

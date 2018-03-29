@@ -33,6 +33,7 @@ namespace PPC.Module.Shop.ViewModels
 
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
         private ILog Logger => IocContainer.Default.Resolve<ILog>();
+        private ISessionDL SessionDL => IocContainer.Default.Resolve<ISessionDL>();
 
         #region Shop mode
 
@@ -149,36 +150,58 @@ namespace PPC.Module.Shop.ViewModels
         {
             try
             {
-                if (!Directory.Exists(PPCConfigurationManager.BackupPath))
-                    Directory.CreateDirectory(PPCConfigurationManager.BackupPath);
-                Domain.Shop shop = new Domain.Shop
+                List<ShopTransaction> transactions = Transactions.Select(t => new ShopTransaction
                 {
-                    Transactions = Transactions.Select(t => new ShopTransaction
+                    Timestamp = t.Timestamp,
+                    Articles = t.Articles.Select(a => new Item
                     {
-                        Timestamp = t.Timestamp,
-                        Articles = t.Articles.Select(a => new Item
-                        {
-                            Guid = a.Article.Guid,
-                            Quantity = a.Quantity,
-                        }).ToList(),
-                        Cash = t.Cash,
-                        BankCard = t.BankCard,
-                        DiscountPercentage = t.DiscountPercentage
+                        Guid = a.Article.Guid,
+                        Quantity = a.Quantity,
                     }).ToList(),
-                };
-                string filename = $"{PPCConfigurationManager.BackupPath}{ShopFilename}";
-                using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
-                {
-                    writer.Formatting = Formatting.Indented;
-                    DataContractSerializer serializer = new DataContractSerializer(typeof(Domain.Shop));
-                    serializer.WriteObject(writer, shop);
-                }
+                    Cash = t.Cash,
+                    BankCard = t.BankCard,
+                    DiscountPercentage = t.DiscountPercentage
+                }).ToList();
+                SessionDL.SaveTransactions(transactions);
             }
             catch (Exception ex)
             {
-                Logger.Exception("Error while saving shop", ex);
-                PopupService.DisplayError("Error while saving shop", ex);
+                Logger.Exception("Error while saving transactions", ex);
+                PopupService.DisplayError("Error while saving transactions", ex);
             }
+
+            //try
+            //{
+            //    if (!Directory.Exists(PPCConfigurationManager.BackupPath))
+            //        Directory.CreateDirectory(PPCConfigurationManager.BackupPath);
+            //    Domain.Shop shop = new Domain.Shop
+            //    {
+            //        Transactions = Transactions.Select(t => new ShopTransaction
+            //        {
+            //            Timestamp = t.Timestamp,
+            //            Articles = t.Articles.Select(a => new Item
+            //            {
+            //                Guid = a.Article.Guid,
+            //                Quantity = a.Quantity,
+            //            }).ToList(),
+            //            Cash = t.Cash,
+            //            BankCard = t.BankCard,
+            //            DiscountPercentage = t.DiscountPercentage
+            //        }).ToList(),
+            //    };
+            //    string filename = $"{PPCConfigurationManager.BackupPath}{ShopFilename}";
+            //    using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
+            //    {
+            //        writer.Formatting = Formatting.Indented;
+            //        DataContractSerializer serializer = new DataContractSerializer(typeof(Domain.Shop));
+            //        serializer.WriteObject(writer, shop);
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    Logger.Exception("Error while saving shop", ex);
+            //    PopupService.DisplayError("Error while saving shop", ex);
+            //}
         }
 
         private ICommand _editTransactionCommand;
@@ -251,14 +274,16 @@ namespace PPC.Module.Shop.ViewModels
 
         public void Reload()
         {
-            if (Directory.Exists(PPCConfigurationManager.BackupPath))
+            if (SessionDL.HasActiveSession())
             {
+                //TODO: SessionDL.GetActiveSession();
                 try
                 {
                     // Reload transactions
                     LoadTransactions();
                     // Reload clients
-                    ClientShoppingCartsViewModel.LoadClients(ShopFilename);
+                    //ClientShoppingCartsViewModel.LoadClients(ShopFilename);
+                    ClientShoppingCartsViewModel.LoadClients();
 
                     // If transactions/clients contains unknown article -> remove them and display a warning
                     bool unknownArticleFound = false;
@@ -284,15 +309,57 @@ namespace PPC.Module.Shop.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    Logger.Exception("Error while loading shop", ex);
-                    PopupService.DisplayError("Error while loading shop", ex);
+                    Logger.Exception("Error while loading active session", ex);
+                    PopupService.DisplayError("Error while loading active session", ex);
                 }
             }
             else
             {
-                Logger.Error("Error while loading shop: Backup path not found");
-                PopupService.DisplayError("Error while loading shop", "Backup path not found");
+                PopupService.DisplayError("Reload", "No active session found.");
             }
+
+            //if (Directory.Exists(PPCConfigurationManager.BackupPath))
+            //{
+            //    try
+            //    {
+            //        // Reload transactions
+            //        LoadTransactions();
+            //        // Reload clients
+            //        ClientShoppingCartsViewModel.LoadClients(ShopFilename);
+
+            //        // If transactions/clients contains unknown article -> remove them and display a warning
+            //        bool unknownArticleFound = false;
+            //        foreach (ShopTransactionItem transaction in Transactions.Where(t => t.Articles.Any(a => a.Article == null)))
+            //        {
+            //            transaction.Articles.RemoveAll(x => x.Article == null);
+            //            unknownArticleFound = true;
+            //        }
+
+            //        if (ClientShoppingCartsViewModel.FindAndRemoveInvalidArticles())
+            //            unknownArticleFound = true;
+
+            //        if (unknownArticleFound)
+            //        {
+            //            Logger.Warning("Unknown articles have been found and removed!");
+            //            PopupService.DisplayError("Warning", "Unknown articles have been found and removed!");
+            //            // TODO: 
+            //            // recompute transaction cash/bank if possible
+            //            // recompute client cash/bank if possible
+            //        }
+
+            //        RefreshSoldArticles();
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Logger.Exception("Error while loading shop", ex);
+            //        PopupService.DisplayError("Error while loading shop", ex);
+            //    }
+            //}
+            //else
+            //{
+            //    Logger.Error("Error while loading shop: Backup path not found");
+            //    PopupService.DisplayError("Error while loading shop", "Backup path not found");
+            //}
         }
 
         public CashRegisterClosure PrepareClosure()
@@ -337,21 +404,30 @@ namespace PPC.Module.Shop.ViewModels
 
         public void DeleteBackupFiles(string savePath)
         {
-            // Move backup files into save folder
             try
             {
-                string backupPath = PPCConfigurationManager.BackupPath;
-                foreach (string file in Directory.EnumerateFiles(backupPath))
-                {
-                    string saveFilename = savePath + Path.GetFileName(file);
-                    File.Move(file, saveFilename);
-                }
+                SessionDL.CloseActiveSession();
             }
             catch (Exception ex)
             {
-                Logger.Exception("Error", ex);
-                PopupService.DisplayError("Error", ex);
+                Logger.Exception("Error while performing session backup", ex);
+                PopupService.DisplayError("Error while performing session backup", ex);
             }
+            //// Move backup files into save folder
+            //try
+            //{
+            //    string backupPath = PPCConfigurationManager.BackupPath;
+            //    foreach (string file in Directory.EnumerateFiles(backupPath))
+            //    {
+            //        string saveFilename = savePath + Path.GetFileName(file);
+            //        File.Move(file, saveFilename);
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    Logger.Exception("Error", ex);
+            //    PopupService.DisplayError("Error", ex);
+            //}
         }
 
         public ShopViewModel()
@@ -446,41 +522,64 @@ namespace PPC.Module.Shop.ViewModels
 
         private void LoadTransactions()
         {
-            string filename = $"{PPCConfigurationManager.BackupPath}{ShopFilename}";
-            if (File.Exists(filename))
+            try
             {
-                try
+                List<ShopTransaction> transactions = SessionDL.GetTransactions();
+
+                Transactions = new ObservableCollection<ShopTransactionItem>(transactions.Select(t => new ShopTransactionItem
                 {
-                    Domain.Shop shop;
-                    using (XmlTextReader reader = new XmlTextReader(filename))
+                    Id = Guid.NewGuid(),
+                    Timestamp = t.Timestamp,
+                    Articles = t.Articles.Select(a => new ShopArticleItem
                     {
-                        DataContractSerializer serializer = new DataContractSerializer(typeof(Domain.Shop));
-                        shop = (Domain.Shop)serializer.ReadObject(reader);
-                    }
-                    Transactions = new ObservableCollection<ShopTransactionItem>(shop.Transactions.Select(t => new ShopTransactionItem
-                    {
-                        Id = Guid.NewGuid(),
-                        Timestamp = t.Timestamp,
-                        Articles = t.Articles.Select(a => new ShopArticleItem
-                        {
-                            Article = IocContainer.Default.Resolve<IArticleDL>().GetById(a.Guid),
-                            Quantity = a.Quantity
-                        }).ToList(),
-                        Cash = t.Cash,
-                        BankCard = t.BankCard,
-                    }));
-                }
-                catch (Exception ex)
-                {
-                    Logger.Exception("Error while loading shop", ex);
-                    PopupService.DisplayError("Error while loading shop", ex);
-                }
+                        Article = IocContainer.Default.Resolve<IArticleDL>().GetById(a.Guid),
+                        Quantity = a.Quantity
+                    }).ToList(),
+                    Cash = t.Cash,
+                    BankCard = t.BankCard,
+                }));
             }
-            else
+            catch (Exception ex)
             {
-                Logger.Error("Error while loading shop: Shop file not found");
-                PopupService.DisplayError("Error while loading shop", "Shop file not found");
+                Logger.Exception("Error while loading transactions", ex);
+                PopupService.DisplayError("Error while loading transactions", ex);
             }
+
+            //string filename = $"{PPCConfigurationManager.BackupPath}{ShopFilename}";
+            //if (File.Exists(filename))
+            //{
+            //    try
+            //    {
+            //        Domain.Shop shop;
+            //        using (XmlTextReader reader = new XmlTextReader(filename))
+            //        {
+            //            DataContractSerializer serializer = new DataContractSerializer(typeof(Domain.Shop));
+            //            shop = (Domain.Shop)serializer.ReadObject(reader);
+            //        }
+            //        Transactions = new ObservableCollection<ShopTransactionItem>(shop.Transactions.Select(t => new ShopTransactionItem
+            //        {
+            //            Id = Guid.NewGuid(),
+            //            Timestamp = t.Timestamp,
+            //            Articles = t.Articles.Select(a => new ShopArticleItem
+            //            {
+            //                Article = IocContainer.Default.Resolve<IArticleDL>().GetById(a.Guid),
+            //                Quantity = a.Quantity
+            //            }).ToList(),
+            //            Cash = t.Cash,
+            //            BankCard = t.BankCard,
+            //        }));
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Logger.Exception("Error while loading shop", ex);
+            //        PopupService.DisplayError("Error while loading shop", ex);
+            //    }
+            //}
+            //else
+            //{
+            //    Logger.Error("Error while loading shop: Shop file not found");
+            //    PopupService.DisplayError("Error while loading shop", "Shop file not found");
+            //}
         }
     }
 

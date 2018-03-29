@@ -28,6 +28,7 @@ namespace PPC.Module.Shop.ViewModels
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
         private ILog Logger => IocContainer.Default.Resolve<ILog>();
         private IArticleDL ArticlesDL => IocContainer.Default.Resolve<IArticleDL>();
+        private ISessionDL SessionDL => IocContainer.Default.Resolve<ISessionDL>();
 
         private Action<decimal, decimal, decimal> _cartPaidAction;
         private Action _cartReopenedAction;
@@ -142,10 +143,16 @@ namespace PPC.Module.Shop.ViewModels
             ShoppingCart = new ShoppingCartViewModel(Payment, Save);
         }
 
-        public ClientShoppingCartViewModel(Action<decimal, decimal, decimal> cartPaidAction, Action cartReopenedAction, string filename) 
+        //public ClientShoppingCartViewModel(Action<decimal, decimal, decimal> cartPaidAction, Action cartReopenedAction, string filename) 
+        //    : this(cartPaidAction, cartReopenedAction)
+        //{
+        //    Load(filename);
+        //}
+
+        public ClientShoppingCartViewModel(Action<decimal, decimal, decimal> cartPaidAction, Action cartReopenedAction, ClientCart cart)
             : this(cartPaidAction, cartReopenedAction)
         {
-            Load(filename);
+            InitializeFromCart(cart);
         }
 
         private void Payment(decimal cash, decimal bankCard, decimal discountPercentage)
@@ -163,14 +170,20 @@ namespace PPC.Module.Shop.ViewModels
 
         #region Load/Save
 
-        private void Load(string filename)
+        //private void Load(string filename)
+        //{
+        //    ClientCart cart;
+        //    using (XmlTextReader reader = new XmlTextReader(filename))
+        //    {
+        //        DataContractSerializer serializer = new DataContractSerializer(typeof(ClientCart));
+        //        cart = (ClientCart)serializer.ReadObject(reader);
+        //    }
+            
+        //    LoadFromCart(cart);
+        //}
+
+        private void InitializeFromCart(ClientCart cart)
         {
-            ClientCart cart;
-            using (XmlTextReader reader = new XmlTextReader(filename))
-            {
-                DataContractSerializer serializer = new DataContractSerializer(typeof(ClientCart));
-                cart = (ClientCart)serializer.ReadObject(reader);
-            }
             ClientName = cart.ClientName;
             ClientFirstName = cart.ClientFirstName;
             ClientLastName = cart.ClientLastName;
@@ -196,8 +209,6 @@ namespace PPC.Module.Shop.ViewModels
         {
             try
             {
-                if (!Directory.Exists(PPCConfigurationManager.BackupPath))
-                    Directory.CreateDirectory(PPCConfigurationManager.BackupPath);
                 ClientCart cart = new ClientCart
                 {
                     ClientName = ClientName,
@@ -215,19 +226,48 @@ namespace PPC.Module.Shop.ViewModels
                         Quantity = x.Quantity,
                     }).ToList()
                 };
-                string filename = Filename;
-                using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
-                {
-                    writer.Formatting = Formatting.Indented;
-                    DataContractSerializer serializer = new DataContractSerializer(typeof(ClientCart));
-                    serializer.WriteObject(writer, cart);
-                }
+
+                SessionDL.SaveClientCart(cart);
             }
             catch (Exception ex)
             {
                 Logger.Exception("Error while saving client cart", ex);
                 PopupService.DisplayError("Error while saving client cart", ex);
             }
+            //try
+            //{
+            //    if (!Directory.Exists(PPCConfigurationManager.BackupPath))
+            //        Directory.CreateDirectory(PPCConfigurationManager.BackupPath);
+            //    ClientCart cart = new ClientCart
+            //    {
+            //        ClientName = ClientName,
+            //        ClientFirstName = ClientFirstName,
+            //        ClientLastName = ClientLastName,
+            //        DciNumber = DciNumber,
+            //        HasFullPlayerInfos = HasFullPlayerInfos,
+            //        IsPaid = PaymentState == ClientShoppingCartPaymentStates.Paid,
+            //        PaymentTimeStamp = PaymentTimestamp,
+            //        Cash = Cash,
+            //        BankCard = BankCard,
+            //        Articles = ShoppingCart.ShoppingCartArticles.Select(x => new Item
+            //        {
+            //            Guid = x.Article.Guid,
+            //            Quantity = x.Quantity,
+            //        }).ToList()
+            //    };
+            //    string filename = Filename;
+            //    using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
+            //    {
+            //        writer.Formatting = Formatting.Indented;
+            //        DataContractSerializer serializer = new DataContractSerializer(typeof(ClientCart));
+            //        serializer.WriteObject(writer, cart);
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    Logger.Exception("Error while saving client cart", ex);
+            //    PopupService.DisplayError("Error while saving client cart", ex);
+            //}
         }
 
         #endregion

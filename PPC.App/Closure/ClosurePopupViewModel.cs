@@ -113,8 +113,13 @@ namespace PPC.App.Closure
         public ICommand SwitchToCashCountCommand => _switchToCashCountCommand = _switchToCashCountCommand ?? new RelayCommand(() => Mode = ClosureDisplayModes.CashCount);
 
         private ICommand _switchToNotesCommand;
-        public ICommand SwitchToNotesCommand => _switchToNotesCommand = _switchToNotesCommand ?? new RelayCommand(() => Mode = ClosureDisplayModes.Notes);
-        
+        public ICommand SwitchToNotesCommand => _switchToNotesCommand = _switchToNotesCommand ?? new RelayCommand(SwitchToNotes);
+
+        private void SwitchToNotes()
+        {
+            Mode = ClosureDisplayModes.Notes;
+            NotesViewModel.GotFocus();
+        }
 
         //http://stackoverflow.com/questions/12466049/passing-an-awaitable-anonymous-function-as-a-parameter
         public ClosurePopupViewModel(NotesViewModel notesViewModel, Action closeAction, CashRegisterClosure cashRegisterClosure, List<SoldCards> soldCards, Func<Domain.Closure, List<SoldCards>, Task> sendMailsAsyncFunc)

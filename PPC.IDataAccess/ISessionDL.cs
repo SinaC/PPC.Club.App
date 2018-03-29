@@ -14,6 +14,9 @@ namespace PPC.IDataAccess
         List<ClientCart> GetClientCarts();
         void SaveClientCart(ClientCart clientCart);
 
+        string GetNotes();
+        void SaveNotes(string notes);
+
         bool HasActiveSession();
         void CreateActiveSession();
         Session GetActiveSession();

@@ -1,14 +1,27 @@
-﻿using EasyMVVM;
+﻿using System;
+using EasyIoc;
+using EasyMVVM;
+using PPC.IDataAccess;
+using PPC.Log;
+using PPC.Services.Popup;
 
 namespace PPC.Module.Notes.ViewModels
 {
     public class NotesViewModel : ObservableObject
     {
+        private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
+        private ILog Logger => IocContainer.Default.Resolve<ILog>();
+        private ISessionDL SessionDL => IocContainer.Default.Resolve<ISessionDL>();
+
         private string _note;
         public string Note
         {
             get { return _note; }
-            set { Set(() => Note, ref _note, value); }
+            set
+            {
+                if (Set(() => Note, ref _note, value))
+                    SessionDL.SaveNotes(Note); // TODO: async write
+            }
         }
 
         private bool _isNoteFocused;
@@ -20,6 +33,19 @@ namespace PPC.Module.Notes.ViewModels
                 // Force RaisePropertyChanged
                 _isNoteFocused = value;
                 RaisePropertyChanged(() => IsNoteFocused);
+            }
+        }
+
+        public void Reload()
+        {
+            try
+            {
+                Note = SessionDL.GetNotes();
+            }
+            catch (Exception ex)
+            {
+                Logger.Exception("Error while loading notes", ex);
+                PopupService.DisplayError("Error while loading notes", ex);
             }
         }
 

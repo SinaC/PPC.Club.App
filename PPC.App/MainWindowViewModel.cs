@@ -198,8 +198,11 @@ namespace PPC.App
         {
             Logger.Info("Reload started");
 
+            // TODO: if (SessionDL.HasActiveSession())
+
             ShopViewModel.Reload();
             CardsViewModel.Reload();
+            NotesViewModel.Reload();
 
             int cartsCount = ShopViewModel.ClientShoppingCartsViewModel.Clients.Count;
             int cardSellersCount = CardsViewModel.Sellers.Count;

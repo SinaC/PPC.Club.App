@@ -51,6 +51,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EasyIoc\EasyIoc.csproj">
+      <Project>{38D20E7F-9510-4B80-8755-1DEF2EF07BCF}</Project>
+      <Name>EasyIoc</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EasyMVVM\EasyMVVM.csproj">
       <Project>{10833C79-C3FB-4F70-AD1D-7F0173D01966}</Project>
       <Name>EasyMVVM</Name>
@@ -58,6 +62,18 @@
     <ProjectReference Include="..\PPC.Helpers\PPC.Helpers.csproj">
       <Project>{3523c53f-4317-4ac6-b077-76544bdd174a}</Project>
       <Name>PPC.Helpers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.IDataAccess\PPC.IDataAccess.csproj">
+      <Project>{10DA16F1-F77E-4B88-9151-2D0F358B4908}</Project>
+      <Name>PPC.IDataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Log\PPC.Log.csproj">
+      <Project>{BCB79B57-39A1-4714-A728-B09C90BB4B35}</Project>
+      <Name>PPC.Log</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Services\PPC.Services.csproj">
+      <Project>{DAAB6105-1A4D-4AF9-9CAE-B76204B411D0}</Project>
+      <Name>PPC.Services</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

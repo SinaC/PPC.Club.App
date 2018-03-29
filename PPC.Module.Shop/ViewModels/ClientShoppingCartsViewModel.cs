@@ -9,6 +9,7 @@ using EasyMVVM;
 using PPC.Common;
 using PPC.Domain;
 using PPC.Helpers;
+using PPC.IDataAccess;
 using PPC.Log;
 using PPC.Messages;
 using PPC.Module.Shop.Models;
@@ -27,6 +28,7 @@ namespace PPC.Module.Shop.ViewModels
     {
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
         private ILog Logger => IocContainer.Default.Resolve<ILog>();
+        private ISessionDL SessionDL => IocContainer.Default.Resolve<ISessionDL>();
 
         private readonly Action<ShopTransactionItem> _addTransactionAction;
         private readonly Action<decimal, decimal, decimal> _clientCartPaidAction;
@@ -171,29 +173,70 @@ namespace PPC.Module.Shop.ViewModels
 
         #endregion
 
-        public void LoadClients(string shopFilename)
+        public void LoadClients()
         {
             SelectedClient = null;
             Clients.Clear();
-            //  add backup clients
-            string path = PPCConfigurationManager.BackupPath;
-            if (Directory.Exists(path))
+
+            List<ClientCart> carts = null;
+            try
             {
-                foreach (string filename in Directory.EnumerateFiles(path, "*.xml", SearchOption.TopDirectoryOnly).Where(x => !x.Contains(shopFilename)))
+                carts = SessionDL.GetClientCarts();
+            }
+            catch (GetClientCartsException ex)
+            {
+                carts = ex.ClientCarts;
+
+                Logger.Exception("Error while loading clients carts", ex);
+                PopupService.DisplayError("Error while loading clients carts", ex);
+            }
+            catch (Exception ex)
+            {
+                Logger.Exception("Error while loading clients carts", ex);
+                PopupService.DisplayError("Error while loading clients carts", ex);
+            }
+
+            if (carts != null)
+            {
+                foreach (ClientCart cart in carts)
                 {
                     try
                     {
-                        ClientShoppingCartViewModel client = new ClientShoppingCartViewModel(ClientCartPaid, ClientCartReopened, filename);
+                        ClientShoppingCartViewModel client = new ClientShoppingCartViewModel(ClientCartPaid, ClientCartReopened, cart);
                         Clients.Add(client);
                     }
                     catch (Exception ex)
                     {
-                        Logger.Exception($"Error while loading {filename ?? "??"} cart", ex);
-                        PopupService.DisplayError($"Error while loading {filename ?? "??"} cart", ex);
+                        Logger.Exception($"Error while creating client {cart.ClientName} from cart", ex);
+                        PopupService.DisplayError($"Error while creating client {cart.ClientName} from cart", ex);
                     }
                 }
             }
         }
+
+        //public void LoadClients(string shopFilename)
+        //{
+        //    SelectedClient = null;
+        //    Clients.Clear();
+        //    //  add backup clients
+        //    string path = PPCConfigurationManager.BackupPath;
+        //    if (Directory.Exists(path))
+        //    {
+        //        foreach (string filename in Directory.EnumerateFiles(path, "*.xml", SearchOption.TopDirectoryOnly).Where(x => !x.Contains(shopFilename)))
+        //        {
+        //            try
+        //            {
+        //                ClientShoppingCartViewModel client = new ClientShoppingCartViewModel(ClientCartPaid, ClientCartReopened, filename);
+        //                Clients.Add(client);
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                Logger.Exception($"Error while loading {filename ?? "??"} cart", ex);
+        //                PopupService.DisplayError($"Error while loading {filename ?? "??"} cart", ex);
+        //            }
+        //        }
+        //    }
+        //}
 
         public bool FindAndRemoveInvalidArticles()
         {

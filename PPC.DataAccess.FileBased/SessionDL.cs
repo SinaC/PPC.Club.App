@@ -14,9 +14,11 @@ namespace PPC.DataAccess.FileBased
     public class SessionDL : ISessionDL
     {
         private const string ShopFilename = "_shop.xml";
+        private const string NotesFilename = "_note.xml";
+
+        #region Transactions
 
         private string BuildShopFilename => $"{PPCConfigurationManager.BackupPath}{ShopFilename}";
-        private Func<ClientCart, string> BuildClientFilename => cart => $"{PPCConfigurationManager.BackupPath}{(cart.HasFullPlayerInfos ? cart.DciNumber : cart.ClientName.ToLowerInvariant())}.xml";
 
         public List<ShopTransaction> GetTransactions()
         {
@@ -73,6 +75,12 @@ namespace PPC.DataAccess.FileBased
             }
         }
 
+        #endregion
+
+        #region Client carts
+
+        private Func<ClientCart, string> BuildClientFilename => cart => $"{PPCConfigurationManager.BackupPath}{(cart.HasFullPlayerInfos ? cart.DciNumber : cart.ClientName.ToLowerInvariant())}.xml";
+
         public List<ClientCart> GetClientCarts()
         {
             List<Exception> exceptions = null;
@@ -80,7 +88,7 @@ namespace PPC.DataAccess.FileBased
             string path = PPCConfigurationManager.BackupPath;
             if (Directory.Exists(path))
             {
-                foreach (string filename in Directory.EnumerateFiles(path, "*.xml", SearchOption.TopDirectoryOnly).Where(x => !x.Contains(ShopFilename)))
+                foreach (string filename in Directory.EnumerateFiles(path, "*.xml", SearchOption.TopDirectoryOnly).Where(x => !x.Contains(ShopFilename) && !x.Contains(NotesFilename)))
                 {
                     try
                     {
@@ -113,9 +121,47 @@ namespace PPC.DataAccess.FileBased
             }
         }
 
+        private ClientCart LoadClient(string filename)
+        {
+            ClientCart cart;
+            using (XmlTextReader reader = new XmlTextReader(filename))
+            {
+                DataContractSerializer serializer = new DataContractSerializer(typeof(ClientCart));
+                cart = (ClientCart)serializer.ReadObject(reader);
+            }
+            return cart;
+        }
+
+
+        #endregion
+
+        #region Notes
+
+        private string BuildNotesFilename => $"{PPCConfigurationManager.BackupPath}{NotesFilename}";
+
+        public string GetNotes()
+        {
+            string filename = BuildNotesFilename;
+            if (File.Exists(filename))
+                return File.ReadAllText(filename, Encoding.UTF8);
+            return null;
+        }
+
+        public void SaveNotes(string notes)
+        {
+            if (!Directory.Exists(PPCConfigurationManager.BackupPath))
+                Directory.CreateDirectory(PPCConfigurationManager.BackupPath);
+            string filename = BuildNotesFilename;
+            File.WriteAllText(filename, notes, Encoding.UTF8);
+        }
+
+        #endregion
+
+        #region Session
+
         public bool HasActiveSession()
         {
-            return !Directory.EnumerateFiles(PPCConfigurationManager.BackupPath).Any();
+            return Directory.EnumerateFiles(PPCConfigurationManager.BackupPath).Any();
         }
 
         public void CreateActiveSession()
@@ -137,18 +183,19 @@ namespace PPC.DataAccess.FileBased
 
         public void CloseActiveSession()
         {
-            // TODO: copy current Session in backup and delete current session
+            string savePath = PPCConfigurationManager.BackupPath + $"{DateTime.Now:yyyy-MM-dd HH-mm-ss}\\";
+            if (!Directory.Exists(savePath))
+                Directory.CreateDirectory(savePath);
+
+            // Move backup files into save folder
+            string backupPath = PPCConfigurationManager.BackupPath;
+            foreach (string file in Directory.EnumerateFiles(backupPath))
+            {
+                string saveFilename = savePath + Path.GetFileName(file);
+                File.Move(file, saveFilename);
+            }
         }
 
-        private ClientCart LoadClient(string filename)
-        {
-            ClientCart cart;
-            using (XmlTextReader reader = new XmlTextReader(filename))
-            {
-                DataContractSerializer serializer = new DataContractSerializer(typeof(ClientCart));
-                cart = (ClientCart)serializer.ReadObject(reader);
-            }
-            return cart;
-        }
+        #endregion
     }
 }
