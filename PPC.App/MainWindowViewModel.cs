@@ -36,6 +36,7 @@ namespace PPC.App
     {
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
         private ILog Logger => IocContainer.Default.Resolve<ILog>();
+        private ISessionDL SessionDL => IocContainer.Default.Resolve<ISessionDL>();
 
         private bool _isWaiting;
         public bool IsWaiting
@@ -372,6 +373,39 @@ namespace PPC.App
             if (msg.SwitchToShop)
                 ApplicationMode = ApplicationModes.Shop;
         }
+
+        #region Automatic reload
+
+        //Auto reload when starting
+        //    if active session found, ask if reload
+        //        if reload, reload session
+        //        else, close session and restart a new one
+        //    else, start a new session
+
+        private void AutomaticReload()
+        {
+            if (SessionDL.HasActiveSession())
+            {
+                PopupService.DisplayQuestion("Reload", "An unfinished session has been detected. Do you want to reload ?", QuestionActionButton.Yes(AutomaticReloadAccepted), QuestionActionButton.No(AutomaticReloadRefused));
+            }
+            else
+                SessionDL.CreateActiveSession();
+        }
+
+        private void AutomaticReloadAccepted()
+        {
+            Session session = SessionDL.GetActiveSession();
+            // TODO: ShopViewModel.Reload(session)
+            // TODO: NotesViewModel.Reload(session)
+        }
+
+        private void AutomaticReloadRefused()
+        {
+            SessionDL.CloseActiveSession();
+            SessionDL.CreateActiveSession();
+        }
+
+        #endregion
     }
 
     public class MainWindowViewModelDesignData : MainWindowViewModel
