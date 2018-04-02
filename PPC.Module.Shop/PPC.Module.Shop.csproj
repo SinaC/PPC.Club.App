@@ -170,9 +170,9 @@
       <Project>{10833c79-c3fb-4f70-ad1d-7f0173d01966}</Project>
       <Name>EasyMVVM</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PPC.Popups\PPC.Popups.csproj">
-      <Project>{c06f804c-58a5-48ea-a3b4-935470804b05}</Project>
-      <Name>PPC.Popups</Name>
+    <ProjectReference Include="..\PPC.Module.Common\PPC.Module.Common.csproj">
+      <Project>{900E0782-493D-49AE-89D5-D5C6B6E34BC0}</Project>
+      <Name>PPC.Module.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Services\PPC.Services.csproj">
       <Project>{daab6105-1a4d-4af9-9cae-b76204b411d0}</Project>

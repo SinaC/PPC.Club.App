@@ -1,10 +1,6 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
 using System.Windows.Input;
-using System.Xml;
 using EasyIoc;
 using EasyMVVM;
 using PPC.Common;

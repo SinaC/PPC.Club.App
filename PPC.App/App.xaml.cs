@@ -29,10 +29,15 @@ namespace PPC.App
 
             // Register instances
             if (PPCConfigurationManager.UseMongo == true)
+            {
                 IocContainer.Default.RegisterInstance<IArticleDL>(new DataAccess.MongoDB.ArticleDL());
+                IocContainer.Default.RegisterInstance<ISessionDL>(new DataAccess.MongoDB.SessionDL());
+            }
             else
+            {
                 IocContainer.Default.RegisterInstance<IArticleDL>(new DataAccess.FileBased.ArticleDL());
-            IocContainer.Default.RegisterInstance<ISessionDL>(new DataAccess.FileBased.SessionDL());
+                IocContainer.Default.RegisterInstance<ISessionDL>(new DataAccess.FileBased.SessionDL());
+            }
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
             //Dispatcher.CurrentDispatcher.UnhandledException += CurrentDispatcherOnUnhandledException;

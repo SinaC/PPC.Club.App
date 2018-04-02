@@ -215,6 +215,10 @@
       <Project>{10DA16F1-F77E-4B88-9151-2D0F358B4908}</Project>
       <Name>PPC.IDataAccess</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PPC.IServiceAgent\PPC.IServiceAgent.csproj">
+      <Project>{EFB80EFD-8E05-49A2-A87B-EA5C89CD1FBB}</Project>
+      <Name>PPC.IServiceAgent</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PPC.Log\PPC.Log.csproj">
       <Project>{BCB79B57-39A1-4714-A728-B09C90BB4B35}</Project>
       <Name>PPC.Log</Name>
@@ -222,6 +226,10 @@
     <ProjectReference Include="..\PPC.Controls\PPC.Controls.csproj">
       <Project>{04cd3c36-e320-4a14-952b-1e09340e9b58}</Project>
       <Name>PPC.Controls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Module.Common\PPC.Module.Common.csproj">
+      <Project>{900E0782-493D-49AE-89D5-D5C6B6E34BC0}</Project>
+      <Name>PPC.Module.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Module.Inventory\PPC.Module.Inventory.csproj">
       <Project>{e734f70a-12e8-46bb-857d-35d606169a11}</Project>
@@ -238,10 +246,6 @@
     <ProjectReference Include="..\PPC.Module.Notes\PPC.Module.Notes.csproj">
       <Project>{62AB5298-6D6E-4A43-9CE7-4E1541A1BC21}</Project>
       <Name>PPC.Module.Notes</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PPC.Popups\PPC.Popups.csproj">
-      <Project>{c06f804c-58a5-48ea-a3b4-935470804b05}</Project>
-      <Name>PPC.Popups</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Services\PPC.Services.csproj">
       <Project>{DAAB6105-1A4D-4AF9-9CAE-B76204B411D0}</Project>

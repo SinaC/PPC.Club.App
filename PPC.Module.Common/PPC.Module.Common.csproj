@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C06F804C-58A5-48EA-A3B4-935470804B05}</ProjectGuid>
+    <ProjectGuid>{900E0782-493D-49AE-89D5-D5C6B6E34BC0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PPC.Popups</RootNamespace>
-    <AssemblyName>PPC.Popups</AssemblyName>
+    <RootNamespace>PPC.Module.Common</RootNamespace>
+    <AssemblyName>PPC.Module.Common</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -34,15 +34,12 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Windows.Controls.Input.Toolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\WPFToolkit.3.5.50211.1\lib\System.Windows.Controls.Input.Toolkit.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Windows.Controls.Layout.Toolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\WPFToolkit.3.5.50211.1\lib\System.Windows.Controls.Layout.Toolkit.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
     <Reference Include="Xceed.Wpf.AvalonDock, Version=3.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
@@ -71,10 +68,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CreateEditArticlePopup.xaml.cs">
+    <Compile Include="IModule.cs" />
+    <Compile Include="IReloadModule.cs" />
+    <Compile Include="Popups\CreateEditArticlePopup.xaml.cs">
       <DependentUpon>CreateEditArticlePopup.xaml</DependentUpon>
     </Compile>
-    <Compile Include="CreateEditArticlePopupViewModel.cs" />
+    <Compile Include="Popups\CreateEditArticlePopupViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -91,7 +90,7 @@
       <Name>PPC.Domain</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Services\PPC.Services.csproj">
-      <Project>{DAAB6105-1A4D-4AF9-9CAE-B76204B411D0}</Project>
+      <Project>{daab6105-1a4d-4af9-9cae-b76204b411d0}</Project>
       <Name>PPC.Services</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Styles\PPC.Styles.csproj">
@@ -100,9 +99,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="CreateEditArticlePopup.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="Popups\CreateEditArticlePopup.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>

@@ -5,9 +5,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using EasyIoc;
 using PPC.Common;
-using PPC.Log;
 using PPC.Services.Popup;
-using PPC.IDataAccess;
 
 namespace PPC.App
 {

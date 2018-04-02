@@ -1,4 +1,7 @@
 Don't use Savetransactions, but use InsertTransaction, UpdateTransactions, DeleteTransactions -> REDO ShopTransaction
+Closure: should be saved only when clicking on Ok button in ClosurePopupViewModel
+
+Split ShopViewModel and ClientShoppingCartsViewModel
 
 Rethink ClientCart, Transactions, Closure
 Move mail send code in a new BL
@@ -7,8 +10,6 @@ Closure: Domain.Closure should be saved on disk instead of CashRegisterClosure
 Transaction edition: we should save original transaction in transaction
 
 Localization
-
-IModule: with method GotFocus
 
 Business Layer to abstract Data access + add Mail sending, file save, ... within
 add informative logging

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Mail;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +14,7 @@ using PPC.Common;
 using PPC.Domain;
 using PPC.Helpers;
 using PPC.IDataAccess;
+using PPC.IServiceAgent;
 using PPC.Log;
 using PPC.Messages;
 using PPC.Module.Inventory.ViewModels;
@@ -37,6 +36,7 @@ namespace PPC.App
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
         private ILog Logger => IocContainer.Default.Resolve<ILog>();
         private ISessionDL SessionDL => IocContainer.Default.Resolve<ISessionDL>();
+        private IMailSenderSA MailSenderSA => IocContainer.Default.Resolve<IMailSenderSA>();
 
         private bool _isWaiting;
         public bool IsWaiting
@@ -272,12 +272,17 @@ namespace PPC.App
 
         private void CloseApplicationAfterClosurePopup()
         {
-            string savePath = PPCConfigurationManager.BackupPath + $"{DateTime.Now:yyyy-MM-dd hh-mm-ss}\\";
-            if (!Directory.Exists(savePath))
-                Directory.CreateDirectory(savePath);
+            try
+            {
+                Logger.Info("Closing session");
 
-            Logger.Info("Deleting backup files");
-            ShopViewModel.DeleteBackupFiles(savePath);
+                SessionDL.CloseActiveSession();
+            }
+            catch (Exception ex)
+            {
+                Logger.Exception("Error while closing session", ex);
+                PopupService.DisplayError("Error while closing session", ex);
+            }
 
             Application.Current.Shutdown();
         }
@@ -300,8 +305,11 @@ namespace PPC.App
 
                     try
                     {
+                        Logger.Info("Sending closure mail.");
                         // Send closure mail
-                        await SendClosureMailAsync(closure, closureConfig.SenderMail, closureConfig.SenderPassword, closureConfig.RecipientMail);
+                        await MailSenderSA.SendMailAsync(closureConfig.SenderMail, "From PPC Club", closureConfig.SenderPassword, closureConfig.RecipientMail, "To PPC", $"Cloture caisse du club (date {DateTime.Now:F})", closure.ToString());
+                        //
+                        Logger.Info("Closure mail sent.");
                     }
                     catch (Exception ex)
                     {
@@ -324,35 +332,6 @@ namespace PPC.App
             {
                 IsWaiting = false;
             }
-        }
-
-        private async Task SendClosureMailAsync(Domain.Closure closure, string senderMail, string senderPassword, string recipientMail)
-        {
-            Logger.Info("Sending closure mail.");
-
-            MailAddress fromAddress = new MailAddress(senderMail, "From PPC Club");
-            MailAddress toAddress = new MailAddress(recipientMail, "To PPC");
-            using (SmtpClient client = new SmtpClient
-            {
-                Host = "smtp.gmail.com",
-                Port = 587,
-                EnableSsl = true,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(fromAddress.Address, senderPassword)
-            })
-            {
-                using (var message = new MailMessage(fromAddress, toAddress)
-                {
-                    Subject = $"Cloture caisse du club (date {DateTime.Now:F})",
-                    Body = closure.ToString()
-                })
-                {
-                    await client.SendMailAsync(message);
-                }
-            }
-
-            Logger.Info("Closure mail sent.");
         }
 
         #endregion

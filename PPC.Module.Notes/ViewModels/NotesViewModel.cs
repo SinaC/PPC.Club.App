@@ -5,10 +5,11 @@ using PPC.IDataAccess;
 using PPC.Log;
 using PPC.Services.Popup;
 using PPC.Domain;
+using PPC.Module.Common;
 
 namespace PPC.Module.Notes.ViewModels
 {
-    public class NotesViewModel : ObservableObject
+    public class NotesViewModel : ObservableObject, IReloadModule
     {
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
         private ILog Logger => IocContainer.Default.Resolve<ILog>();
@@ -21,7 +22,7 @@ namespace PPC.Module.Notes.ViewModels
             set
             {
                 if (Set(() => Note, ref _note, value))
-                    SessionDL.SaveNotes(Note); // TODO: async save
+                    SaveNote();
             }
         }
 
@@ -37,27 +38,35 @@ namespace PPC.Module.Notes.ViewModels
             }
         }
 
+        #region IReloadModule
+
         public void Reload(Session session)
         {
             Note = session.Notes;
         }
 
-        //public void Reload()
-        //{
-        //    try
-        //    {
-        //        Note = SessionDL.GetNotes();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Logger.Exception("Error while loading notes", ex);
-        //        PopupService.DisplayError("Error while loading notes", ex);
-        //    }
-        //}
+        #region IModule
 
         public void GotFocus()
         {
             IsNoteFocused = true; // grrrrrrrrr f**king focus
+        }
+
+        #endregion
+
+        #endregion
+
+        private void SaveNote()
+        {
+            try
+            {
+                SessionDL.SaveNotes(Note); // TODO: async save
+            }
+            catch (Exception ex)
+            {
+                Logger.Exception("Error while saving notes.", ex);
+                PopupService.DisplayError("Error while saving notes", ex);
+            }
         }
     }
 

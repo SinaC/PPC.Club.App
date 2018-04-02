@@ -6,10 +6,8 @@ using System.Linq;
 using System.Windows.Input;
 using EasyIoc;
 using EasyMVVM;
-using PPC.Common;
 using PPC.Domain;
 using PPC.Helpers;
-using PPC.IDataAccess;
 using PPC.Log;
 using PPC.Messages;
 using PPC.Module.Shop.Models;
@@ -28,7 +26,6 @@ namespace PPC.Module.Shop.ViewModels
     {
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
         private ILog Logger => IocContainer.Default.Resolve<ILog>();
-        private ISessionDL SessionDL => IocContainer.Default.Resolve<ISessionDL>();
 
         private readonly Action<ShopTransactionItem> _addTransactionAction;
         private readonly Action<decimal, decimal, decimal> _clientCartPaidAction;
@@ -98,7 +95,7 @@ namespace PPC.Module.Shop.ViewModels
 
         private void AddNewClientNameSelected(string name)
         {
-            ClientShoppingCartViewModel alreadyExistingClient = Clients.FirstOrDefault(x => String.Equals(x.ClientName, name, StringComparison.InvariantCultureIgnoreCase));
+            ClientShoppingCartViewModel alreadyExistingClient = Clients.FirstOrDefault(x => string.Equals(x.ClientName, name, StringComparison.InvariantCultureIgnoreCase));
             if (alreadyExistingClient != null)
             {
                 Logger.Warning($"A shopping cart with that client name '{name}' has already been opened!");

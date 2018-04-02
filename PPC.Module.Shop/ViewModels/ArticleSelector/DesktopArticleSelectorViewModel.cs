@@ -9,7 +9,7 @@ using EasyMVVM;
 using PPC.Domain;
 using PPC.IDataAccess;
 using PPC.Log;
-using PPC.Popups;
+using PPC.Module.Common.Popups;
 using PPC.Services.Popup;
 
 namespace PPC.Module.Shop.ViewModels.ArticleSelector
@@ -198,9 +198,9 @@ namespace PPC.Module.Shop.ViewModels.ArticleSelector
         private void DisplayCreateArticlePopup()
         {
             SelectedArticle = null;
-            CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(Categories, Producers, BuildSubCategories, CreateArticle)
+            CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(SelectedArticle, Categories, Producers, BuildSubCategories, CreateArticle)
             {
-                IsEdition = false
+                IsEdition = false,
             };
             PopupService.DisplayModal(vm, "New article");
         }
@@ -254,18 +254,9 @@ namespace PPC.Module.Shop.ViewModels.ArticleSelector
         {
             if (SelectedArticle != null)
             {
-                CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(Categories, Producers, BuildSubCategories, SaveArticle)
+                CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(SelectedArticle, Categories, Producers, BuildSubCategories, SaveArticle)
                 {
-                    IsEdition = true,
-                    Ean = SelectedArticle.Ean,
-                    Description = SelectedArticle.Description,
-                    Category = SelectedArticle.Category,
-                    SubCategory = SelectedArticle.SubCategory,
-                    Producer = SelectedArticle.Producer,
-                    SupplierPrice = SelectedArticle.SupplierPrice,
-                    Price = SelectedArticle.Price,
-                    VatRate = SelectedArticle.VatRate,
-                    Stock = SelectedArticle.Stock
+                    IsEdition = true
                 };
                 PopupService.DisplayModal(vm, "Edit article");
             }

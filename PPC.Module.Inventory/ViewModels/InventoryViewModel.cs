@@ -8,7 +8,7 @@ using PPC.Common;
 using PPC.Domain;
 using PPC.IDataAccess;
 using PPC.Log;
-using PPC.Popups;
+using PPC.Module.Common.Popups;
 using PPC.Services.IO;
 using PPC.Services.Popup;
 
@@ -124,7 +124,7 @@ namespace PPC.Module.Inventory.ViewModels
 
         private void DisplayCreateArticlePopup()
         {
-            CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(Categories, Producers, BuildSubCategories, CreateArticle)
+            CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(SelectedArticle, Categories, Producers, BuildSubCategories, CreateArticle)
             {
                 IsEdition = false
             };
@@ -173,18 +173,9 @@ namespace PPC.Module.Inventory.ViewModels
         {
             if (SelectedArticle != null)
             {
-                CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(Categories, Producers, BuildSubCategories, SaveArticle)
+                CreateEditArticlePopupViewModel vm = new CreateEditArticlePopupViewModel(SelectedArticle, Categories, Producers, BuildSubCategories, SaveArticle)
                 {
                     IsEdition = true,
-                    Ean = SelectedArticle.Ean,
-                    Description = SelectedArticle.Description,
-                    Category = SelectedArticle.Category,
-                    SubCategory = SelectedArticle.SubCategory,
-                    Producer = SelectedArticle.Producer,
-                    SupplierPrice = SelectedArticle.SupplierPrice,
-                    Price = SelectedArticle.Price,
-                    VatRate = SelectedArticle.VatRate,
-                    Stock = SelectedArticle.Stock
                 };
                 PopupService.DisplayModal(vm, "Edit article");
             }
