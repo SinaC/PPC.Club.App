@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArticleDL.cs" />
+    <Compile Include="ClosureDL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SessionDL.cs" />
   </ItemGroup>

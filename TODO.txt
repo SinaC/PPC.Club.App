@@ -1,28 +1,20 @@
 Don't use Savetransactions, but use InsertTransaction, UpdateTransactions, DeleteTransactions -> REDO ShopTransaction
-Closure: should be saved only when clicking on Ok button in ClosurePopupViewModel
 
-Split ShopViewModel and ClientShoppingCartsViewModel
+Move ShopViewModel and ClientShoppingCartsViewModel in 2 separate modules
 
 Rethink ClientCart, Transactions, Closure
-Move mail send code in a new BL
 
-Closure: Domain.Closure should be saved on disk instead of CashRegisterClosure
 Transaction edition: we should save original transaction in transaction
 
 Localization
 
 Business Layer to abstract Data access + add Mail sending, file save, ... within
 add informative logging
-AskNameEmailPopup: check email validity
 article refund (client doesn't want anymore an already paid article !! only for cash payment)
-PlayersDb: store the list of players (similar to ArticlesDb + call load from MainViewModel)
-Players -> remove save button, save automatically once a modification has been done
 BubbleMouseWheelBehavior:
 	datagrid column are not recomputed correctly (reproduce: zoom in 5-6 times then zoom out 5-6 times)
 	window title is not zoomed
 finish mobile article selector view
-
-rename PPC.Popups in PPC.Module.Common
 
 popup style
 
@@ -32,9 +24,6 @@ inventory:
 known issues:
 after creating a new article, article cannot be added to shopping cart with enter
  ==> it seems KeyFriendlyAutoCompleteBox lose SelectedItem once entered is pressed
-
-workaround to fix:
-PlayerViewModel: Load must be called after Save to reset row.IsNewItem
 
 virtualization:
 https://blogs.msdn.microsoft.com/dancre/2006/02/06/implementing-a-virtualized-panel-in-wpf-avalon/  -> http://www.boingo.org/samples/VirtualizingTilePanelSample.zip

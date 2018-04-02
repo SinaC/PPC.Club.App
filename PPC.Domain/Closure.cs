@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Runtime.Serialization;
 using System.Text;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace PPC.Domain
 {
     [DataContract(Namespace = "")]
     public class Closure
     {
+        [BsonId]
+        [DataMember]
+        public Guid Guid { get; set; }
+
         [DataMember]
         public DateTime CreationTime { get; set; }
 

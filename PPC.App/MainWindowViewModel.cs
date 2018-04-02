@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -37,6 +36,7 @@ namespace PPC.App
         private ILog Logger => IocContainer.Default.Resolve<ILog>();
         private ISessionDL SessionDL => IocContainer.Default.Resolve<ISessionDL>();
         private IMailSenderSA MailSenderSA => IocContainer.Default.Resolve<IMailSenderSA>();
+        private IClosureDL ClosureDL => IocContainer.Default.Resolve<IClosureDL>();
 
         private bool _isWaiting;
         public bool IsWaiting
@@ -210,7 +210,6 @@ namespace PPC.App
 
         private void Close()
         {
-            // TODO: check if players have been saved, check if one or more shopping carts articles still opened: new method string PrepareClose (return null if ready or error message otherwise)
             PopupService.DisplayQuestion("Close application", "Do you want to perform cash registry closure", QuestionActionButton.Yes(CheckUnpaidShoppingCarts), QuestionActionButton.No(() => Application.Current.Shutdown()), QuestionActionButton.Cancel());
         }
 
@@ -224,57 +223,84 @@ namespace PPC.App
 
         private void DisplayClosurePopup()
         {
-            CashRegisterClosure cashClosure = PrepareCashRegisterClosure();
-            ClosurePopupViewModel vm = new ClosurePopupViewModel(NotesViewModel, CloseApplicationAfterClosurePopup, cashClosure, SendMailsAsync);
+            CashRegisterClosure cashClosure = ShopViewModel.PrepareClosure();
+            ClosurePopupViewModel vm = new ClosurePopupViewModel(NotesViewModel, CloseApplicationAfterClosurePopup, cashClosure, SendClosureMailAsync);
             PopupService.DisplayModal(vm, "Cash register closure", 640, 480);
         }
 
-        private CashRegisterClosure PrepareCashRegisterClosure()
-        {
-            CashRegisterClosure closure = ShopViewModel.PrepareClosure();
+        //private CashRegisterClosure PrepareCashRegisterClosure()
+        //{
+        //    CashRegisterClosure closure = ShopViewModel.PrepareClosure();
 
-            // Dump cash register closure file
-            DateTime now = DateTime.Now;
-            //  txt
-            try
-            {
-                if (!Directory.Exists(PPCConfigurationManager.CashRegisterClosurePath))
-                    Directory.CreateDirectory(PPCConfigurationManager.CashRegisterClosurePath);
-                string filename = $"{PPCConfigurationManager.CashRegisterClosurePath}CashRegister_{now:yyyy-MM-dd_HH-mm-ss}.txt";
-                File.WriteAllText(filename, closure.ToString());
-            }
-            catch (Exception ex)
-            {
-                Logger.Exception("Error", ex);
-                PopupService.DisplayError("Error", ex);
-            }
-            //  xml
-            try
-            {
-                if (!Directory.Exists(PPCConfigurationManager.CashRegisterClosurePath))
-                    Directory.CreateDirectory(PPCConfigurationManager.CashRegisterClosurePath);
-                string filename = $"{PPCConfigurationManager.CashRegisterClosurePath}CashRegister_{now:yyyy-MM-dd_HH-mm-ss}.xml";
-                using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
-                {
-                    writer.Formatting = Formatting.Indented;
-                    DataContractSerializer serializer = new DataContractSerializer(typeof(CashRegisterClosure));
-                    serializer.WriteObject(writer, closure);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Exception("Error", ex);
-                PopupService.DisplayError("Error", ex);
-            }
+        //    // Dump cash register closure file
+        //    DateTime now = DateTime.Now;
+        //    //  txt
+        //    try
+        //    {
+        //        if (!Directory.Exists(PPCConfigurationManager.CashRegisterClosurePath))
+        //            Directory.CreateDirectory(PPCConfigurationManager.CashRegisterClosurePath);
+        //        string filename = $"{PPCConfigurationManager.CashRegisterClosurePath}CashRegister_{now:yyyy-MM-dd_HH-mm-ss}.txt";
+        //        File.WriteAllText(filename, closure.ToString());
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.Exception("Error", ex);
+        //        PopupService.DisplayError("Error", ex);
+        //    }
+        //    //  xml
+        //    try
+        //    {
+        //        if (!Directory.Exists(PPCConfigurationManager.CashRegisterClosurePath))
+        //            Directory.CreateDirectory(PPCConfigurationManager.CashRegisterClosurePath);
+        //        string filename = $"{PPCConfigurationManager.CashRegisterClosurePath}CashRegister_{now:yyyy-MM-dd_HH-mm-ss}.xml";
+        //        using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
+        //        {
+        //            writer.Formatting = Formatting.Indented;
+        //            DataContractSerializer serializer = new DataContractSerializer(typeof(CashRegisterClosure));
+        //            serializer.WriteObject(writer, closure);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.Exception("Error", ex);
+        //        PopupService.DisplayError("Error", ex);
+        //    }
 
-            return closure;
-        }
+        //    return closure;
+        //}
 
-        private void CloseApplicationAfterClosurePopup()
+        private void CloseApplicationAfterClosurePopup(Domain.Closure closure)
         {
             try
             {
                 Logger.Info("Closing session");
+
+                // Dump closure as text file (same content as email)
+                DateTime now = DateTime.Now;
+                //  txt
+                try
+                {
+                    if (!Directory.Exists(PPCConfigurationManager.CashRegisterClosurePath))
+                        Directory.CreateDirectory(PPCConfigurationManager.CashRegisterClosurePath);
+                    string filename = $"{PPCConfigurationManager.CashRegisterClosurePath}CashRegister_{now:yyyy-MM-dd_HH-mm-ss}.txt";
+                    File.WriteAllText(filename, closure.ToString());
+                }
+                catch (Exception ex)
+                {
+                    Logger.Exception("Error", ex);
+                    PopupService.DisplayError("Error", ex);
+                }
+
+                // Save closure
+                try
+                {
+                    ClosureDL.SaveClosure(closure);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Exception("Error", ex);
+                    PopupService.DisplayError("Error", ex);
+                }
 
                 SessionDL.CloseActiveSession();
             }
@@ -287,7 +313,7 @@ namespace PPC.App
             Application.Current.Shutdown();
         }
 
-        private async Task SendMailsAsync(Domain.Closure closure)
+        private async Task SendClosureMailAsync(Domain.Closure closure)
         {
             IsWaiting = true;
             try

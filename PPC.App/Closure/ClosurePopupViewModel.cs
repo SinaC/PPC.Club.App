@@ -21,7 +21,7 @@ namespace PPC.App.Closure
     {
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
 
-        private readonly Action _closeAction;
+        private readonly Action<Domain.Closure> _closeAction;
         private readonly Func<Domain.Closure, Task> _sendMailsAsyncFunc;
 
         private bool _isWaiting;
@@ -71,8 +71,11 @@ namespace PPC.App.Closure
         public ICommand OkCommand => _okCommand = _okCommand ?? new RelayCommand(Ok);
         private void Ok()
         {
+            //
             PopupService?.Close(this);
-            _closeAction?.Invoke();
+            //
+            Domain.Closure closure = PrepareClosure();
+            _closeAction?.Invoke(closure);
         }
 
         private ICommand _sendMailsCommand;
@@ -81,14 +84,11 @@ namespace PPC.App.Closure
         private async Task SendMails()
         {
             IsWaiting = true;
-            CashRegisterClosure cashRegisterClosure = ArticlesViewModel.ClosureData;
-            Domain.Closure closure = new Domain.Closure
-            {
-                CreationTime = DateTime.Now,
-                Notes = NotesViewModel.Note,
-                CashRegisterClosure = cashRegisterClosure
-            };
+            //
+            Domain.Closure closure = PrepareClosure();
+            //
             await _sendMailsAsyncFunc(closure);
+            //
             IsWaiting = false;
         }
 
@@ -108,7 +108,7 @@ namespace PPC.App.Closure
         }
 
         //http://stackoverflow.com/questions/12466049/passing-an-awaitable-anonymous-function-as-a-parameter
-        public ClosurePopupViewModel(NotesViewModel notesViewModel, Action closeAction, CashRegisterClosure cashRegisterClosure, Func<Domain.Closure, Task> sendMailsAsyncFunc)
+        public ClosurePopupViewModel(NotesViewModel notesViewModel, Action<Domain.Closure> closeAction, CashRegisterClosure cashRegisterClosure, Func<Domain.Closure, Task> sendMailsAsyncFunc)
         {
             Mode = ClosureDisplayModes.Articles;
 
@@ -119,11 +119,23 @@ namespace PPC.App.Closure
             CashCountViewModel = new CashCountViewModel();
             NotesViewModel = notesViewModel;
         }
+
+        private Domain.Closure PrepareClosure()
+        {
+            CashRegisterClosure cashRegisterClosure = ArticlesViewModel.ClosureData;
+            return new Domain.Closure
+            {
+                Guid = Guid.NewGuid(),
+                CreationTime = DateTime.Now,
+                Notes = NotesViewModel.Note,
+                CashRegisterClosure = cashRegisterClosure
+            };
+        }
     }
 
     public class ClosurePopupViewModelDesignData : ClosurePopupViewModel
     {
-        public ClosurePopupViewModelDesignData() : base(null, () => { }, new CashRegisterClosure(), null)
+        public ClosurePopupViewModelDesignData() : base(null, _ => { }, new CashRegisterClosure(), null)
         {
             ArticlesViewModel = new ArticlesViewModelDesignData();
             CashCountViewModel = new CashCountViewModelDesignData();

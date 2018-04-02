@@ -32,11 +32,13 @@ namespace PPC.App
             {
                 IocContainer.Default.RegisterInstance<IArticleDL>(new DataAccess.MongoDB.ArticleDL());
                 IocContainer.Default.RegisterInstance<ISessionDL>(new DataAccess.MongoDB.SessionDL());
+                IocContainer.Default.RegisterInstance<IClosureDL>(new DataAccess.MongoDB.ClosureDL());
             }
             else
             {
                 IocContainer.Default.RegisterInstance<IArticleDL>(new DataAccess.FileBased.ArticleDL());
                 IocContainer.Default.RegisterInstance<ISessionDL>(new DataAccess.FileBased.SessionDL());
+                IocContainer.Default.RegisterInstance<IClosureDL>(new DataAccess.FileBased.ClosureDL());
             }
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;

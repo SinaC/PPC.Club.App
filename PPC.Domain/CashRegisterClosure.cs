@@ -44,6 +44,8 @@ namespace PPC.Domain
                                 Guid = article.Guid,
                                 Ean = article.Ean,
                                 Description = article.Description,
+                                Category = article.Category,
+                                SubCategory = article.SubCategory,
                                 Price = article.Price,
                                 Quantity = 0,
                             };
