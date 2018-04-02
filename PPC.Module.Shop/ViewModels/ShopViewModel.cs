@@ -375,6 +375,8 @@ namespace PPC.Module.Shop.ViewModels
                     Guid = x.Article.Guid,
                     Ean = x.Article.Ean,
                     Description = x.Article.Description,
+                    Category = x.Article.Category,
+                    SubCategory = x.Article.SubCategory,
                     Price = x.Article.Price,
                     Quantity = x.Quantity
                 }).ToList(),
@@ -393,6 +395,8 @@ namespace PPC.Module.Shop.ViewModels
                     Guid = x.Article.Guid,
                     Ean = x.Article.Ean,
                     Description = x.Article.Description,
+                    Category = x.Article.Category,
+                    SubCategory = x.Article.SubCategory,
                     Price = x.Article.Price,
                     Quantity = x.Quantity
                 }).ToList(),

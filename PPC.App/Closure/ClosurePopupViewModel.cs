@@ -84,6 +84,7 @@ namespace PPC.App.Closure
             CashRegisterClosure cashRegisterClosure = ArticlesViewModel.ClosureData;
             Domain.Closure closure = new Domain.Closure
             {
+                CreationTime = DateTime.Now,
                 Notes = NotesViewModel.Note,
                 CashRegisterClosure = cashRegisterClosure
             };

@@ -8,6 +8,9 @@ namespace PPC.Domain
     public class Closure
     {
         [DataMember]
+        public DateTime? CreationTime { get; set; }
+
+        [DataMember]
         public CashRegisterClosure CashRegisterClosure { get; set; }
 
         [DataMember]
@@ -16,7 +19,7 @@ namespace PPC.Domain
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"Cloture de la caisse du club (date: {DateTime.Now:F})");
+            sb.AppendLine($"Cloture de la caisse du club (date: {CreationTime:F})");
             sb.AppendLine("**********************");
             if (!string.IsNullOrWhiteSpace(Notes))
             {

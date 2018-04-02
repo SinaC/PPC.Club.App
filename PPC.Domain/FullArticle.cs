@@ -13,13 +13,17 @@ namespace PPC.Domain
         [DataMember]
         public string Description { get; set; }
         [DataMember]
+        public string Category { get; set; }
+        [DataMember]
+        public string SubCategory { get; set; }
+        [DataMember]
         public decimal Price { get; set; }
         [DataMember]
         public int Quantity { get; set; }
 
         public override string ToString()
         {
-            return $"{Quantity,-3} * {Ean,-15} {Description,-30} {Price,-10:C}";
+            return $"{Quantity,-3} * {Ean,-15} {Description,-30} {Category,-20} {SubCategory,-20} {Price,-10:C}";
         }
     }
 }

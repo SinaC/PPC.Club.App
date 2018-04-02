@@ -1,5 +1,6 @@
 Rethink ClientCart, Transactions, Closure
 Move mail send code in a new BL
+FullArticle should contain Category
 
 Session should contain a different kind of ShopTransaction storing whole article data (allow price change tracking, can use session even article doesn't exist anymore)
 
