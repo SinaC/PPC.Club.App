@@ -1,19 +1,10 @@
+Don't use Savetransactions, but use InsertTransaction, UpdateTransactions, DeleteTransactions -> REDO ShopTransaction
+
 Rethink ClientCart, Transactions, Closure
 Move mail send code in a new BL
-FullArticle should contain Category
 
-Session should contain a different kind of ShopTransaction storing whole article data (allow price change tracking, can use session even article doesn't exist anymore)
-
-Auto reload when starting
-	if active session found, ask if reload
-		if reload, reload session
-		else, close session and restart a new one
-	else, start a new session
-
-Implement ISessionDL in Mongo
 Closure: Domain.Closure should be saved on disk instead of CashRegisterClosure
 Transaction edition: we should save original transaction in transaction
-ShopTransaction should contain an Id (BSonId)
 
 Localization
 

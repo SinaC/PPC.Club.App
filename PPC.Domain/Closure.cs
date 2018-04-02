@@ -8,7 +8,7 @@ namespace PPC.Domain
     public class Closure
     {
         [DataMember]
-        public DateTime? CreationTime { get; set; }
+        public DateTime CreationTime { get; set; }
 
         [DataMember]
         public CashRegisterClosure CashRegisterClosure { get; set; }

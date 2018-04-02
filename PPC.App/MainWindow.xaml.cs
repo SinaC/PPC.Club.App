@@ -30,18 +30,20 @@ namespace PPC.App
                 TextElement.SetFontSize(this, fontSize.Value);
 
             // Create MainViewModel
-            DataContext = new MainWindowViewModel();
+            MainWindowViewModel vm = new MainWindowViewModel();
+            DataContext = vm;
 
             //FocusManager.AddGotFocusHandler(this, GotFocusHandler);
+            Loaded += OnLoaded;
         }
 
-        //private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
-        //{
-        //    Loaded -= OnLoaded;
+        private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
+        {
+            Loaded -= OnLoaded;
 
-        //    // Create MainViewModel
-        //    DataContext = new MainWindowViewModel();
-        //}
+            MainWindowViewModel vm = DataContext as MainWindowViewModel;
+            vm.Initialize();
+        }
 
         private void GotFocusHandler(object sender, RoutedEventArgs routedEventArgs)
         {

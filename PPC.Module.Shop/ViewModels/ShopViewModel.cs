@@ -142,6 +142,19 @@ namespace PPC.Module.Shop.ViewModels
             RaisePropertyChanged(() => BankCard);
 
             SaveTransactions();
+            //SessionDL.InsertTransaction(new ShopTransaction
+            //{
+            //    Guid = transaction.Id,
+            //    Timestamp = transaction.Timestamp,
+            //    Articles = transaction.Articles.Select(a => new Item
+            //    {
+            //        Guid = a.Article.Guid,
+            //        Quantity = a.Quantity,
+            //    }).ToList(),
+            //    Cash = transaction.Cash,
+            //    BankCard = transaction.BankCard,
+            //    DiscountPercentage = transaction.DiscountPercentage
+            //});
 
             RefreshSoldArticles();
         }
@@ -273,95 +286,123 @@ namespace PPC.Module.Shop.ViewModels
             Mode = ShopModes.SoldArticles;
         }
 
-        public void Reload()
+        public void Reload(Session session)
         {
-            if (SessionDL.HasActiveSession())
+            ReloadTransactions(session);
+            ReloadClients(session);
+
+            // If transactions / clients contains unknown article->remove them and display a warning
+            bool unknownArticleFound = false;
+            foreach (ShopTransactionItem transaction in Transactions.Where(t => t.Articles.Any(a => a.Article == null)))
             {
-                //TODO: SessionDL.GetActiveSession();
-                try
-                {
-                    // Reload transactions
-                    LoadTransactions();
-                    // Reload clients
-                    //ClientShoppingCartsViewModel.LoadClients(ShopFilename);
-                    ClientShoppingCartsViewModel.LoadClients();
-
-                    // If transactions/clients contains unknown article -> remove them and display a warning
-                    bool unknownArticleFound = false;
-                    foreach (ShopTransactionItem transaction in Transactions.Where(t => t.Articles.Any(a => a.Article == null)))
-                    {
-                        transaction.Articles.RemoveAll(x => x.Article == null);
-                        unknownArticleFound = true;
-                    }
-
-                    if (ClientShoppingCartsViewModel.FindAndRemoveInvalidArticles())
-                        unknownArticleFound = true;
-
-                    if (unknownArticleFound)
-                    {
-                        Logger.Warning("Unknown articles have been found and removed!");
-                        PopupService.DisplayError("Warning", "Unknown articles have been found and removed!");
-                        // TODO: 
-                        // recompute transaction cash/bank if possible
-                        // recompute client cash/bank if possible
-                    }
-
-                    RefreshSoldArticles();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Exception("Error while loading active session", ex);
-                    PopupService.DisplayError("Error while loading active session", ex);
-                }
-            }
-            else
-            {
-                PopupService.DisplayError("Reload", "No active session found.");
+                transaction.Articles.RemoveAll(x => x.Article == null);
+                unknownArticleFound = true;
             }
 
-            //if (Directory.Exists(PPCConfigurationManager.BackupPath))
-            //{
-            //    try
-            //    {
-            //        // Reload transactions
-            //        LoadTransactions();
-            //        // Reload clients
-            //        ClientShoppingCartsViewModel.LoadClients(ShopFilename);
+            if (ClientShoppingCartsViewModel.FindAndRemoveInvalidArticles())
+                unknownArticleFound = true;
 
-            //        // If transactions/clients contains unknown article -> remove them and display a warning
-            //        bool unknownArticleFound = false;
-            //        foreach (ShopTransactionItem transaction in Transactions.Where(t => t.Articles.Any(a => a.Article == null)))
-            //        {
-            //            transaction.Articles.RemoveAll(x => x.Article == null);
-            //            unknownArticleFound = true;
-            //        }
+            if (unknownArticleFound)
+            {
+                Logger.Warning("Unknown articles have been found and removed!");
+                PopupService.DisplayError("Warning", "Unknown articles have been found and removed!");
+                // TODO: 
+                // recompute transaction cash/bank if possible
+                // recompute client cash/bank if possible
+            }
 
-            //        if (ClientShoppingCartsViewModel.FindAndRemoveInvalidArticles())
-            //            unknownArticleFound = true;
-
-            //        if (unknownArticleFound)
-            //        {
-            //            Logger.Warning("Unknown articles have been found and removed!");
-            //            PopupService.DisplayError("Warning", "Unknown articles have been found and removed!");
-            //            // TODO: 
-            //            // recompute transaction cash/bank if possible
-            //            // recompute client cash/bank if possible
-            //        }
-
-            //        RefreshSoldArticles();
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        Logger.Exception("Error while loading shop", ex);
-            //        PopupService.DisplayError("Error while loading shop", ex);
-            //    }
-            //}
-            //else
-            //{
-            //    Logger.Error("Error while loading shop: Backup path not found");
-            //    PopupService.DisplayError("Error while loading shop", "Backup path not found");
-            //}
+            RefreshSoldArticles();
         }
+
+        //public void Reload()
+        //{
+        //    if (SessionDL.HasActiveSession())
+        //    {
+        //        //TODO: SessionDL.GetActiveSession();
+        //        try
+        //        {
+        //            // Reload transactions
+        //            LoadTransactions();
+        //            // Reload clients
+        //            //ClientShoppingCartsViewModel.LoadClients(ShopFilename);
+        //            ClientShoppingCartsViewModel.LoadClients();
+
+        //            // If transactions/clients contains unknown article -> remove them and display a warning
+        //            bool unknownArticleFound = false;
+        //            foreach (ShopTransactionItem transaction in Transactions.Where(t => t.Articles.Any(a => a.Article == null)))
+        //            {
+        //                transaction.Articles.RemoveAll(x => x.Article == null);
+        //                unknownArticleFound = true;
+        //            }
+
+        //            if (ClientShoppingCartsViewModel.FindAndRemoveInvalidArticles())
+        //                unknownArticleFound = true;
+
+        //            if (unknownArticleFound)
+        //            {
+        //                Logger.Warning("Unknown articles have been found and removed!");
+        //                PopupService.DisplayError("Warning", "Unknown articles have been found and removed!");
+        //                // TODO: 
+        //                // recompute transaction cash/bank if possible
+        //                // recompute client cash/bank if possible
+        //            }
+
+        //            RefreshSoldArticles();
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            Logger.Exception("Error while loading active session", ex);
+        //            PopupService.DisplayError("Error while loading active session", ex);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        PopupService.DisplayError("Reload", "No active session found.");
+        //    }
+
+        //    //if (Directory.Exists(PPCConfigurationManager.BackupPath))
+        //    //{
+        //    //    try
+        //    //    {
+        //    //        // Reload transactions
+        //    //        LoadTransactions();
+        //    //        // Reload clients
+        //    //        ClientShoppingCartsViewModel.LoadClients(ShopFilename);
+
+        //    //        // If transactions/clients contains unknown article -> remove them and display a warning
+        //    //        bool unknownArticleFound = false;
+        //    //        foreach (ShopTransactionItem transaction in Transactions.Where(t => t.Articles.Any(a => a.Article == null)))
+        //    //        {
+        //    //            transaction.Articles.RemoveAll(x => x.Article == null);
+        //    //            unknownArticleFound = true;
+        //    //        }
+
+        //    //        if (ClientShoppingCartsViewModel.FindAndRemoveInvalidArticles())
+        //    //            unknownArticleFound = true;
+
+        //    //        if (unknownArticleFound)
+        //    //        {
+        //    //            Logger.Warning("Unknown articles have been found and removed!");
+        //    //            PopupService.DisplayError("Warning", "Unknown articles have been found and removed!");
+        //    //            // TODO: 
+        //    //            // recompute transaction cash/bank if possible
+        //    //            // recompute client cash/bank if possible
+        //    //        }
+
+        //    //        RefreshSoldArticles();
+        //    //    }
+        //    //    catch (Exception ex)
+        //    //    {
+        //    //        Logger.Exception("Error while loading shop", ex);
+        //    //        PopupService.DisplayError("Error while loading shop", ex);
+        //    //    }
+        //    //}
+        //    //else
+        //    //{
+        //    //    Logger.Error("Error while loading shop: Backup path not found");
+        //    //    PopupService.DisplayError("Error while loading shop", "Backup path not found");
+        //    //}
+        //}
 
         public CashRegisterClosure PrepareClosure()
         {
@@ -525,67 +566,88 @@ namespace PPC.Module.Shop.ViewModels
             RaisePropertyChanged(() => PaidCartsCount);
         }
 
-        private void LoadTransactions()
+        private void ReloadTransactions(Session session)
         {
-            try
+            Transactions = new ObservableCollection<ShopTransactionItem>(session.Transactions.Select(t => new ShopTransactionItem
             {
-                List<ShopTransaction> transactions = SessionDL.GetTransactions();
-
-                Transactions = new ObservableCollection<ShopTransactionItem>(transactions.Select(t => new ShopTransactionItem
+                Id = t.Guid,
+                Timestamp = t.Timestamp,
+                Articles = t.Articles.Select(a => new ShopArticleItem
                 {
-                    Id = t.Guid,
-                    Timestamp = t.Timestamp,
-                    Articles = t.Articles.Select(a => new ShopArticleItem
-                    {
-                        Article = IocContainer.Default.Resolve<IArticleDL>().GetById(a.Guid),
-                        Quantity = a.Quantity
-                    }).ToList(),
-                    Cash = t.Cash,
-                    BankCard = t.BankCard,
-                }));
-            }
-            catch (Exception ex)
-            {
-                Logger.Exception("Error while loading transactions", ex);
-                PopupService.DisplayError("Error while loading transactions", ex);
-            }
-
-            //string filename = $"{PPCConfigurationManager.BackupPath}{ShopFilename}";
-            //if (File.Exists(filename))
-            //{
-            //    try
-            //    {
-            //        Domain.Shop shop;
-            //        using (XmlTextReader reader = new XmlTextReader(filename))
-            //        {
-            //            DataContractSerializer serializer = new DataContractSerializer(typeof(Domain.Shop));
-            //            shop = (Domain.Shop)serializer.ReadObject(reader);
-            //        }
-            //        Transactions = new ObservableCollection<ShopTransactionItem>(shop.Transactions.Select(t => new ShopTransactionItem
-            //        {
-            //            Id = Guid.NewGuid(),
-            //            Timestamp = t.Timestamp,
-            //            Articles = t.Articles.Select(a => new ShopArticleItem
-            //            {
-            //                Article = IocContainer.Default.Resolve<IArticleDL>().GetById(a.Guid),
-            //                Quantity = a.Quantity
-            //            }).ToList(),
-            //            Cash = t.Cash,
-            //            BankCard = t.BankCard,
-            //        }));
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        Logger.Exception("Error while loading shop", ex);
-            //        PopupService.DisplayError("Error while loading shop", ex);
-            //    }
-            //}
-            //else
-            //{
-            //    Logger.Error("Error while loading shop: Shop file not found");
-            //    PopupService.DisplayError("Error while loading shop", "Shop file not found");
-            //}
+                    Article = IocContainer.Default.Resolve<IArticleDL>().GetById(a.Guid),
+                    Quantity = a.Quantity
+                }).ToList(),
+                Cash = t.Cash,
+                BankCard = t.BankCard,
+            }));
         }
+
+        private void ReloadClients(Session session)
+        {
+            ClientShoppingCartsViewModel.ReloadClients(session);
+        }
+
+        //private void LoadTransactions()
+        //{
+        //    try
+        //    {
+        //        List<ShopTransaction> transactions = SessionDL.GetTransactions();
+
+        //        Transactions = new ObservableCollection<ShopTransactionItem>(transactions.Select(t => new ShopTransactionItem
+        //        {
+        //            Id = t.Guid,
+        //            Timestamp = t.Timestamp,
+        //            Articles = t.Articles.Select(a => new ShopArticleItem
+        //            {
+        //                Article = IocContainer.Default.Resolve<IArticleDL>().GetById(a.Guid),
+        //                Quantity = a.Quantity
+        //            }).ToList(),
+        //            Cash = t.Cash,
+        //            BankCard = t.BankCard,
+        //        }));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.Exception("Error while loading transactions", ex);
+        //        PopupService.DisplayError("Error while loading transactions", ex);
+        //    }
+
+        //    //string filename = $"{PPCConfigurationManager.BackupPath}{ShopFilename}";
+        //    //if (File.Exists(filename))
+        //    //{
+        //    //    try
+        //    //    {
+        //    //        Domain.Shop shop;
+        //    //        using (XmlTextReader reader = new XmlTextReader(filename))
+        //    //        {
+        //    //            DataContractSerializer serializer = new DataContractSerializer(typeof(Domain.Shop));
+        //    //            shop = (Domain.Shop)serializer.ReadObject(reader);
+        //    //        }
+        //    //        Transactions = new ObservableCollection<ShopTransactionItem>(shop.Transactions.Select(t => new ShopTransactionItem
+        //    //        {
+        //    //            Id = Guid.NewGuid(),
+        //    //            Timestamp = t.Timestamp,
+        //    //            Articles = t.Articles.Select(a => new ShopArticleItem
+        //    //            {
+        //    //                Article = IocContainer.Default.Resolve<IArticleDL>().GetById(a.Guid),
+        //    //                Quantity = a.Quantity
+        //    //            }).ToList(),
+        //    //            Cash = t.Cash,
+        //    //            BankCard = t.BankCard,
+        //    //        }));
+        //    //    }
+        //    //    catch (Exception ex)
+        //    //    {
+        //    //        Logger.Exception("Error while loading shop", ex);
+        //    //        PopupService.DisplayError("Error while loading shop", ex);
+        //    //    }
+        //    //}
+        //    //else
+        //    //{
+        //    //    Logger.Error("Error while loading shop: Shop file not found");
+        //    //    PopupService.DisplayError("Error while loading shop", "Shop file not found");
+        //    //}
+        //}
     }
 
     public class ShopViewModelDesignData : ShopViewModel

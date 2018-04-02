@@ -180,6 +180,9 @@ namespace PPC.DataAccess.FileBased
                 LastReloadTime = DateTime.Now,
             };
 
+            session.ClientCarts = GetClientCarts();
+            session.Transactions = GetTransactions();
+
             return session;
         }
 

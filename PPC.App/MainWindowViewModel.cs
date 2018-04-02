@@ -159,16 +159,46 @@ namespace PPC.App
         {
             Logger.Info("Reload started");
 
-            // TODO: if (SessionDL.HasActiveSession())
+            if (SessionDL.HasActiveSession())
+            {
+                try
+                {
+                    Session activeSession = SessionDL.GetActiveSession();
 
-            ShopViewModel.Reload();
-            NotesViewModel.Reload();
+                    ShopViewModel.Reload(activeSession);
+                    NotesViewModel.Reload(activeSession);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Exception("Error while setting active session ", ex);
+                }
+                //catch (GetClientCartsException ex)
+                //{
+                //    //TODO: carts = ex.ClientCarts;
 
-            int cartsCount = ShopViewModel.ClientShoppingCartsViewModel.Clients.Count;
-            int transactionsCount = ShopViewModel.Transactions.Count;
-            PopupService.DisplayQuestion("Reload", $"Reload done. Carts:{cartsCount} Transactions:{transactionsCount}.", QuestionActionButton.Ok());
+                //    Logger.Exception("Error while loading clients carts", ex);
+                //    PopupService.DisplayError("Error while loading clients carts", ex);
+                //}
+                //catch (Exception ex)
+                //{
+                //    Logger.Exception("Error while loading clients carts", ex);
+                //    PopupService.DisplayError("Error while loading clients carts", ex);
+                //}
 
-            Logger.Info($"Reload done. Carts:{cartsCount} Transactions:{transactionsCount}.");
+                int cartsCount = ShopViewModel.ClientShoppingCartsViewModel.Clients.Count;
+                int transactionsCount = ShopViewModel.Transactions.Count;
+                PopupService.DisplayQuestion("Reload", $"Reload done. Carts:{cartsCount} Transactions:{transactionsCount}.", QuestionActionButton.Ok());
+
+                Logger.Info($"Reload done. Carts:{cartsCount} Transactions:{transactionsCount}.");
+            }
+            else
+            {
+                Logger.Warning("No active session found.");
+                PopupService.DisplayError("Reload", "No active session found.");
+            }
+
+            //ShopViewModel.Reload();
+            //NotesViewModel.Reload();
         }
 
         #endregion
@@ -363,6 +393,11 @@ namespace PPC.App
             Mediator.Default.Register<PlayerSelectedMessage>(this, PlayerSelected);
         }
 
+        public void Initialize()
+        {
+            AutomaticReload();
+        }
+
         private void ChangeWaiting(ChangeWaitingMessage msg)
         {
             IsWaiting = msg.IsWaiting;
@@ -386,7 +421,7 @@ namespace PPC.App
         {
             if (SessionDL.HasActiveSession())
             {
-                PopupService.DisplayQuestion("Reload", "An unfinished session has been detected. Do you want to reload ?", QuestionActionButton.Yes(AutomaticReloadAccepted), QuestionActionButton.No(AutomaticReloadRefused));
+                PopupService.DisplayQuestion("Reload", "An active session has been detected. Do you want to reload ?", QuestionActionButton.Yes(AutomaticReloadAccepted), QuestionActionButton.No(AutomaticReloadRefused));
             }
             else
                 SessionDL.CreateActiveSession();
@@ -394,9 +429,21 @@ namespace PPC.App
 
         private void AutomaticReloadAccepted()
         {
-            Session session = SessionDL.GetActiveSession();
-            // TODO: ShopViewModel.Reload(session)
-            // TODO: NotesViewModel.Reload(session)
+            try
+            {
+                Session activeSession = SessionDL.GetActiveSession();
+
+                ShopViewModel.Reload(activeSession);
+                NotesViewModel.Reload(activeSession);
+            }
+            catch (Exception ex)
+            {
+                Logger.Exception("Error while setting active session ", ex);
+            }
+
+            int cartsCount = ShopViewModel.ClientShoppingCartsViewModel.Clients.Count;
+            int transactionsCount = ShopViewModel.Transactions.Count;
+            PopupService.DisplayQuestion("Reload", $"Reload done. Carts:{cartsCount} Transactions:{transactionsCount}.", QuestionActionButton.Ok());
         }
 
         private void AutomaticReloadRefused()

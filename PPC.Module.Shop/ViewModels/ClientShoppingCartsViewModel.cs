@@ -173,28 +173,12 @@ namespace PPC.Module.Shop.ViewModels
 
         #endregion
 
-        public void LoadClients()
+        public void ReloadClients(Session session)
         {
             SelectedClient = null;
             Clients.Clear();
 
-            List<ClientCart> carts = null;
-            try
-            {
-                carts = SessionDL.GetClientCarts();
-            }
-            catch (GetClientCartsException ex)
-            {
-                carts = ex.ClientCarts;
-
-                Logger.Exception("Error while loading clients carts", ex);
-                PopupService.DisplayError("Error while loading clients carts", ex);
-            }
-            catch (Exception ex)
-            {
-                Logger.Exception("Error while loading clients carts", ex);
-                PopupService.DisplayError("Error while loading clients carts", ex);
-            }
+            List<ClientCart> carts = session.ClientCarts;
 
             if (carts != null)
             {
@@ -213,6 +197,47 @@ namespace PPC.Module.Shop.ViewModels
                 }
             }
         }
+
+        //public void LoadClients()
+        //{
+        //    SelectedClient = null;
+        //    Clients.Clear();
+
+        //    List<ClientCart> carts = null;
+        //    try
+        //    {
+        //        carts = SessionDL.GetClientCarts();
+        //    }
+        //    catch (GetClientCartsException ex)
+        //    {
+        //        carts = ex.ClientCarts;
+
+        //        Logger.Exception("Error while loading clients carts", ex);
+        //        PopupService.DisplayError("Error while loading clients carts", ex);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.Exception("Error while loading clients carts", ex);
+        //        PopupService.DisplayError("Error while loading clients carts", ex);
+        //    }
+
+        //    if (carts != null)
+        //    {
+        //        foreach (ClientCart cart in carts)
+        //        {
+        //            try
+        //            {
+        //                ClientShoppingCartViewModel client = new ClientShoppingCartViewModel(ClientCartPaid, ClientCartReopened, cart);
+        //                Clients.Add(client);
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                Logger.Exception($"Error while creating client {cart.ClientName} from cart", ex);
+        //                PopupService.DisplayError($"Error while creating client {cart.ClientName} from cart", ex);
+        //            }
+        //        }
+        //    }
+        //}
 
         //public void LoadClients(string shopFilename)
         //{

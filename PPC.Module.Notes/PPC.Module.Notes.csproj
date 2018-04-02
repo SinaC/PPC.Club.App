@@ -59,6 +59,10 @@
       <Project>{10833C79-C3FB-4F70-AD1D-7F0173D01966}</Project>
       <Name>EasyMVVM</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PPC.Domain\PPC.Domain.csproj">
+      <Project>{11AA6511-78E6-408F-8894-811989851F04}</Project>
+      <Name>PPC.Domain</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PPC.Helpers\PPC.Helpers.csproj">
       <Project>{3523c53f-4317-4ac6-b077-76544bdd174a}</Project>
       <Name>PPC.Helpers</Name>

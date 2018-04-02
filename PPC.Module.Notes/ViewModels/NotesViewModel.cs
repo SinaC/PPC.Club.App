@@ -4,6 +4,7 @@ using EasyMVVM;
 using PPC.IDataAccess;
 using PPC.Log;
 using PPC.Services.Popup;
+using PPC.Domain;
 
 namespace PPC.Module.Notes.ViewModels
 {
@@ -20,7 +21,7 @@ namespace PPC.Module.Notes.ViewModels
             set
             {
                 if (Set(() => Note, ref _note, value))
-                    SessionDL.SaveNotes(Note); // TODO: async write
+                    SessionDL.SaveNotes(Note); // TODO: async save
             }
         }
 
@@ -36,18 +37,23 @@ namespace PPC.Module.Notes.ViewModels
             }
         }
 
-        public void Reload()
+        public void Reload(Session session)
         {
-            try
-            {
-                Note = SessionDL.GetNotes();
-            }
-            catch (Exception ex)
-            {
-                Logger.Exception("Error while loading notes", ex);
-                PopupService.DisplayError("Error while loading notes", ex);
-            }
+            Note = session.Notes;
         }
+
+        //public void Reload()
+        //{
+        //    try
+        //    {
+        //        Note = SessionDL.GetNotes();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.Exception("Error while loading notes", ex);
+        //        PopupService.DisplayError("Error while loading notes", ex);
+        //    }
+        //}
 
         public void GotFocus()
         {

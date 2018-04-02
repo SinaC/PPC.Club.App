@@ -5,16 +5,16 @@ namespace PPC.IDataAccess
 {
     public interface ISessionDL
     {
-        List<ShopTransaction> GetTransactions();
-        void InsertTransaction(ShopTransaction transaction);
-        void UpdateTransaction(ShopTransaction transaction);
-        void DeleteTransaction(ShopTransaction transaction);
+        //List<ShopTransaction> GetTransactions();
+        //void InsertTransaction(ShopTransaction transaction);
+        //void UpdateTransaction(ShopTransaction transaction);
+        //void DeleteTransaction(ShopTransaction transaction);
         void SaveTransactions(IEnumerable<ShopTransaction> transactions);
 
-        List<ClientCart> GetClientCarts();
+        //List<ClientCart> GetClientCarts();
         void SaveClientCart(ClientCart clientCart);
 
-        string GetNotes();
+        //string GetNotes();
         void SaveNotes(string notes);
 
         bool HasActiveSession();
