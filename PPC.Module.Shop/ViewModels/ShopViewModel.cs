@@ -253,8 +253,8 @@ namespace PPC.Module.Shop.ViewModels
 
         #region Paid carts
 
-        private List<ShopTransactionItem> _paidCarts;
-        public List<ShopTransactionItem> PaidCarts
+        private ObservableCollection<ShopTransactionItem> _paidCarts;
+        public ObservableCollection<ShopTransactionItem> PaidCarts
         {
             get { return _paidCarts; }
             protected set { Set(() => PaidCarts, ref _paidCarts, value); }
@@ -374,7 +374,7 @@ namespace PPC.Module.Shop.ViewModels
             CashRegisterViewModel = new CashRegisterViewModel(AddTransaction);
             ClientShoppingCartsViewModel = new ClientShoppingCartsViewModel(AddTransaction, ClientCartPaid, RefreshSoldArticles);
             SoldArticles = new List<ShopArticleItem>();
-            PaidCarts = new List<ShopTransactionItem>();
+            PaidCarts = new ObservableCollection<ShopTransactionItem>();
 
             CashRegisterViewModel.ShoppingCart.GotFocus();
         }

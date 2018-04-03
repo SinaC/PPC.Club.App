@@ -182,6 +182,7 @@ namespace PPC.DataAccess.FileBased
 
             session.ClientCarts = GetClientCarts();
             session.Transactions = GetTransactions();
+            session.Notes = GetNotes();
 
             return session;
         }

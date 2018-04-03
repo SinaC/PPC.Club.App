@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Windows.Threading;
 using EasyIoc;
 using EasyMVVM;
 using PPC.IDataAccess;
@@ -15,6 +17,8 @@ namespace PPC.Module.Notes.ViewModels
         private ILog Logger => IocContainer.Default.Resolve<ILog>();
         private ISessionDL SessionDL => IocContainer.Default.Resolve<ISessionDL>();
 
+        private DispatcherTimer _timer;
+
         private string _note;
         public string Note
         {
@@ -22,7 +26,7 @@ namespace PPC.Module.Notes.ViewModels
             set
             {
                 if (Set(() => Note, ref _note, value))
-                    SaveNote();
+                    NoteUpdated();
             }
         }
 
@@ -42,7 +46,9 @@ namespace PPC.Module.Notes.ViewModels
 
         public void Reload(Session session)
         {
-            Note = session.Notes;
+            // Don't start timer
+            _note = session.Notes;
+            RaisePropertyChanged(() => Note);
         }
 
         #region IModule
@@ -56,8 +62,26 @@ namespace PPC.Module.Notes.ViewModels
 
         #endregion
 
-        private void SaveNote()
+        private void NoteUpdated()
         {
+            // Write only when 5 seconds elapsed since last property update
+            if (_timer == null)
+            {
+                _timer = new DispatcherTimer();
+                _timer.Tick += SaveNoteOnTimerElapsed;
+            }
+            else
+            {
+                if (_timer.IsEnabled)
+                    _timer.Stop();
+            }
+            _timer.Interval = TimeSpan.FromSeconds(5);
+            _timer.Start();
+        }
+
+        private void SaveNoteOnTimerElapsed(object sender, EventArgs eventArgs)
+        {
+            _timer.Stop();
             try
             {
                 SessionDL.SaveNotes(Note); // TODO: async save

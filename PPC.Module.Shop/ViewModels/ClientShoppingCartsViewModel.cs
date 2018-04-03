@@ -173,7 +173,7 @@ namespace PPC.Module.Shop.ViewModels
         public void ReloadClients(Session session)
         {
             SelectedClient = null;
-            Clients.Clear();
+            Clients.Clear(); // TODO: remove handlers
 
             List<ClientCart> carts = session.ClientCarts;
 

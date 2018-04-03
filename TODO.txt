@@ -1,9 +1,33 @@
+In CashRegister, when cart is paid, a transaction is added to closed transactions [can be edited in ShopSoldArticlesViews/Transactions Grid]
+
+ClientShoppingCart cannot be closed unless it's empty, even if it has been paid [for the moment, it's possible to do this]
+When paying ClientShoppingCart, a transaction is created in ClientCart and is added to closed transactions [cannot be edited in TransactionView]
+When reopening a ClientShoppingCart, related transaction is removed from closed transactions and reset in ClientShoppingCart
+
+Shop module overview:
+	ShopView
+		CashRegisterView(ShopViewModel.CashRegisterViewModel)
+			ShoppingCartView(CashRegisterViewModel.ShoppingCart ***)
+		or
+		ClientShoppingCartsView(ShopViewModel.ClientShoppingCartsViewModel)
+			ClientShoppingCartView(ClientShoppingCartsViewModel.SelectedClient of type ClientShoppingCartViewModel)
+				ShoppingCartView(ClientShoppingCartViewModel.ShoppingCart ***) [unpaid]
+				or
+				Some controls + ShoppingCartView(ClientShoppingCartViewModel.ShoppingCart ***) [paid]
+			or
+			List of buttons (ClientShoppingCartsViewModel.Clients of type ClientShoppingCartViewModel) [Click switch to other view]
+		or
+		ShopSoldArticlesViews(ShopViewModel)
+			3 grids (bound on Transactions, PaidCarts and SoldArticles)
+
+
 Don't use Savetransactions, but use InsertTransaction, UpdateTransactions, DeleteTransactions -> REDO ShopTransaction
 
 Move ShopViewModel and ClientShoppingCartsViewModel in 2 separate modules
 Split SessionDL into TransactionDL, ClientCartDL, NotesDL, SessionDL
 
 Rethink ClientCart, Transactions(ShopTransaction, TransactionFullArticle, ShopTransactionItem), Closure
+	ShopTransaction and ShopTransactionItem are identical except for RaisePropertyChanged ==> remove ShopTransactionItem and use ShopTransaction instead
 
 Transaction edition: we should save original transaction in transaction
 
