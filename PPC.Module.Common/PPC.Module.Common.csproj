@@ -70,11 +70,13 @@
   <ItemGroup>
     <Compile Include="IModule.cs" />
     <Compile Include="IReloadModule.cs" />
+    <Compile Include="ITransactionManager.cs" />
     <Compile Include="Popups\CreateEditArticlePopup.xaml.cs">
       <DependentUpon>CreateEditArticlePopup.xaml</DependentUpon>
     </Compile>
     <Compile Include="Popups\CreateEditArticlePopupViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TransactionManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EasyIoc\EasyIoc.csproj">
@@ -88,6 +90,14 @@
     <ProjectReference Include="..\PPC.Domain\PPC.Domain.csproj">
       <Project>{11AA6511-78E6-408F-8894-811989851F04}</Project>
       <Name>PPC.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.IDataAccess\PPC.IDataAccess.csproj">
+      <Project>{10DA16F1-F77E-4B88-9151-2D0F358B4908}</Project>
+      <Name>PPC.IDataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Log\PPC.Log.csproj">
+      <Project>{BCB79B57-39A1-4714-A728-B09C90BB4B35}</Project>
+      <Name>PPC.Log</Name>
     </ProjectReference>
     <ProjectReference Include="..\PPC.Services\PPC.Services.csproj">
       <Project>{daab6105-1a4d-4af9-9cae-b76204b411d0}</Project>

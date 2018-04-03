@@ -1,10 +1,14 @@
 Don't use Savetransactions, but use InsertTransaction, UpdateTransactions, DeleteTransactions -> REDO ShopTransaction
 
 Move ShopViewModel and ClientShoppingCartsViewModel in 2 separate modules
+Split SessionDL into TransactionDL, ClientCartDL, NotesDL, SessionDL
 
-Rethink ClientCart, Transactions, Closure
+Rethink ClientCart, Transactions(ShopTransaction, TransactionFullArticle, ShopTransactionItem), Closure
 
 Transaction edition: we should save original transaction in transaction
+
+TransactionManager: singleton used to share Transactions between view model without passing thru DL -> current implementation is useless. first we have to simplify domain and vm models
+ClientCartManager: same as TransactionManager but for client cart
 
 Localization
 
