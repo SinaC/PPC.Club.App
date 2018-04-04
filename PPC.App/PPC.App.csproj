@@ -247,6 +247,10 @@
       <Project>{62AB5298-6D6E-4A43-9CE7-4E1541A1BC21}</Project>
       <Name>PPC.Module.Notes</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PPC.ServiceAgent.MailSender\PPC.ServiceAgent.MailSender.csproj">
+      <Project>{604C9F35-A450-4B7C-83D0-395997A63F10}</Project>
+      <Name>PPC.ServiceAgent.MailSender</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PPC.Services\PPC.Services.csproj">
       <Project>{DAAB6105-1A4D-4AF9-9CAE-B76204B411D0}</Project>
       <Name>PPC.Services</Name>

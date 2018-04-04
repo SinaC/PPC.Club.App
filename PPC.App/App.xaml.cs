@@ -7,7 +7,9 @@ using System.Windows.Media;
 using EasyIoc;
 using PPC.Common;
 using PPC.IDataAccess;
+using PPC.IServiceAgent;
 using PPC.Log;
+using PPC.ServiceAgent.MailSender;
 
 namespace PPC.App
 {
@@ -40,6 +42,7 @@ namespace PPC.App
                 IocContainer.Default.RegisterInstance<ISessionDL>(new DataAccess.FileBased.SessionDL());
                 IocContainer.Default.RegisterInstance<IClosureDL>(new DataAccess.FileBased.ClosureDL());
             }
+            IocContainer.Default.RegisterInstance<IMailSenderSA>(new MailSenderSA());
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
             //Dispatcher.CurrentDispatcher.UnhandledException += CurrentDispatcherOnUnhandledException;
