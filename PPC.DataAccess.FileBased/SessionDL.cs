@@ -124,6 +124,13 @@ namespace PPC.DataAccess.FileBased
             }
         }
 
+        public void DeleteClientCart(ClientCart clientCart)
+        {
+            // Delete backup file
+            string filename = BuildClientFilename(clientCart);
+            File.Delete(filename);
+        }
+
         private ClientCart LoadClient(string filename)
         {
             ClientCart cart;

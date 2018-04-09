@@ -129,8 +129,36 @@ namespace PPC.Module.Shop.ViewModels
             protected set { Set(() => DiscountPercentage, ref _discountPercentage, value); }
         }
 
-        public void RemoveHandlers()
+        public void DeleteClientCart()
         {
+            ClientCart cart = new ClientCart
+            {
+                Guid = ClientGuid,
+                ClientName = ClientName,
+                ClientFirstName = ClientFirstName,
+                ClientLastName = ClientLastName,
+                DciNumber = DciNumber,
+                HasFullPlayerInfos = HasFullPlayerInfos,
+                IsPaid = PaymentState == ClientShoppingCartPaymentStates.Paid,
+                PaymentTimeStamp = PaymentTimestamp,
+                Cash = Cash,
+                BankCard = BankCard,
+                Articles = ShoppingCart.ShoppingCartArticles.Select(x => new Item
+                {
+                    Guid = x.Article.Guid,
+                    Quantity = x.Quantity,
+                }).ToList()
+            };
+            try
+            {
+                SessionDL.DeleteClientCart(cart);
+            }
+            catch (Exception ex)
+            {
+                Logger.Exception("Error while deleting client cart", ex);
+                PopupService.DisplayError("Error while deleting client cart", ex);
+            }
+            //
             _cartPaidAction = null;
             _cartReopenedAction = null;
             ShoppingCart.RemoveHandlers();

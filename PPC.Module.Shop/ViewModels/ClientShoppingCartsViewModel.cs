@@ -8,6 +8,7 @@ using EasyIoc;
 using EasyMVVM;
 using PPC.Domain;
 using PPC.Helpers;
+using PPC.IDataAccess;
 using PPC.Log;
 using PPC.Messages;
 using PPC.Module.Shop.Models;
@@ -26,6 +27,7 @@ namespace PPC.Module.Shop.ViewModels
     {
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
         private ILog Logger => IocContainer.Default.Resolve<ILog>();
+        private ISessionDL SessionDL => IocContainer.Default.Resolve<ISessionDL>();
 
         private readonly Action<ShopTransactionItem> _addTransactionAction;
         private readonly Action<decimal, decimal, decimal> _clientCartPaidAction;
@@ -135,7 +137,6 @@ namespace PPC.Module.Shop.ViewModels
         {
             SelectedClient = null;
             Mode = ClientShoppingCartsModes.List;
-            Clients.Remove(client);
             if (client.ShoppingCart.ShoppingCartArticles.Any())
             {
                 // Create a transaction and add it to transactions
@@ -153,19 +154,19 @@ namespace PPC.Module.Shop.ViewModels
                 };
                 _addTransactionAction?.Invoke(transaction);
             }
-            // Delete backup file
-            try
-            {
-                string filename = client.Filename;
-                File.Delete(filename);
-            }
-            catch (Exception ex)
-            {
-                Logger.Exception("Error while deleting backup file", ex);
-                PopupService.DisplayError("Error while deleting backup file", ex);
-            }
-            //
-            client.RemoveHandlers();
+            client.DeleteClientCart();
+            Clients.Remove(client);
+            //// Delete backup file
+            //try
+            //{
+            //    string filename = client.Filename;
+            //    File.Delete(filename);
+            //}
+            //catch (Exception ex)
+            //{
+            //    Logger.Exception("Error while deleting backup file", ex);
+            //    PopupService.DisplayError("Error while deleting backup file", ex);
+            //}
         }
 
         #endregion

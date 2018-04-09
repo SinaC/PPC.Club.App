@@ -9,12 +9,11 @@ namespace PPC.IDataAccess
         //void InsertTransaction(ShopTransaction transaction);
         //void UpdateTransaction(ShopTransaction transaction);
         //void DeleteTransaction(ShopTransaction transaction);
-        void SaveTransactions(IEnumerable<ShopTransaction> transactions);
+        void SaveTransactions(IEnumerable<ShopTransaction> transactions); // TODO: remove
 
-        //List<ClientCart> GetClientCarts();
         void SaveClientCart(ClientCart clientCart);
+        void DeleteClientCart(ClientCart clientCart);
 
-        //string GetNotes();
         void SaveNotes(string notes);
 
         bool HasActiveSession();

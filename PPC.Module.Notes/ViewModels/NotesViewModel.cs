@@ -13,6 +13,8 @@ namespace PPC.Module.Notes.ViewModels
 {
     public class NotesViewModel : ObservableObject, IReloadModule
     {
+        private const double SecondsBeforeSavingNotes = 2;
+
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
         private ILog Logger => IocContainer.Default.Resolve<ILog>();
         private ISessionDL SessionDL => IocContainer.Default.Resolve<ISessionDL>();
@@ -75,7 +77,7 @@ namespace PPC.Module.Notes.ViewModels
                 if (_timer.IsEnabled)
                     _timer.Stop();
             }
-            _timer.Interval = TimeSpan.FromSeconds(5);
+            _timer.Interval = TimeSpan.FromSeconds(SecondsBeforeSavingNotes);
             _timer.Start();
         }
 
