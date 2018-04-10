@@ -216,7 +216,7 @@
                     Command="{Binding CancelCommand}"
                     ToolTip="Cancel">
                 <Image Style="{StaticResource AutoDisableImageStyle}"
-                       Source="{StaticResource CloseImage}"/>
+                        Source="{StaticResource CloseImage}"/>
             </Button>
         </Grid>
     </Grid>

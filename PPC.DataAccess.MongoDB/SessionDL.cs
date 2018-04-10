@@ -32,6 +32,7 @@ namespace PPC.DataAccess.MongoDB
             SessionsCollection.UpdateOne(x => x.Guid == _activeSessionId, Builders<Session>.Update.Set(x => x.Transactions, transactions));
         }
 
+        // Insert/Update could be replaced with SaveTransaction(ShopTransaction transaction)
         public void InsertTransaction(ShopTransaction transaction)
         {
             SessionsCollection.FindOneAndUpdate(x => x.Guid == _activeSessionId, Builders<Session>.Update.Push(x => x.Transactions, transaction));
@@ -42,6 +43,17 @@ namespace PPC.DataAccess.MongoDB
             var filter = Builders<Session>.Filter;
             var transactionIdAndSessionIdFilter = filter.Eq(x => x.Guid, _activeSessionId) & filter.ElemMatch(x => x.Transactions, x => x.Guid == transaction.Guid);
             SessionsCollection.UpdateOne(transactionIdAndSessionIdFilter, Builders<Session>.Update.Set(x => x.Transactions[-1], transaction));
+        }
+
+        public void SaveTransaction(ShopTransaction transaction)
+        {
+            // Try to update
+            var filter = Builders<Session>.Filter;
+            var transactionIdAndSessionIdFilter = filter.Eq(x => x.Guid, _activeSessionId) & filter.ElemMatch(x => x.Transactions, x => x.Guid == transaction.Guid);
+            UpdateResult updateResult = SessionsCollection.UpdateOne(transactionIdAndSessionIdFilter, Builders<Session>.Update.Set(x => x.Transactions[-1], transaction));
+            // Update failed -> insert
+            if (updateResult.ModifiedCount == 0)
+                SessionsCollection.FindOneAndUpdate(x => x.Guid == _activeSessionId, Builders<Session>.Update.Push(x => x.Transactions, transaction));
         }
 
         public void DeleteTransaction(ShopTransaction transaction)

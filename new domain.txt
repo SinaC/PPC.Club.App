@@ -1,0 +1,27 @@
+Article (same as actual one)
+
+Discount
+	Id
+	Type: Percentage, Fixed, Free
+	Value
+
+ShopArticle
+	Id
+	Article
+	Quantity
+	Discount
+
+Transaction
+	Id
+	CreatedOn
+	UpdatedOn
+	List<ShopArticle>
+	Cash
+	BankCard
+	Discount
+
+ClientCart
+	Id
+	ClientName
+	Transaction (set if cart is paid)
+	List<ShopArticle>

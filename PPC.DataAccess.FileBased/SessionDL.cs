@@ -27,13 +27,11 @@ namespace PPC.DataAccess.FileBased
             string filename = BuildShopFilename;
             if (File.Exists(filename))
             {
-                Shop shop;
                 using (XmlTextReader reader = new XmlTextReader(filename))
                 {
-                    DataContractSerializer serializer = new DataContractSerializer(typeof(Shop));
-                    shop = (Shop) serializer.ReadObject(reader);
+                    DataContractSerializer serializer = new DataContractSerializer(typeof(List<ShopTransaction>));
+                    transactions = (List<ShopTransaction>) serializer.ReadObject(reader);
                 }
-                transactions = shop.Transactions;
             }
 
             return transactions;
@@ -61,20 +59,31 @@ namespace PPC.DataAccess.FileBased
             SaveTransactions(transactions);
         }
 
+        public void SaveTransaction(ShopTransaction transaction)
+        {
+            List<ShopTransaction> transactions = GetTransactions();
+            // If transaction already exists -> update
+            if (transactions.Any(x => x.Guid == transaction.Guid))
+            {
+                transactions.RemoveAll(x => x.Guid == transaction.Guid);
+                transactions.Add(transaction);
+            }
+            // Else, insert
+            else
+                transactions.Add(transaction);
+            SaveTransactions(transactions);
+        }
+
         public void SaveTransactions(IEnumerable<ShopTransaction> transactions)
         {
             if (!Directory.Exists(PPCConfigurationManager.BackupPath))
                 Directory.CreateDirectory(PPCConfigurationManager.BackupPath);
-            Shop shop = new Shop
-            {
-                Transactions = transactions.ToList(),
-            };
             string filename = $"{PPCConfigurationManager.BackupPath}{ShopFilename}";
             using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
             {
                 writer.Formatting = Formatting.Indented;
-                DataContractSerializer serializer = new DataContractSerializer(typeof(Shop));
-                serializer.WriteObject(writer, shop);
+                DataContractSerializer serializer = new DataContractSerializer(typeof(List<ShopTransaction>));
+                serializer.WriteObject(writer, transactions);
             }
         }
 

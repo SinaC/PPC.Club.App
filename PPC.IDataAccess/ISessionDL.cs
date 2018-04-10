@@ -5,10 +5,11 @@ namespace PPC.IDataAccess
 {
     public interface ISessionDL
     {
-        //List<ShopTransaction> GetTransactions();
+        // Insert/Update could be replaced with SaveTransaction(ShopTransaction transaction)
         //void InsertTransaction(ShopTransaction transaction);
         //void UpdateTransaction(ShopTransaction transaction);
         //void DeleteTransaction(ShopTransaction transaction);
+        //void SaveTransaction(ShopTransaction transaction);
         void SaveTransactions(IEnumerable<ShopTransaction> transactions); // TODO: remove
 
         void SaveClientCart(ClientCart clientCart);

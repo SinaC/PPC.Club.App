@@ -102,32 +102,24 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0"
-                        Orientation="Vertical">
-                <Button Width="48"
-                        Height="48"
-                        Margin="5,2"
-                        Command="{Binding ConfirmCommand}"
-                        ToolTip="Confirm">
-                    <Image Style="{StaticResource AutoDisableImageStyle}"
-                           Source="{StaticResource CheckmarkImage}"/>
-                </Button>
-                <TextBlock Style="{StaticResource SubButtonTextBlockStyle}"
-                           Text="Confirm"/>
-            </StackPanel>
-            <StackPanel Grid.Column="1"
-                        Orientation="Vertical">
-                <Button Width="48"
-                        Height="48"
-                        Margin="5,2"
-                        Command="{Binding CancelCommand}"
-                        ToolTip="Cancel">
-                    <Image Style="{StaticResource AutoDisableImageStyle}"
-                           Source="{StaticResource CloseImage}"/>
-                </Button>
-                <TextBlock Style="{StaticResource SubButtonTextBlockStyle}"
-                           Text="Cancel"/>
-            </StackPanel>
+            <Button Grid.Column="0"
+                    Width="48"
+                    Height="48"
+                    Margin="5,2"
+                    Command="{Binding ConfirmCommand}"
+                    ToolTip="Confirm">
+                <Image Style="{StaticResource AutoDisableImageStyle}"
+                        Source="{StaticResource CheckmarkImage}"/>
+            </Button>
+            <Button Grid.Column="1"
+                    Width="48"
+                    Height="48"
+                    Margin="5,2"
+                    Command="{Binding CancelCommand}"
+                    ToolTip="Cancel">
+                <Image Style="{StaticResource AutoDisableImageStyle}"
+                        Source="{StaticResource CloseImage}"/>
+            </Button>
         </Grid>
     </Grid>
 
