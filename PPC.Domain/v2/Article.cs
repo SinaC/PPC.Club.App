@@ -36,7 +36,7 @@ namespace PPC.Domain.v2
         public int Stock { get; set; }
 
         [DataMember]
-        public VatRates VatRate { get; set; }
+        public decimal VatRate { get; set; }
 
         [DataMember]
         public bool IsNewArticle { get; set; }

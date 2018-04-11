@@ -53,6 +53,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EasyDBFParser\EasyDBFParser.csproj">
+      <Project>{e85892e8-7837-483d-b20d-dfe6a89d8330}</Project>
+      <Name>EasyDBFParser</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PPC.DataAccess.FileBased\PPC.DataAccess.FileBased.csproj">
       <Project>{b5893212-fcf0-4a0b-b0ea-4908f5235e39}</Project>
       <Name>PPC.DataAccess.FileBased</Name>

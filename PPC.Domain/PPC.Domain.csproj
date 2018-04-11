@@ -67,7 +67,6 @@
     <Compile Include="v2\ShopArticle.cs" />
     <Compile Include="v2\Transaction.cs" />
     <Compile Include="v2\TransactionTypes.cs" />
-    <Compile Include="v2\VatRates.cs" />
     <Compile Include="VatRates.cs" />
   </ItemGroup>
   <ItemGroup />
