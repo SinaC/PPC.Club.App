@@ -58,7 +58,17 @@
     <Compile Include="Session.cs" />
     <Compile Include="ShopTransaction.cs" />
     <Compile Include="TransactionFullArticle.cs" />
+    <Compile Include="v2\Article.cs" />
+    <Compile Include="v2\ClientShoppingCart.cs" />
+    <Compile Include="v2\Closure.cs" />
+    <Compile Include="v2\Discount.cs" />
+    <Compile Include="v2\DiscountTypes.cs" />
+    <Compile Include="v2\ShopArticle.cs" />
+    <Compile Include="v2\Transaction.cs" />
+    <Compile Include="v2\TransactionTypes.cs" />
+    <Compile Include="v2\VatRates.cs" />
     <Compile Include="VatRates.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

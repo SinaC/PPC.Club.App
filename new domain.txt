@@ -13,15 +13,27 @@ ShopArticle
 
 Transaction
 	Id
+	Type: Purchase, Refund
 	CreatedOn
 	UpdatedOn
 	List<ShopArticle>
-	Cash
-	BankCard
+	Total (without discount)
+	Cash (can be greater than total)
+	BankCard (should not be greater than total)
 	Discount
+	TransactionBeforeModification (used when modifying a transaction)
 
-ClientCart
+ClientShoppingCart
 	Id
 	ClientName
 	Transaction (set if cart is paid)
 	List<ShopArticle>
+
+Closure
+	Id
+	CreationTime
+	Notes
+	List<Article>
+	Cash
+	BankCard
+	List<Transaction>
