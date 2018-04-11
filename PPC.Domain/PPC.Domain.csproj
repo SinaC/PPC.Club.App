@@ -63,6 +63,7 @@
     <Compile Include="v2\Closure.cs" />
     <Compile Include="v2\Discount.cs" />
     <Compile Include="v2\DiscountTypes.cs" />
+    <Compile Include="v2\Session.cs" />
     <Compile Include="v2\ShopArticle.cs" />
     <Compile Include="v2\Transaction.cs" />
     <Compile Include="v2\TransactionTypes.cs" />
