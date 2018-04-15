@@ -18,20 +18,24 @@ namespace PPC.App
     /// </summary>
     public partial class App : Application
     {
-        private ILog Logger => EasyIoc.IocContainer.Default.Resolve<ILog>();
+        private ILog Logger => IocContainer.Default.Resolve<ILog>();
 
         public App()
         {
             //ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
+            Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            DateTime buildDate = new DateTime(2000, 1, 1).AddDays(version.Build).AddSeconds(version.Revision * 2);
+
             // Initialize log
-            IocContainer.Default.RegisterInstance<ILog>(new NLogger());
+            IocContainer.Default.RegisterInstance<ILog>(new NLogger("PPC"));
             Logger.Initialize(PPCConfigurationManager.LogPath, "${shortdate}.log");
-            Logger.Info("Application started");
+            Logger.Info($"Application started v{version} ({buildDate})");
 
             // Register instances
             if (PPCConfigurationManager.UseMongo == true)
             {
+                Logger.Info("Using mongo db");
                 IocContainer.Default.RegisterInstance<IArticleDL>(new DataAccess.MongoDB.ArticleDL());
                 IocContainer.Default.RegisterInstance<ISessionDL>(new DataAccess.MongoDB.SessionDL());
                 IocContainer.Default.RegisterInstance<IClosureDL>(new DataAccess.MongoDB.ClosureDL());

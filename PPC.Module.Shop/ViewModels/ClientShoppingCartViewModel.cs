@@ -88,8 +88,12 @@ namespace PPC.Module.Shop.ViewModels
         private void ReOpen()
         {
             PaymentState = ClientShoppingCartPaymentStates.Unpaid;
-            _cartReopenedAction();
+
+            Logger.Info($"Reopen client shopping cart: {ClientName}. Cash: {Cash:C} BankCard: {BankCard:C} Discount: {DiscountPercentage}%");
+
             Save();
+
+            _cartReopenedAction();
         }
 
         #endregion
@@ -131,6 +135,8 @@ namespace PPC.Module.Shop.ViewModels
 
         public void DeleteClientCart()
         {
+            Logger.Info($"Deleting client shopping cart: {ClientName}");
+
             ClientCart cart = new ClientCart
             {
                 Guid = ClientGuid,
@@ -176,12 +182,6 @@ namespace PPC.Module.Shop.ViewModels
             ShoppingCart = new ShoppingCartViewModel(Payment, Save);
         }
 
-        //public ClientShoppingCartViewModel(Action<decimal, decimal, decimal> cartPaidAction, Action cartReopenedAction, string filename) 
-        //    : this(cartPaidAction, cartReopenedAction)
-        //{
-        //    Load(filename);
-        //}
-
         public ClientShoppingCartViewModel(Action<decimal, decimal, decimal> cartPaidAction, Action cartReopenedAction, ClientCart cart)
             : this(cartPaidAction, cartReopenedAction)
         {
@@ -196,24 +196,12 @@ namespace PPC.Module.Shop.ViewModels
             DiscountPercentage = discountPercentage;
             PaymentTimestamp = DateTime.Now;
 
+            Logger.Info($"Payment client: {ClientName}. Cash:{cash:C} BankCard:{bankCard:C} Discount:{discountPercentage}%");
+
             Save();
 
             _cartPaidAction(cash, bankCard, discountPercentage);
         }
-
-        #region Load/Save
-
-        //private void Load(string filename)
-        //{
-        //    ClientCart cart;
-        //    using (XmlTextReader reader = new XmlTextReader(filename))
-        //    {
-        //        DataContractSerializer serializer = new DataContractSerializer(typeof(ClientCart));
-        //        cart = (ClientCart)serializer.ReadObject(reader);
-        //    }
-            
-        //    LoadFromCart(cart);
-        //}
 
         private void InitializeFromCart(ClientCart cart)
         {
@@ -269,43 +257,7 @@ namespace PPC.Module.Shop.ViewModels
                 Logger.Exception("Error while saving client cart", ex);
                 PopupService.DisplayError("Error while saving client cart", ex);
             }
-            //try
-            //{
-            //    if (!Directory.Exists(PPCConfigurationManager.BackupPath))
-            //        Directory.CreateDirectory(PPCConfigurationManager.BackupPath);
-            //    ClientCart cart = new ClientCart
-            //    {
-            //        ClientName = ClientName,
-            //        ClientFirstName = ClientFirstName,
-            //        ClientLastName = ClientLastName,
-            //        DciNumber = DciNumber,
-            //        HasFullPlayerInfos = HasFullPlayerInfos,
-            //        IsPaid = PaymentState == ClientShoppingCartPaymentStates.Paid,
-            //        PaymentTimeStamp = PaymentTimestamp,
-            //        Cash = Cash,
-            //        BankCard = BankCard,
-            //        Articles = ShoppingCart.ShoppingCartArticles.Select(x => new Item
-            //        {
-            //            Guid = x.Article.Guid,
-            //            Quantity = x.Quantity,
-            //        }).ToList()
-            //    };
-            //    string filename = Filename;
-            //    using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
-            //    {
-            //        writer.Formatting = Formatting.Indented;
-            //        DataContractSerializer serializer = new DataContractSerializer(typeof(ClientCart));
-            //        serializer.WriteObject(writer, cart);
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    Logger.Exception("Error while saving client cart", ex);
-            //    PopupService.DisplayError("Error while saving client cart", ex);
-            //}
         }
-
-        #endregion
     }
 
     public class ClientShoppingCartViewModelDesignData : ClientShoppingCartViewModel

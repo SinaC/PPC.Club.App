@@ -136,24 +136,10 @@ namespace PPC.Module.Shop.ViewModels
             RaisePropertyChanged(() => BankCard);
 
             SaveTransactions();
-            //SessionDL.InsertTransaction(new ShopTransaction
-            //{
-            //    Guid = transaction.Id,
-            //    Timestamp = transaction.Timestamp,
-            //    Articles = transaction.Articles.Select(a => new Item
-            //    {
-            //        Guid = a.Article.Guid,
-            //        Quantity = a.Quantity,
-            //    }).ToList(),
-            //    Cash = transaction.Cash,
-            //    BankCard = transaction.BankCard,
-            //    DiscountPercentage = transaction.DiscountPercentage
-            //});
-
             RefreshSoldArticles();
         }
 
-        private void SaveTransactions()
+        private void SaveTransactions() // TODO: remove this and use SaveTransaction/DeleteTransaction from DL
         {
             try
             {
@@ -177,39 +163,6 @@ namespace PPC.Module.Shop.ViewModels
                 Logger.Exception("Error while saving transactions", ex);
                 PopupService.DisplayError("Error while saving transactions", ex);
             }
-
-            //try
-            //{
-            //    if (!Directory.Exists(PPCConfigurationManager.BackupPath))
-            //        Directory.CreateDirectory(PPCConfigurationManager.BackupPath);
-            //    Domain.Shop shop = new Domain.Shop
-            //    {
-            //        Transactions = Transactions.Select(t => new ShopTransaction
-            //        {
-            //            Timestamp = t.Timestamp,
-            //            Articles = t.Articles.Select(a => new Item
-            //            {
-            //                Guid = a.Article.Guid,
-            //                Quantity = a.Quantity,
-            //            }).ToList(),
-            //            Cash = t.Cash,
-            //            BankCard = t.BankCard,
-            //            DiscountPercentage = t.DiscountPercentage
-            //        }).ToList(),
-            //    };
-            //    string filename = $"{PPCConfigurationManager.BackupPath}{ShopFilename}";
-            //    using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
-            //    {
-            //        writer.Formatting = Formatting.Indented;
-            //        DataContractSerializer serializer = new DataContractSerializer(typeof(Domain.Shop));
-            //        serializer.WriteObject(writer, shop);
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    Logger.Exception("Error while saving shop", ex);
-            //    PopupService.DisplayError("Error while saving shop", ex);
-            //}
         }
 
         private ICommand _editTransactionCommand;

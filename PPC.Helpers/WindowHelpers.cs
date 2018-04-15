@@ -5,7 +5,7 @@ using System.Windows.Interop;
 
 namespace PPC.Helpers
 {
-    public static class WindowHelper
+    public static class WindowHelpers
     {
         [DllImport("user32.dll")]
         static extern int GetWindowLong(IntPtr hwnd, int index);

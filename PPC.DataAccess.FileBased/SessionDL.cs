@@ -7,6 +7,7 @@ using System.Text;
 using System.Xml;
 using PPC.Common;
 using PPC.Domain;
+using PPC.Helpers;
 using PPC.IDataAccess;
 
 namespace PPC.DataAccess.FileBased
@@ -26,13 +27,7 @@ namespace PPC.DataAccess.FileBased
 
             string filename = BuildShopFilename;
             if (File.Exists(filename))
-            {
-                using (XmlTextReader reader = new XmlTextReader(filename))
-                {
-                    DataContractSerializer serializer = new DataContractSerializer(typeof(List<ShopTransaction>));
-                    transactions = (List<ShopTransaction>) serializer.ReadObject(reader);
-                }
-            }
+                transactions = DataContractHelpers.Read<List<ShopTransaction>>(filename);
 
             return transactions;
         }
@@ -79,12 +74,7 @@ namespace PPC.DataAccess.FileBased
             if (!Directory.Exists(PPCConfigurationManager.BackupPath))
                 Directory.CreateDirectory(PPCConfigurationManager.BackupPath);
             string filename = $"{PPCConfigurationManager.BackupPath}{ShopFilename}";
-            using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
-            {
-                writer.Formatting = Formatting.Indented;
-                DataContractSerializer serializer = new DataContractSerializer(typeof(List<ShopTransaction>));
-                serializer.WriteObject(writer, transactions);
-            }
+            DataContractHelpers.Write(filename, transactions);
         }
 
         #endregion
@@ -125,12 +115,7 @@ namespace PPC.DataAccess.FileBased
             if (!Directory.Exists(PPCConfigurationManager.BackupPath))
                 Directory.CreateDirectory(PPCConfigurationManager.BackupPath);
             string filename = BuildClientFilename(clientCart);
-            using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
-            {
-                writer.Formatting = Formatting.Indented;
-                DataContractSerializer serializer = new DataContractSerializer(typeof(ClientCart));
-                serializer.WriteObject(writer, clientCart);
-            }
+            DataContractHelpers.Write(filename, clientCart);
         }
 
         public void DeleteClientCart(ClientCart clientCart)
@@ -142,12 +127,7 @@ namespace PPC.DataAccess.FileBased
 
         private ClientCart LoadClient(string filename)
         {
-            ClientCart cart;
-            using (XmlTextReader reader = new XmlTextReader(filename))
-            {
-                DataContractSerializer serializer = new DataContractSerializer(typeof(ClientCart));
-                cart = (ClientCart)serializer.ReadObject(reader);
-            }
+            ClientCart cart = DataContractHelpers.Read<ClientCart>(filename);
             return cart;
         }
 

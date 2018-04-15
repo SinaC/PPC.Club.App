@@ -8,6 +8,7 @@ namespace PPC.Domain
     {
         [DataMember]
         public Guid Guid { get; set; }
+
         [DataMember]
         public int Quantity { get; set; }
     }

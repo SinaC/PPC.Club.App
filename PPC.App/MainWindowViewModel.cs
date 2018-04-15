@@ -157,48 +157,13 @@ namespace PPC.App
 
         private void ReloadConfirmed()
         {
-            Logger.Info("Reload started");
-
             if (SessionDL.HasActiveSession())
-            {
-                try
-                {
-                    Session activeSession = SessionDL.GetActiveSession();
-
-                    ShopViewModel.Reload(activeSession);
-                    NotesViewModel.Reload(activeSession);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Exception("Error while setting active session ", ex);
-                }
-                //catch (GetClientCartsException ex)
-                //{
-                //    //TODO: carts = ex.ClientCarts;
-
-                //    Logger.Exception("Error while loading clients carts", ex);
-                //    PopupService.DisplayError("Error while loading clients carts", ex);
-                //}
-                //catch (Exception ex)
-                //{
-                //    Logger.Exception("Error while loading clients carts", ex);
-                //    PopupService.DisplayError("Error while loading clients carts", ex);
-                //}
-
-                int cartsCount = ShopViewModel.ClientShoppingCartsViewModel.Clients.Count;
-                int transactionsCount = ShopViewModel.Transactions.Count;
-                PopupService.DisplayQuestion("Reload", $"Reload done. Carts:{cartsCount} Transactions:{transactionsCount}.", QuestionActionButton.Ok());
-
-                Logger.Info($"Reload done. Carts:{cartsCount} Transactions:{transactionsCount}.");
-            }
+                PerformReload();
             else
             {
                 Logger.Warning("No active session found.");
                 PopupService.DisplayError("Reload", "No active session found.");
             }
-
-            //ShopViewModel.Reload();
-            //NotesViewModel.Reload();
         }
 
         #endregion
@@ -227,47 +192,6 @@ namespace PPC.App
             ClosurePopupViewModel vm = new ClosurePopupViewModel(NotesViewModel, CloseApplicationAfterClosurePopup, cashClosure, SendClosureMailAsync);
             PopupService.DisplayModal(vm, "Cash register closure", 640, 480);
         }
-
-        //private CashRegisterClosure PrepareCashRegisterClosure()
-        //{
-        //    CashRegisterClosure closure = ShopViewModel.PrepareClosure();
-
-        //    // Dump cash register closure file
-        //    DateTime now = DateTime.Now;
-        //    //  txt
-        //    try
-        //    {
-        //        if (!Directory.Exists(PPCConfigurationManager.CashRegisterClosurePath))
-        //            Directory.CreateDirectory(PPCConfigurationManager.CashRegisterClosurePath);
-        //        string filename = $"{PPCConfigurationManager.CashRegisterClosurePath}CashRegister_{now:yyyy-MM-dd_HH-mm-ss}.txt";
-        //        File.WriteAllText(filename, closure.ToString());
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Logger.Exception("Error", ex);
-        //        PopupService.DisplayError("Error", ex);
-        //    }
-        //    //  xml
-        //    try
-        //    {
-        //        if (!Directory.Exists(PPCConfigurationManager.CashRegisterClosurePath))
-        //            Directory.CreateDirectory(PPCConfigurationManager.CashRegisterClosurePath);
-        //        string filename = $"{PPCConfigurationManager.CashRegisterClosurePath}CashRegister_{now:yyyy-MM-dd_HH-mm-ss}.xml";
-        //        using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
-        //        {
-        //            writer.Formatting = Formatting.Indented;
-        //            DataContractSerializer serializer = new DataContractSerializer(typeof(CashRegisterClosure));
-        //            serializer.WriteObject(writer, closure);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Logger.Exception("Error", ex);
-        //        PopupService.DisplayError("Error", ex);
-        //    }
-
-        //    return closure;
-        //}
 
         private void CloseApplicationAfterClosurePopup(Domain.Closure closure)
         {
@@ -303,6 +227,8 @@ namespace PPC.App
                 }
 
                 SessionDL.CloseActiveSession();
+
+                Logger.Info("Session closed");
             }
             catch (Exception ex)
             {
@@ -322,12 +248,7 @@ namespace PPC.App
                 if (File.Exists(closureConfigFilename))
                 {
                     // Read closure config
-                    CashRegisterClosureConfig closureConfig;
-                    using (XmlTextReader reader = new XmlTextReader(closureConfigFilename))
-                    {
-                        DataContractSerializer serializer = new DataContractSerializer(typeof(CashRegisterClosureConfig));
-                        closureConfig = (CashRegisterClosureConfig) await serializer.ReadObjectAsync(reader);
-                    }
+                    CashRegisterClosureConfig closureConfig = await DataContractHelpers.ReadAsync<CashRegisterClosureConfig>(closureConfigFilename);
 
                     try
                     {
@@ -368,7 +289,7 @@ namespace PPC.App
             {
                 Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
                 DateTime buildDate = new DateTime(2000, 1, 1).AddDays(version.Build).AddSeconds(version.Revision * 2);
-                return $"v{version} ({buildDate})";
+                return $"v{version.Major}.{version.Minor} ({buildDate})";
             }
         }
 
@@ -395,7 +316,6 @@ namespace PPC.App
             ApplicationMode = ApplicationModes.Shop;
 
             Mediator.Default.Register<ChangeWaitingMessage>(this, ChangeWaiting);
-            Mediator.Default.Register<PlayerSelectedMessage>(this, PlayerSelected);
         }
 
         public void Initialize()
@@ -406,12 +326,6 @@ namespace PPC.App
         private void ChangeWaiting(ChangeWaitingMessage msg)
         {
             IsWaiting = msg.IsWaiting;
-        }
-
-        private void PlayerSelected(PlayerSelectedMessage msg)
-        {
-            if (msg.SwitchToShop)
-                ApplicationMode = ApplicationModes.Shop;
         }
 
         #region Automatic reload
@@ -426,14 +340,23 @@ namespace PPC.App
         {
             if (SessionDL.HasActiveSession())
             {
-                PopupService.DisplayQuestion("Reload", "An active session has been detected. Do you want to reload ?", QuestionActionButton.Yes(AutomaticReloadAccepted), QuestionActionButton.No(AutomaticReloadRefused));
+                PopupService.DisplayQuestion("Reload", "An active session has been detected. Do you want to reload ?", QuestionActionButton.Yes(PerformReload), QuestionActionButton.No(AutomaticReloadRefused));
             }
             else
                 SessionDL.CreateActiveSession();
         }
 
-        private void AutomaticReloadAccepted()
+        private void AutomaticReloadRefused()
         {
+            SessionDL.CloseActiveSession();
+            SessionDL.CreateActiveSession();
+        }
+
+        #endregion
+
+        private void PerformReload()
+        {
+            Logger.Info("Reload started.");
             try
             {
                 Session activeSession = SessionDL.GetActiveSession();
@@ -448,16 +371,11 @@ namespace PPC.App
 
             int cartsCount = ShopViewModel.ClientShoppingCartsViewModel.Clients.Count;
             int transactionsCount = ShopViewModel.Transactions.Count;
+
+            Logger.Info($"Reload done. Carts:{cartsCount} Transactions:{transactionsCount}.");
+
             PopupService.DisplayQuestion("Reload", $"Reload done. Carts:{cartsCount} Transactions:{transactionsCount}.", QuestionActionButton.Ok());
         }
-
-        private void AutomaticReloadRefused()
-        {
-            SessionDL.CloseActiveSession();
-            SessionDL.CreateActiveSession();
-        }
-
-        #endregion
     }
 
     public class MainWindowViewModelDesignData : MainWindowViewModel

@@ -8,12 +8,20 @@ namespace PPC.Log
 {
     public class NLogger : ILog
     {
-        private readonly Logger _logger = LogManager.GetLogger("PPC");
+        private readonly Logger _logger;
+
+        public NLogger(string loggerName)
+        {
+            if (loggerName == null)
+                throw new ArgumentNullException(nameof(loggerName));
+            _logger = LogManager.GetLogger(loggerName);
+        }
 
         #region ILog
 
         public void Initialize(string path, string file, string fileTargetName = "logfile")
         {
+            //
             string logfile = Path.Combine(path, file);
             //FileTarget target = LogManager.Configuration.FindTargetByName(fileTarget) as FileTarget;
             var target = LogManager.Configuration.FindTargetByName(fileTargetName);
@@ -58,7 +66,6 @@ namespace PPC.Log
         {
             _logger.Error(ex, msg);
         }
-
 
         public void WriteLine(LogLevels level, string format, params object[] args)
         {

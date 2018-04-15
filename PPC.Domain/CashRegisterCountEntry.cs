@@ -7,6 +7,7 @@ namespace PPC.Domain
     {
         [DataMember]
         public decimal Value { get; set; }
+
         [DataMember]
         public int Count { get; set; }
     }

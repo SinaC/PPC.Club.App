@@ -8,6 +8,7 @@ using EasyIoc;
 using EasyMVVM;
 using PPC.Common;
 using PPC.Domain;
+using PPC.Helpers;
 using PPC.Log;
 using PPC.Services.Popup;
 
@@ -86,11 +87,7 @@ namespace PPC.App.Closure
             try
             {
                 string filename = PPCConfigurationManager.CashRegisterCountPath;
-                using (XmlTextReader reader = new XmlTextReader(filename))
-                {
-                    DataContractSerializer serializer = new DataContractSerializer(typeof(CashRegisterCount));
-                    countData = (CashRegisterCount) serializer.ReadObject(reader);
-                }
+                countData = DataContractHelpers.Read<CashRegisterCount>(filename);
             }
             catch (Exception ex)
             {
@@ -109,7 +106,6 @@ namespace PPC.App.Closure
         {
             try
             {
-
                 CashRegisterCount countData = new CashRegisterCount
                 {
                     Entries = Counts.Select(x => new CashRegisterCountEntry
@@ -119,12 +115,7 @@ namespace PPC.App.Closure
                     }).ToList()
                 };
                 string filename = PPCConfigurationManager.CashRegisterCountPath;
-                using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
-                {
-                    writer.Formatting = Formatting.Indented;
-                    DataContractSerializer serializer = new DataContractSerializer(typeof(CashRegisterCount));
-                    serializer.WriteObject(writer, countData);
-                }
+                DataContractHelpers.Write(filename, countData);
             }
             catch(Exception ex)
             {

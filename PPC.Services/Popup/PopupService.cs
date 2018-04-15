@@ -167,7 +167,7 @@ namespace PPC.Services.Popup
             if (window == null)
                 return;
             window.SourceInitialized -= ModalPopupWindow_SourceInitialized;
-            WindowHelper.HideMinimizeAndMaximizeButtons(window);
+            WindowHelpers.HideMinimizeAndMaximizeButtons(window);
         }
 
         private void DisplayViewInModalPopup(FrameworkElement view, string title, double width, double height, double maxWidth, double maxHeight)

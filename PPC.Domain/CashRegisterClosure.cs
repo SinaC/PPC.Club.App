@@ -11,10 +11,13 @@ namespace PPC.Domain
     {
         [DataMember]
         public List<FullArticle> Articles { get; set; }
+
         [DataMember]
         public decimal Cash { get; set; }
+
         [DataMember]
         public decimal BankCard { get; set; }
+
         [DataMember]
         public List<TransactionFullArticle> Transactions { get; set; }
 

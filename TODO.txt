@@ -1,3 +1,17 @@
+Renaming:
+	PPC.App -> PPC.Club.WPF.App
+	PPC.Controls -> PPC.Club.WPF.Controls
+	PPC.Module.XXX -> PPC.Club.WPF.Module.XXX
+	PPC.Services -> PPC.Club.WPF.Services
+	PPC.Styles -> PPC.Club.WPF.Styles
+	PPC.Messages -> PPC.Club.WPF.Messages
+	PPC.ConsoleApp -> PPC.Club.Console.App
+	PPC.IDataAccess -> PPC.Club.IDataAccess
+	PPC.DataAccess.XXX -> PPC.Club.DataAccess.XXX
+	PPC.Domain -> PPC.Club.Domain
+Split
+	PPC.Helpers into PPC.WPF.Helpers and PPC.Helpers
+
 In CashRegister, when cart is paid, a transaction is added to closed transactions [can be edited in ShopSoldArticlesViews/Transactions Grid]
 
 ClientShoppingCart cannot be closed unless it's empty, even if it has been paid [for the moment, it's possible to do this]

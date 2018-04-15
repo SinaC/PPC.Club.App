@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Windows.Input;
 using EasyIoc;
 using EasyMVVM;
 using PPC.Domain;
 using PPC.Helpers;
-using PPC.IDataAccess;
 using PPC.Log;
-using PPC.Messages;
 using PPC.Module.Shop.Models;
 using PPC.Module.Shop.ViewModels.Popups;
 using PPC.Services.Popup;
@@ -27,7 +24,6 @@ namespace PPC.Module.Shop.ViewModels
     {
         private IPopupService PopupService => IocContainer.Default.Resolve<IPopupService>();
         private ILog Logger => IocContainer.Default.Resolve<ILog>();
-        private ISessionDL SessionDL => IocContainer.Default.Resolve<ISessionDL>();
 
         private readonly Action<ShopTransactionItem> _addTransactionAction;
         private readonly Action<decimal, decimal, decimal> _clientCartPaidAction;
@@ -108,6 +104,8 @@ namespace PPC.Module.Shop.ViewModels
             }
             else
             {
+                Logger.Info($"Adding new client shopping cart: {name}");
+
                 ClientShoppingCartViewModel newClient = new ClientShoppingCartViewModel(ClientCartPaid, ClientCartReopened)
                 {
                     HasFullPlayerInfos = false,
@@ -156,17 +154,6 @@ namespace PPC.Module.Shop.ViewModels
             }
             client.DeleteClientCart();
             Clients.Remove(client);
-            //// Delete backup file
-            //try
-            //{
-            //    string filename = client.Filename;
-            //    File.Delete(filename);
-            //}
-            //catch (Exception ex)
-            //{
-            //    Logger.Exception("Error while deleting backup file", ex);
-            //    PopupService.DisplayError("Error while deleting backup file", ex);
-            //}
         }
 
         #endregion
@@ -184,6 +171,8 @@ namespace PPC.Module.Shop.ViewModels
                 {
                     try
                     {
+                        Logger.Info($"Reload client shopping cart: {cart.ClientName}. Cash: {cart.Cash:C} BankCard: {cart.BankCard:C} IsPaid: {cart.IsPaid}");
+
                         ClientShoppingCartViewModel client = new ClientShoppingCartViewModel(ClientCartPaid, ClientCartReopened, cart);
                         Clients.Add(client);
                     }
@@ -195,71 +184,6 @@ namespace PPC.Module.Shop.ViewModels
                 }
             }
         }
-
-        //public void LoadClients()
-        //{
-        //    SelectedClient = null;
-        //    Clients.Clear();
-
-        //    List<ClientCart> carts = null;
-        //    try
-        //    {
-        //        carts = SessionDL.GetClientCarts();
-        //    }
-        //    catch (GetClientCartsException ex)
-        //    {
-        //        carts = ex.ClientCarts;
-
-        //        Logger.Exception("Error while loading clients carts", ex);
-        //        PopupService.DisplayError("Error while loading clients carts", ex);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Logger.Exception("Error while loading clients carts", ex);
-        //        PopupService.DisplayError("Error while loading clients carts", ex);
-        //    }
-
-        //    if (carts != null)
-        //    {
-        //        foreach (ClientCart cart in carts)
-        //        {
-        //            try
-        //            {
-        //                ClientShoppingCartViewModel client = new ClientShoppingCartViewModel(ClientCartPaid, ClientCartReopened, cart);
-        //                Clients.Add(client);
-        //            }
-        //            catch (Exception ex)
-        //            {
-        //                Logger.Exception($"Error while creating client {cart.ClientName} from cart", ex);
-        //                PopupService.DisplayError($"Error while creating client {cart.ClientName} from cart", ex);
-        //            }
-        //        }
-        //    }
-        //}
-
-        //public void LoadClients(string shopFilename)
-        //{
-        //    SelectedClient = null;
-        //    Clients.Clear();
-        //    //  add backup clients
-        //    string path = PPCConfigurationManager.BackupPath;
-        //    if (Directory.Exists(path))
-        //    {
-        //        foreach (string filename in Directory.EnumerateFiles(path, "*.xml", SearchOption.TopDirectoryOnly).Where(x => !x.Contains(shopFilename)))
-        //        {
-        //            try
-        //            {
-        //                ClientShoppingCartViewModel client = new ClientShoppingCartViewModel(ClientCartPaid, ClientCartReopened, filename);
-        //                Clients.Add(client);
-        //            }
-        //            catch (Exception ex)
-        //            {
-        //                Logger.Exception($"Error while loading {filename ?? "??"} cart", ex);
-        //                PopupService.DisplayError($"Error while loading {filename ?? "??"} cart", ex);
-        //            }
-        //        }
-        //    }
-        //}
 
         public bool FindAndRemoveInvalidArticles()
         {
@@ -305,29 +229,6 @@ namespace PPC.Module.Shop.ViewModels
             {
                 RefreshCounters();
             };
-
-            Mediator.Default.Register<PlayerSelectedMessage>(this, PlayerSelected);
-        }
-
-        private void PlayerSelected(PlayerSelectedMessage msg)
-        {
-            // Select shopping cart or create it
-            ClientShoppingCartViewModel client = Clients.FirstOrDefault(x => x.DciNumber == msg.DciNumber && x.ClientFirstName == msg.FirstName && x.ClientLastName == msg.LastName);
-            if (client == null)
-            {
-                ClientShoppingCartViewModel newClient = new ClientShoppingCartViewModel(ClientCartPaid, ClientCartReopened)
-                {
-                    HasFullPlayerInfos = true,
-                    ClientName = msg.FirstName,
-                    ClientFirstName = msg.FirstName,
-                    ClientLastName = msg.LastName,
-                    DciNumber = msg.DciNumber
-                };
-                Clients.Add(newClient);
-                SelectedClient = newClient;
-            }
-            else
-                SelectedClient = client;
         }
 
         private void RefreshCounters()

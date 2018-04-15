@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Linq;
+using EasyIoc;
 using EasyMVVM;
+using PPC.Log;
 using PPC.Module.Shop.Models;
 
 namespace PPC.Module.Shop.ViewModels
 {
     public class CashRegisterViewModel : ObservableObject
     {
+        private ILog Logger => IocContainer.Default.Resolve<ILog>();
+
         private readonly Action<ShopTransactionItem> _addTransactionAction;
 
         private ShoppingCartViewModel _shoppingCart;
@@ -25,6 +29,8 @@ namespace PPC.Module.Shop.ViewModels
 
         private void Payment(decimal cash, decimal bankCard, decimal discountPercentage)
         {
+            Logger.Info($"Payment. Cash:{cash:C} BankCard:{bankCard:C} Discount:{discountPercentage}%");
+
             // Create shoptransaction from shopping cart
             ShopTransactionItem transaction = new ShopTransactionItem
             {

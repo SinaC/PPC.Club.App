@@ -86,23 +86,13 @@ namespace PPC.DataAccess.FileBased
         private void Save()
         {
             string filename = PPCConfigurationManager.ArticlesPath;
-            using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
-            {
-                writer.Formatting = Formatting.Indented;
-                DataContractSerializer serializer = new DataContractSerializer(typeof(List<Article>));
-                serializer.WriteObject(writer, Articles);
-            }
+            DataContractHelpers.Write(filename, Articles);
         }
 
         private async Task SaveAsync()
         {
             string filename = PPCConfigurationManager.ArticlesPath;
-            using (XmlTextWriter writer = new XmlTextWriter(filename, Encoding.UTF8))
-            {
-                writer.Formatting = Formatting.Indented;
-                DataContractSerializer serializer = new DataContractSerializer(typeof(List<Article>));
-                await serializer.WriteObjectAsync(writer, Articles);
-            }
+            await DataContractHelpers.WriteAsync(filename, Articles);
         }
 
         private void Load()
@@ -114,12 +104,7 @@ namespace PPC.DataAccess.FileBased
             string filename = PPCConfigurationManager.ArticlesPath;
             if (File.Exists(filename))
             {
-                List<Article> newArticles;
-                using (XmlTextReader reader = new XmlTextReader(filename))
-                {
-                    DataContractSerializer serializer = new DataContractSerializer(typeof(List<Article>));
-                    newArticles = (List<Article>)serializer.ReadObject(reader);
-                }
+                List<Article> newArticles = DataContractHelpers.Read<List<Article>>(filename);
                 _articles = newArticles;
             }
             else
@@ -132,12 +117,7 @@ namespace PPC.DataAccess.FileBased
             string filename = PPCConfigurationManager.ArticlesPath;
             if (File.Exists(filename))
             {
-                List<Article> newArticles;
-                using (XmlTextReader reader = new XmlTextReader(filename))
-                {
-                    DataContractSerializer serializer = new DataContractSerializer(typeof(List<Article>));
-                    newArticles = (List<Article>)await serializer.ReadObjectAsync(reader);
-                }
+                List<Article> newArticles = await DataContractHelpers.ReadAsync<List<Article>>(filename);
                 _articles = newArticles;
             }
             else
