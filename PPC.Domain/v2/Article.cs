@@ -39,6 +39,6 @@ namespace PPC.Domain.v2
         public decimal VatRate { get; set; }
 
         [DataMember]
-        public bool IsNewArticle { get; set; }
+        public Guid OriginalId { get; set; }
     }
 }
