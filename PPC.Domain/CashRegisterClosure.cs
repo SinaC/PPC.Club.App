@@ -26,6 +26,7 @@ namespace PPC.Domain
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
+            sb.AppendLine("Total:");
             sb.AppendLine($"Cash: {Cash:C}");
             sb.AppendLine($"Bancontact: {BankCard:C}");
             sb.AppendLine("**********************");
@@ -77,6 +78,11 @@ namespace PPC.Domain
             }
             //
             return sb.ToString();
+        }
+
+        public string ToHtml()
+        {
+            return ToString().Replace(Environment.NewLine, "<br/>"); // NOP for the moment
         }
     }
 }

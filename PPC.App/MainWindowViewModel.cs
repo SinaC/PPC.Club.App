@@ -254,7 +254,7 @@ namespace PPC.App
                     {
                         Logger.Info("Sending closure mail.");
                         // Send closure mail
-                        await MailSenderSA.SendMailAsync(closureConfig.SenderMail, "From PPC Club", closureConfig.SenderPassword, closureConfig.RecipientMail, "To PPC", $"Cloture caisse du club (date {DateTime.Now:F})", closure.ToString());
+                        await MailSenderSA.SendMailAsync(closureConfig.SenderMail, "From PPC Club", closureConfig.SenderPassword, closureConfig.RecipientMail, "To PPC", $"Cloture caisse du club (date {DateTime.Now:F})", closure.ToHtml());
                         //
                         Logger.Info("Closure mail sent.");
                     }
