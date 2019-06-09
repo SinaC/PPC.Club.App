@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E734F70A-12E8-46BB-857D-35D606169A11}</ProjectGuid>
+    <OutputType>library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PPC.Module.Inventory</RootNamespace>
+    <AssemblyName>PPC.Module.Inventory</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="ViewModels\InventoryViewModel.cs" />
+    <Compile Include="Views\InventoryView.xaml.cs">
+      <DependentUpon>InventoryView.xaml</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Libraries\EasyIoc\EasyIoc.csproj">
+      <Project>{38d20e7f-9510-4b80-8755-1def2ef07bcf}</Project>
+      <Name>EasyIoc</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Shared\PPC.Common\PPC.Common.csproj">
+      <Project>{7F9D7666-1A58-4AE1-AD47-AB68A3D4E2FE}</Project>
+      <Name>PPC.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Backend\PPC.DataAccess.DesignMode\PPC.DataAccess.DesignMode.csproj">
+      <Project>{cd76befe-c138-412f-b50b-b601db4ac0a1}</Project>
+      <Name>PPC.DataAccess.DesignMode</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Shared\PPC.Domain\PPC.Domain.csproj">
+      <Project>{11AA6511-78E6-408F-8894-811989851F04}</Project>
+      <Name>PPC.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Helpers\PPC.Helpers.csproj">
+      <Project>{3523C53F-4317-4AC6-B077-76544BDD174A}</Project>
+      <Name>PPC.Helpers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Backend\PPC.IDataAccess\PPC.IDataAccess.csproj">
+      <Project>{10DA16F1-F77E-4B88-9151-2D0F358B4908}</Project>
+      <Name>PPC.IDataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Shared\PPC.Log\PPC.Log.csproj">
+      <Project>{BCB79B57-39A1-4714-A728-B09C90BB4B35}</Project>
+      <Name>PPC.Log</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\EasyMVVM\EasyMVVM.csproj">
+      <Project>{10833c79-c3fb-4f70-ad1d-7f0173d01966}</Project>
+      <Name>EasyMVVM</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Module.Common\PPC.Module.Common.csproj">
+      <Project>{900e0782-493d-49ae-89d5-d5c6b6e34bc0}</Project>
+      <Name>PPC.Module.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Services\PPC.Services.csproj">
+      <Project>{daab6105-1a4d-4af9-9cae-b76204b411d0}</Project>
+      <Name>PPC.Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PPC.Styles\PPC.Styles.csproj">
+      <Project>{d75a55fb-738b-4771-be10-7db9008c412f}</Project>
+      <Name>PPC.Styles</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Page Include="Views\InventoryView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

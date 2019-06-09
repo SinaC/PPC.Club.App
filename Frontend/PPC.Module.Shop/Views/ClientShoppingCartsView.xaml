@@ -1,0 +1,118 @@
+﻿<UserControl x:Class="PPC.Module.Shop.Views.ClientShoppingCartsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:viewModels="clr-namespace:PPC.Module.Shop.ViewModels"
+             xmlns:views="clr-namespace:PPC.Module.Shop.Views"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance viewModels:ClientShoppingCartsViewModelDesignData, IsDesignTimeCreatable=True}"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/PPC.Styles;component/Images.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <DataTemplate DataType="{x:Type viewModels:ClientShoppingCartsViewModel}" x:Key="DetailTemplate">
+                <views:ClientShoppingCartView DataContext="{Binding SelectedClient}"/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:ClientShoppingCartsViewModel}" x:Key="ListTemplate">
+                <ItemsControl ItemsSource="{Binding Clients}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type viewModels:ClientShoppingCartViewModel}">
+                            <Button Width="96"
+                                    Height="96"
+                                    Margin="5,2"
+                                    Command="{Binding DataContext.SelectClientCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                                    CommandParameter="{Binding}">
+                                <Button.ToolTip>
+                                    <StackPanel Orientation="Vertical">
+                                        <TextBlock Text="{Binding DisplayName, StringFormat={}Go to {0} shopping cart}"/>
+                                        <!-- Unpaid -->
+                                        <StackPanel Orientation="Vertical">
+                                            <StackPanel.Style>
+                                                <Style TargetType="{x:Type StackPanel}">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding PaymentState}" Value="{x:Static viewModels:ClientShoppingCartPaymentStates.Unpaid}">
+                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </StackPanel.Style>
+                                            <TextBlock Text="{Binding ShoppingCart.Total, StringFormat={}Unpaid: {0:C}}"/>
+                                        </StackPanel>
+                                        <!-- Paid -->
+                                        <StackPanel Orientation="Vertical">
+                                            <StackPanel.Style>
+                                                <Style TargetType="{x:Type StackPanel}">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding PaymentState}" Value="{x:Static viewModels:ClientShoppingCartPaymentStates.Paid}">
+                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </StackPanel.Style>
+                                            <TextBlock Text="{Binding Cash, StringFormat={}Cash: {0:C}}"/>
+                                            <TextBlock Text="{Binding BankCard, StringFormat={}Bank card: {0:C}}"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Button.ToolTip>
+                                <Button.Style>
+                                    <Style TargetType="{x:Type Button}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding PaymentState}" Value="{x:Static viewModels:ClientShoppingCartPaymentStates.Paid}">
+                                                <Setter Property="Background" Value="LimeGreen"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding PaymentState}" Value="{x:Static viewModels:ClientShoppingCartPaymentStates.Unpaid}">
+                                                <Setter Property="Background" Value="Crimson"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                        <EventSetter Event="PreviewMouseMove" Handler="PreviewMouseMove" />
+                                        <EventSetter Event="Drop" Handler="Drop" />
+                                        <Setter Property="AllowDrop" Value="True" />
+                                    </Style>
+                                </Button.Style>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Image Grid.Row="0"
+                                           Style="{StaticResource AutoDisableImageStyle}"
+                                           Source="{StaticResource AddShoppingCartImage}"/>
+                                    <TextBlock Grid.Row="1"
+                                               HorizontalAlignment="Center"
+                                               FontWeight="Bold"
+                                               TextTrimming="CharacterEllipsis"
+                                               Text="{Binding DisplayName}"/>
+                                </Grid>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </DataTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <ContentPresenter Content="{Binding}">
+        <ContentPresenter.Style>
+            <Style TargetType="{x:Type ContentPresenter}">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Mode}" Value="{x:Static viewModels:ClientShoppingCartsModes.Detail}">
+                        <Setter Property="ContentTemplate" Value="{StaticResource DetailTemplate}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Mode}" Value="{x:Static viewModels:ClientShoppingCartsModes.List}">
+                        <Setter Property="ContentTemplate" Value="{StaticResource ListTemplate}"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </ContentPresenter.Style>
+    </ContentPresenter>
+</UserControl>
