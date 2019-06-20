@@ -20,8 +20,13 @@ namespace PPC.DataAccess.MongoDB
 
         public SessionDL()
         {
-            var client = new MongoClient();
-            _db = client.GetDatabase(DatabaseName);
+            MongoClient mongoClient;
+            string connectionString = MongoSettings.ConnectionString;
+            if (string.IsNullOrWhiteSpace(connectionString))
+                mongoClient = new MongoClient();
+            else
+                mongoClient = new MongoClient(connectionString);
+            _db = mongoClient.GetDatabase(DatabaseName);
         }
 
         #region Transactions

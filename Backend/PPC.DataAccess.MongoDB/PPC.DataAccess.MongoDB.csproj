@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="ArticleDL.cs" />
     <Compile Include="ClosureDL.cs" />
+    <Compile Include="MongoSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SessionDL.cs" />
     <Compile Include="v2\ArticleDL.cs" />
@@ -74,6 +75,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Shared\PPC.Common\PPC.Common.csproj">
+      <Project>{7F9D7666-1A58-4AE1-AD47-AB68A3D4E2FE}</Project>
+      <Name>PPC.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Shared\PPC.Domain\PPC.Domain.csproj">
       <Project>{11AA6511-78E6-408F-8894-811989851F04}</Project>
       <Name>PPC.Domain</Name>

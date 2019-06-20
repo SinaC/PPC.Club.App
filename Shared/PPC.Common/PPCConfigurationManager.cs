@@ -28,6 +28,7 @@ namespace PPC.Common
         public static string CashRegisterCountPath => AppSettings["CashRegisterCountPath"];
         public static string CardSellersPath => AppSettings["CardSellersPath"];
         public static bool? UseMongo => SaveConvertToBool(AppSettings["UseMongo"]);
+        public static string MongoSettingsPath => AppSettings["MongoSettingsPath"];
 
         private static double? _fontSize;
         public static double? FontSize

@@ -4,15 +4,19 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using EasyDBFParser;
-using PPC.DataAccess.MongoDB;
+using PPC.Domain;
 
 namespace PPC.ConsoleApp
 {
     class Program
     {
         static void Main(string[] args)
+        {
+            FetchMongoArticles();
+        }
+
+        private static void Marges()
         {
             //SessionDL sessionDL = new SessionDL();
             //sessionDL.Test(1);
@@ -53,6 +57,35 @@ namespace PPC.ConsoleApp
             if (double.IsInfinity(d) || double.IsNaN(d) || double.IsNegativeInfinity(d) || double.IsPositiveInfinity(d))
                 return 0;
             return (int)d;
+        }
+
+        private static void FetchMongoArticles()
+        {
+            try
+            {
+                DataAccess.FileBased.ArticleDL fileArticlesDB = new DataAccess.FileBased.ArticleDL();
+                List<Article> articles = fileArticlesDB.Articles.ToList();
+                Console.WriteLine($"{articles.Count} articles read");
+                var counts = articles.GroupBy(x => x.Guid).Select(g => new
+                {
+                    guid = g.Key,
+                    count = g.Count()
+                });
+                foreach (var entry in counts.Where(x => x.count > 1))
+                {
+                    Console.WriteLine($"Duplicate Guid: {entry.guid}");
+                    List<Article> duplicates = articles.Where(x => x.Guid == entry.guid).ToList();
+                    foreach (var duplicate in duplicates)
+                        Console.WriteLine($"{duplicate.Description}");
+                }
+                DataAccess.MongoDB.ArticleDL mongoArticlesDB = new DataAccess.MongoDB.ArticleDL();
+                mongoArticlesDB.Fetch(articles);
+                Console.WriteLine($"{articles.Count} articles inserted");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
     }
 
